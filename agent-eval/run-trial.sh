@@ -99,7 +99,7 @@ echo "== result saved: $RESULTS/$IMPL-$TRIAL.result.json"
 # Preserve the agent's work as a patch, then drop the worktree (disk hygiene).
 cd "$APP"
 git add -A >/dev/null 2>&1 || true
-git diff --cached HEAD > "$RESULTS/$IMPL-$TRIAL.patch" 2>/dev/null || true
+git diff --cached --binary HEAD > "$RESULTS/$IMPL-$TRIAL.patch" 2>/dev/null || true
 cd /
 git -C "$REPO" worktree remove --force "$WT" 2>/dev/null || rm -rf "$WT"
 git -C "$REPO" worktree prune

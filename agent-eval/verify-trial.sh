@@ -15,7 +15,8 @@ rm -rf "$WT"
 git -C "$REPO" worktree add --detach "$WT" HEAD >/dev/null
 APP="$WT/$IMPL"
 cd "$APP"
-git apply --whitespace=nowarn "$RESULTS/$IMPL-$TRIAL.patch" || { echo "$IMPL-$TRIAL PATCH-APPLY-FAILED" >> "$RESULTS/verdicts.txt"; exit 1; }
+git apply --whitespace=nowarn --exclude='*.db' --exclude='*.db-shm' --exclude='*.db-wal' --exclude='*.sqlite3' \
+  "$RESULTS/$IMPL-$TRIAL.patch" || { echo "$IMPL-$TRIAL PATCH-APPLY-FAILED" >> "$RESULTS/verdicts.txt"; exit 1; }
 
 TYPECHECK=fail; TESTS=fail; TESTCOUNT=""
 case "$IMPL" in
@@ -29,6 +30,15 @@ case "$IMPL" in
     bun install >/dev/null 2>&1
     bunx tsc --noEmit >/dev/null 2>&1 && TYPECHECK=pass
     OUT=$(bun test 2>&1); echo "$OUT" | grep -q " 0 fail" && TESTS=pass; TESTCOUNT=$(echo "$OUT" | grep -o "[0-9]* pass" | head -1)
+    ;;
+  nextjs)
+    npm install --silent >/dev/null 2>&1
+    cp .env.example .env.local
+    echo "AUTH_SECRET=$(openssl rand -base64 32)" >> .env.local
+    npm run db:migrate >/dev/null 2>&1
+    npm run typecheck >/dev/null 2>&1 && TYPECHECK=pass
+    OUT=$(npm test 2>&1); echo "$OUT" | grep -qE "Tests +[0-9]+ passed" && ! echo "$OUT" | grep -q "failed" && TESTS=pass
+    TESTCOUNT=$(echo "$OUT" | grep -oE "Tests +[0-9]+ passed" | head -1)
     ;;
   tanstack)
     npm install --silent >/dev/null 2>&1; cp .env.example .env
