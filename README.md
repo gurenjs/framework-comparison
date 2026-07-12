@@ -59,6 +59,30 @@ Guren's 17). Similar typing effort, very different long-term surface. Whether
 generated-but-owned code is a cost is exactly what this repository lets you
 judge.
 
+**Where the lines go** (non-test LOC by area, three representative stacks):
+
+| Area | `guren/` | `hono/` | `nextjs/` |
+|------|---------:|--------:|----------:|
+| Frontend (React UI) | 466 | 536 | 476 (colocated with routes) |
+| Routes / controllers / actions | 179 | 153 | 196 |
+| DB + models | 100 | 79 | 107 |
+| Auth | — (framework) | 61 | 69 (Auth.js wiring) |
+| Validation + serialization + authz | 99 | 48 | 38 |
+| Plumbing (config / bootstrap / providers) | 144 | 64 | 25 |
+
+Two intuitions this corrects. *"Surely plain Hono writes much more DB code"* —
+no: all implementations share Drizzle, so the DB layer is ~80–110 lines
+everywhere; that difference was deliberately designed out. *"Surely the SPA
+means far more frontend"* — barely: the forms, lists, and error displays are
+the same spec everywhere, so UI code converges (~470–540 lines); what Inertia
+saves Hono's SPA is only the fetch-wrapper/router/auth-context plumbing. At
+this app size, what a framework *saves* you (auth logic, error conventions)
+and what its structure *adds* (providers, entries, layered files) nearly
+cancel out in totals — the frameworks' savings are concentrated in
+**who wrote the lines** (Handwritten LOC), and the hand-rolled share grows
+with every feature a framework would otherwise ship (mail verification,
+password reset, real queues), while the plumbing is a one-time fixed cost.
+
 **Test LOC shows API leverage.** The same SPEC §6 scenarios take 136 lines
 with Guren's `TestApp` fluent client, ~330–390 on AdonisJS (Japa), TanStack,
 Hono, and NestJS, and 526 on Next.js (where integration-testing Server
