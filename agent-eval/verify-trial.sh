@@ -39,7 +39,11 @@ case "$IMPL" in
   adonisjs)
     export PATH="$(/opt/homebrew/bin/mise where node@24.18.0)/bin:$PATH"
     npm install --silent >/dev/null 2>&1; cp .env.example .env
-    node ace generate:key >/dev/null 2>&1; node ace migration:run >/dev/null 2>&1
+    node ace generate:key >/dev/null 2>&1; mkdir -p tmp
+    (node ace serve >/dev/null 2>&1 & echo $! > /tmp/adonis-barrel-v.pid)
+    sleep 25; kill "$(cat /tmp/adonis-barrel-v.pid)" 2>/dev/null || true
+    lsof -ti:3333 | xargs kill 2>/dev/null || true
+    node ace migration:run >/dev/null 2>&1
     npm run typecheck >/dev/null 2>&1 && TYPECHECK=pass
     OUT=$(node ace test 2>&1); echo "$OUT" | grep -q "PASSED" && TESTS=pass; TESTCOUNT=$(echo "$OUT" | grep -oE "Tests +[0-9]+ passed" | head -1)
     ;;

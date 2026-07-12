@@ -80,6 +80,9 @@ Requires Node.js ≥ 24.
 npm install
 cp .env.example .env
 node ace generate:key
+mkdir -p tmp            # gitignored SQLite directory
+npm run dev             # first boot generates the gitignored .adonisjs/ type
+                        # registries — required before any other ace command
 node ace migration:run
 ```
 
