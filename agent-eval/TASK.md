@@ -27,4 +27,6 @@ conventions, file layout, and code style throughout.
 
 - Typecheck passes.
 - The full test suite (existing + new) passes.
-- The feature works end-to-end in the running app.
+
+That is the whole definition — you do NOT need to boot the app or verify the
+feature over HTTP; functional acceptance is checked externally afterwards.
