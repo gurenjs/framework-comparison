@@ -1,0 +1,11 @@
+{
+  "name": "framework-comparison",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "measure": "bun scripts/measure.ts"
+  },
+  "devDependencies": {
+    "js-tiktoken": "^1.0.15"
+  }
+}

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+out/
+.next/
+.vercel/
+coverage/
+*.sqlite
+*.sqlite-journal
+*.db
+.env
+.DS_Store
