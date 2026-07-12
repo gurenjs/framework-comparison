@@ -12,6 +12,8 @@ RESULTS="$REPO/agent-eval/results"
 WT="/tmp/agent-eval-worktrees/verify-$IMPL-$TRIAL"
 
 rm -rf "$WT"
+git -C "$REPO" worktree remove --force "$WT" 2>/dev/null || true
+git -C "$REPO" worktree prune
 git -C "$REPO" worktree add --detach "$WT" HEAD >/dev/null
 APP="$WT/$IMPL"
 cd "$APP"

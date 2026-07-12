@@ -45,6 +45,48 @@ smoke-test from curl**, not implementation efficiency.
    proved noisy — agents chose visibly different work orders per run.
 4. Keep `--max-turns 120` as a safety cap; sessions should end well below it.
 
+## Round 2 results (2026-07-13)
+
+N=3 per implementation (one nestjs trial was killed by a transient API
+disconnect and replaced), revised protocol: DoD = typecheck + tests, hidden
+functional smoke run by the harness, `--max-turns 120`.
+
+**Acceptance: 18/18 trials passed typecheck, the full test suite, and the
+hidden `?tag=` smoke.** Every framework's agent shipped a working feature;
+the differences are entirely effort.
+
+Medians per implementation:
+
+| | guren | hono | nextjs | tanstack | adonisjs | nestjs |
+|---|---|---|---|---|---|---|
+| Cost (USD) | 5.54 | **2.03** | 2.48 | 2.42 | 5.98 | 2.50 |
+| Turns | 104 | **61** | 62 | 67 | 104 | 74 |
+| Msgs to green | 156 | 90 | **89** | 93 | 164 | 105 |
+
+(Ranges: guren 5.27–7.62 — one run hit max-turns after reaching green at
+msg 221; tanstack 1.88–4.56; adonisjs 3.73–5.99; others tight.)
+
+**Reading:** in this *bare-framework* condition, the two layered MVC
+frameworks (Guren, AdonisJS) cost the agent ~2.2–2.9× more than the
+colocated stacks. The same layering that minimized *human-typed* LOC in the
+static comparison (migration → model → validator → controller → resource →
+pages → codegen) is more files, more steps, and more convention-discovery
+for an agent working without guidance.
+
+**Condition caveat:** every implementation was measured with its scaffold's
+agent-guidance files stripped (this repo gitignores `CLAUDE.md` /
+`.claude/`). The guren agents never discovered `guren check` or
+`guren context`; they found `bun run codegen` only via package.json. Guren's
+(and increasingly Next.js's) actual shipped developer experience includes
+those files — measuring them is round 3:
+
+- **Round 3**: identical protocol, but each implementation gets exactly the
+  agent-guidance files its own scaffold ships (guren: CLAUDE.md +
+  .claude/skills; nextjs: CLAUDE.md/AGENTS.md from create-next-app;
+  adonisjs: its starter's AGENTS.md; hono/nestjs/tanstack: none — that is
+  their shipped default too). Hypothesis to test: guidance closes or
+  reverses the layering gap.
+
 ## Operational notes
 
 - Trials are disk-hungry (a worktree + node_modules each); run sequentially
