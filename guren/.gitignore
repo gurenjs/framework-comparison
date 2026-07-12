@@ -1,5 +1,4 @@
 .guren/
 data/
-.claude/
 .mcp.json
-CLAUDE.md
+.claude/settings.local.json
