@@ -69,7 +69,8 @@ Use the framework's idiomatic testing tooling.
   to framework glue, not ORM differences.
 - **React** for the UI.
 - Minimal, unstyled UI (a single small CSS file is allowed). No UI component
-  libraries. UI polish is explicitly out of scope.
+  libraries and no CSS frameworks (plain CSS only — this keeps styling out of
+  the measurements entirely). UI polish is explicitly out of scope.
 - Idiomatic code, written the way the framework's own documentation recommends.
   No code golf, no artificial verbosity.
 - Each implementation is self-contained in its directory with its own
