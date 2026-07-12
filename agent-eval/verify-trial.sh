@@ -55,7 +55,10 @@ case "$IMPL" in
     ;;
 esac
 
-echo "$IMPL-$TRIAL typecheck=$TYPECHECK tests=$TESTS ($TESTCOUNT)" >> "$RESULTS/verdicts.txt"
+SMOKE=fail
+bash "$REPO/agent-eval/smoke-trial.sh" "$IMPL" "$APP" >> "$RESULTS/$IMPL-$TRIAL.smoke.log" 2>&1 && SMOKE=pass
+
+echo "$IMPL-$TRIAL typecheck=$TYPECHECK tests=$TESTS ($TESTCOUNT) smoke=$SMOKE" >> "$RESULTS/verdicts.txt"
 cd /
 git -C "$REPO" worktree remove --force "$WT" 2>/dev/null || rm -rf "$WT"
 git -C "$REPO" worktree prune
