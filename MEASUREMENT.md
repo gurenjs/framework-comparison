@@ -35,6 +35,12 @@ For each implementation directory (`guren/`, `hono/`, `nextjs/`):
 - Test files are counted **separately** and reported in their own column, since
   test verbosity is a property of the test API, not the app.
 
+One known bias: generators that timestamp filenames (e.g. AdonisJS
+migrations) produce different names in the committed baseline, so those files
+diff as fully handwritten even though a skeleton was generated. This slightly
+*overstates* handwritten LOC for such frameworks; we accept the error because
+it is small and conservative.
+
 Scaffolded files that the developer subsequently owns and edits (anything
 `create-*-app` or a generator produced into the app tree) **are counted** in
 Source LOC — if a generator wrote it and you are expected to maintain it, it is

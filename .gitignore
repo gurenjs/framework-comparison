@@ -10,3 +10,6 @@ coverage/
 *.db
 .env
 .DS_Store
+*.sqlite3
+tmp/
+.adonisjs/
