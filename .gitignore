@@ -13,3 +13,5 @@ coverage/
 *.sqlite3
 tmp/
 .adonisjs/
+*.db-shm
+*.db-wal
