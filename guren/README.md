@@ -1,8 +1,16 @@
 # Minilog — Guren
 
-The [SPEC.md](../SPEC.md) blog implemented on [Guren](https://github.com/gurenjs/guren),
-scaffolded with `bunx create-guren-app` (`--auth`, SQLite) and
-`bunx guren make:feature Post --fields "title:string,body:text" --policy`.
+The [SPEC.md](../SPEC.md) blog implemented on [Guren](https://github.com/gurenjs/guren).
+
+Generator commands used (their pristine output is committed as
+[`baselines/guren`](../baselines/guren) for the handwritten-LOC metric):
+
+```bash
+bunx create-guren-app@1.0.0-rc.30 guren --mode ssr --database sqlite --auth
+bunx guren make:feature Post --fields "title:string,body:text" --policy --test
+bunx guren make:job SendWelcomeNotification
+bunx guren make:migration create_posts_comments_notifications
+```
 
 ## Stack
 
