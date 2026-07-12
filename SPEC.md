@@ -66,8 +66,12 @@ Use the framework's idiomatic testing tooling.
 - **SQLite** as the database.
 - **Drizzle ORM** for database access, with equivalent schemas
   (`users`, `posts`, `comments`, `notifications`). This isolates the comparison
-  to framework glue, not ORM differences.
-- **React** for the UI.
+  to framework glue, not ORM differences. Exception: a framework that ships a
+  **first-party ORM** (e.g. AdonisJS's Lucid) uses that instead — replacing a
+  batteries-included framework's own ORM would be unidiomatic. Schemas must
+  stay equivalent.
+- **React** for the UI. Backend-only frameworks (e.g. NestJS) pair with a
+  minimal Vite React SPA in the same directory, like the Hono implementation.
 - Minimal, unstyled UI (a single small CSS file is allowed). No UI component
   libraries and no CSS frameworks (plain CSS only — this keeps styling out of
   the measurements entirely). UI polish is explicitly out of scope.

@@ -28,7 +28,10 @@ For each implementation directory (`guren/`, `hono/`, `nextjs/`):
 - **Generated artifacts marked as such** — files whose header says "do not edit"
   or that live in a documented codegen output directory (e.g. Guren's `.guren/`,
   Drizzle's `drizzle/meta/`, Next.js' `next-env.d.ts`). Rationale: nobody reads
-  or maintains them; they are rebuilt by a command.
+  or maintains them; they are rebuilt by a command. Generated SQL migrations
+  fall out automatically (only `.ts`/`.tsx`/`.css` are counted) — but
+  hand-written migration *classes* (e.g. AdonisJS `database/migrations/*.ts`)
+  are code the developer writes and DO count.
 - Test files are counted **separately** and reported in their own column, since
   test verbosity is a property of the test API, not the app.
 
@@ -43,8 +46,9 @@ added-line diff against it.
 ## Fairness rules
 
 - Every implementation follows [SPEC.md](./SPEC.md) exactly.
-- Every implementation uses the same database (SQLite), the same ORM (Drizzle),
-  and React for the UI, so the deltas isolate framework glue.
+- Every implementation uses the same database (SQLite), the same ORM (Drizzle —
+  except frameworks that ship a first-party ORM, per SPEC), and React for the
+  UI, so the deltas isolate framework glue.
 - Implementations are written idiomatically per each framework's documentation.
   If you believe an implementation misrepresents your framework, **PRs are
   welcome** — that is the point of publishing the code.
