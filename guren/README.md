@@ -23,6 +23,7 @@ scaffolded with `bunx create-guren-app` (`--auth`, SQLite) and
 ```bash
 bun install
 cp .env.example .env
+bunx guren key:generate --write
 bun run codegen    # generates .guren/ typed manifests
 bun run db:migrate
 bun run dev        # http://localhost:3333
