@@ -1,0 +1,74 @@
+name: bench
+
+on:
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: 'Measurement rounds per scenario'
+        required: false
+        default: '5'
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install oha
+        run: |
+          curl -sSfL -o oha https://github.com/hatoo/oha/releases/download/v1.15.0/oha-linux-amd64
+          chmod +x oha
+          sudo mv oha /usr/local/bin/oha
+          oha --version
+
+      - name: Build guren
+        working-directory: guren
+        run: |
+          cp .env.example .env
+          sed -i "s|^APP_KEY=$|APP_KEY=base64:$(openssl rand -base64 32)|" .env
+          bun install --frozen-lockfile
+          bun run build
+          mkdir -p data
+          bunx guren db:migrate
+
+      - name: Build adonisjs
+        working-directory: adonisjs
+        run: |
+          cp .env.example .env
+          npm ci
+          node ace generate:key
+          node ace build
+          node ace migration:run --force
+          cp .env build/.env
+          mkdir -p build/tmp
+
+      - name: Seed identical data
+        run: |
+          bun scripts/bench-seed.ts
+          cp adonisjs/tmp/db.sqlite3 adonisjs/build/tmp/db.sqlite3
+
+      - name: Bench
+        run: RUNS="${{ github.event.inputs.runs }}" scripts/bench.sh
+
+      - name: Publish summary
+        if: always()
+        run: |
+          [ -f bench-summary.md ] && cat bench-summary.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bench-results
+          path: |
+            bench-results.csv
+            bench-summary.md
