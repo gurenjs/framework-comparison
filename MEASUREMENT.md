@@ -17,6 +17,7 @@ For each implementation directory (`guren/`, `hono/`, `nextjs/`):
 |--------|------------|
 | Source files | Committed `*.ts` / `*.tsx` / `*.css` files, minus exclusions below |
 | Source LOC | Non-blank lines in those files |
+| Handwritten LOC | Non-blank lines **added relative to the pristine generator output** committed under [`baselines/`](./baselines) (computed with `git diff`). This separates "code you own" from "code you typed": scaffolds produce real code you maintain, but generating it took seconds, not hours. An implementation with no scaffold (`hono/`) has every line handwritten by definition. |
 | Config LOC | Non-blank lines in committed config files (`*.config.*`, `tsconfig*.json`, `.env.example`, `drizzle.config.ts`, …) |
 | Direct dependencies | `dependencies` + `devDependencies` entries in the implementation's `package.json` |
 | Context tokens | Tokens (cl100k_base) required to read every counted source + config file — a proxy for how much an AI agent must load to understand the project |
@@ -32,8 +33,12 @@ For each implementation directory (`guren/`, `hono/`, `nextjs/`):
   test verbosity is a property of the test API, not the app.
 
 Scaffolded files that the developer subsequently owns and edits (anything
-`create-*-app` or a generator produced into the app tree) **are counted**. If a
-generator wrote it and you are expected to maintain it, it is your code.
+`create-*-app` or a generator produced into the app tree) **are counted** in
+Source LOC — if a generator wrote it and you are expected to maintain it, it is
+your code. The Handwritten LOC metric then shows how much of it you actually
+typed: `baselines/<impl>/` holds the untouched output of the exact generator
+commands documented in each implementation's README, and the metric is the
+added-line diff against it.
 
 ## Fairness rules
 

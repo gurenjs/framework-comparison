@@ -4,6 +4,7 @@
  */
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs'
 import { join, relative, basename } from 'node:path'
+import { spawnSync } from 'node:child_process'
 import { getEncoding } from 'js-tiktoken'
 
 const IMPLEMENTATIONS = ['guren', 'hono', 'nextjs'] as const
@@ -41,6 +42,7 @@ interface Metrics {
   testLoc: number
   directDeps: number
   contextTokens: number
+  handwrittenLoc: number
 }
 
 const encoder = getEncoding('cl100k_base')
@@ -85,7 +87,27 @@ function nonBlankLines(content: string): number {
   return content.split('\n').filter((line) => line.trim().length > 0).length
 }
 
-function measure(root: string): Metrics {
+/**
+ * Lines the developer actually wrote: non-blank lines added relative to the
+ * pristine generator output committed under baselines/<impl>. With no
+ * baseline (hono has no scaffold), every line is handwritten.
+ */
+function handwrittenLines(baselineDir: string | null, file: string, root: string): number {
+  const content = readFileSync(file, 'utf8')
+  const baselineFile = baselineDir ? join(baselineDir, relative(root, file)) : null
+
+  if (!baselineFile || !existsSync(baselineFile)) {
+    return nonBlankLines(content)
+  }
+
+  const diff = spawnSync('git', ['diff', '--no-index', '--', baselineFile, file], { encoding: 'utf8' })
+  return diff.stdout
+    .split('\n')
+    .filter((line) => line.startsWith('+') && !line.startsWith('+++') && line.slice(1).trim().length > 0)
+    .length
+}
+
+function measure(root: string, baselineDir: string | null): Metrics {
   const metrics: Metrics = {
     sourceFiles: 0,
     sourceLoc: 0,
@@ -94,6 +116,7 @@ function measure(root: string): Metrics {
     testLoc: 0,
     directDeps: 0,
     contextTokens: 0,
+    handwrittenLoc: 0,
   }
 
   for (const file of walk(root)) {
@@ -107,10 +130,12 @@ function measure(root: string): Metrics {
     } else if (kind === 'config') {
       metrics.configLoc += loc
       metrics.contextTokens += encoder.encode(content).length
+      metrics.handwrittenLoc += handwrittenLines(baselineDir, file, root)
     } else {
       metrics.sourceFiles += 1
       metrics.sourceLoc += loc
       metrics.contextTokens += encoder.encode(content).length
+      metrics.handwrittenLoc += handwrittenLines(baselineDir, file, root)
     }
   }
 
@@ -132,7 +157,8 @@ rows.push('|--------|' + IMPLEMENTATIONS.map(() => '------').join('|') + '|')
 
 const results = IMPLEMENTATIONS.map((impl) => {
   const dir = join(repoRoot, impl)
-  return existsSync(dir) ? measure(dir) : null
+  const baselineDir = join(repoRoot, 'baselines', impl)
+  return existsSync(dir) ? measure(dir, existsSync(baselineDir) ? baselineDir : null) : null
 })
 
 function row(label: string, pick: (metric: Metrics) => number): string {
@@ -142,6 +168,7 @@ function row(label: string, pick: (metric: Metrics) => number): string {
 
 rows.push(row('Source files', (metric) => metric.sourceFiles))
 rows.push(row('Source LOC', (metric) => metric.sourceLoc))
+rows.push(row('Handwritten LOC (vs scaffold)', (metric) => metric.handwrittenLoc))
 rows.push(row('Config LOC', (metric) => metric.configLoc))
 rows.push(row('Test files', (metric) => metric.testFiles))
 rows.push(row('Test LOC', (metric) => metric.testLoc))
