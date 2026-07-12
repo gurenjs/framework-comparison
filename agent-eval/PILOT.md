@@ -87,6 +87,35 @@ those files — measuring them is round 3:
   their shipped default too). Hypothesis to test: guidance closes or
   reverses the layering gap.
 
+## Round 3 results (2026-07-13) — shipped guidance restored
+
+Same protocol as round 2; the only change is commit 434cfb4 restoring each
+scaffold's shipped agent guidance (guren: CLAUDE.md + .claude/skills, with the
+STUMBLES-driven expansion also proposed upstream in gurenjs#86; nextjs:
+create-next-app's AGENTS.md/CLAUDE.md verbatim). hono/tanstack/adonisjs/nestjs
+ship no guidance, so their round-2 numbers already represent their shipped
+state. N=3 (trials 6–8), all 6 trials passed typecheck + tests + hidden smoke.
+
+| median | guren r2 (bare) | guren r3 (guided) | nextjs r2 | nextjs r3 |
+|---|---|---|---|---|
+| Cost (USD) | 5.54 | **4.51** (−19%) | 2.48 | 2.50 (±0) |
+| Turns | 104 | 95 | 62 | 65 |
+| Msgs to first edit | 76–92 | **35–57** | — | — |
+| Msgs to green | 156 | 143 | 89 | 92 |
+| node_modules archaeology share | 17–46% | 17–27% | ~0 | ~0 |
+
+**Reading:** guidance works — time-to-first-edit halved, cost −19% — but the
+gap to the colocated stacks remains ~1.8×. nextjs acts as the control: adding
+its shipped guidance changed nothing because API knowledge was never its
+bottleneck. Residual guren cost: agents still verify exact type details in
+dist .d.ts (`PaginatorOptions`, `BelongsToManyRecord`, TestApp assertion
+signatures) and re-excavate api-client codegen behavior; the .claude/skills
+were invoked 0–1 times per run (pull-based guidance goes unused).
+
+**Round 4 (planned):** replace fat-CLAUDE.md with lean CLAUDE.md +
+glob-scoped `.claude/rules/*.md` carrying exact, source-verified signatures —
+push-based and context-targeted, matching how agents actually consume docs.
+
 ## Operational notes
 
 - Trials are disk-hungry (a worktree + node_modules each); run sequentially
