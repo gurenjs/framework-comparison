@@ -47,6 +47,15 @@ jobs:
           cp .env.example .env
           npm ci
           node ace generate:key
+          # tuyau writes .adonisjs/client/registry (imported by inertia/client.ts)
+          # only when the dev server boots — no dedicated ace command exists, so
+          # boot it briefly before the production build.
+          node ace serve > /tmp/adonis-serve.log 2>&1 &
+          for i in $(seq 1 60); do [ -f .adonisjs/client/registry ] && break; sleep 1; done
+          pkill -f "ace serve" 2>/dev/null || true
+          pkill -f "bin/server.js" 2>/dev/null || true
+          sleep 1
+          test -f .adonisjs/client/registry || { echo "registry was not generated"; cat /tmp/adonis-serve.log; exit 1; }
           node ace build
           node ace migration:run --force
           cp .env build/.env
