@@ -1,8 +1,8 @@
-# Framework Comparison: the same app, three ways
+# Framework Comparison: the same app, six ways
 
 The same minimal multi-user blog — auth, posts CRUD with pagination and
 ownership checks, comments, server-side validation, a deferred welcome
-notification, and integration tests — implemented three times from the same
+notification, and integration tests — implemented six times from the same
 [specification](./SPEC.md):
 
 | Directory | Stack |
@@ -97,6 +97,17 @@ guren check` / `bunx guren audit` verify route↔controller↔page consistency
 and validation/auth coverage mechanically after an agent edits. AdonisJS
 comes closest in spirit (`node ace list:routes`, generated type registries);
 the other stacks have no equivalent — verification is reading the diff.
+
+## Agent evaluation
+
+We also measured what the same feature addition **costs an AI coding agent**
+(Claude Code / Sonnet 5, three scored trials per framework, blind automated
+acceptance including a hidden HTTP smoke). Every framework shipped a working
+feature in every trial; costs ranged from $2.03 (hono) to $5.98 (adonisjs)
+per feature, and the experiment doubles as a case study in **documentation
+engineering for agents** — push-based, glob-scoped guidance cut Guren's
+agent cost by 40% with zero framework changes. Full methodology, honest
+limitations, and reproduction scripts: [agent-eval/](./agent-eval/).
 
 ## Performance
 
