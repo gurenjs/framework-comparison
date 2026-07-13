@@ -57,6 +57,7 @@ jobs:
           sleep 1
           test -e .adonisjs/client/registry/index.ts || { echo "registry was not generated"; cat /tmp/adonis-serve.log; exit 1; }
           node ace build
+          mkdir -p tmp
           node ace migration:run --force
           cp .env build/.env
           mkdir -p build/tmp
