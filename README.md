@@ -98,6 +98,16 @@ and validation/auth coverage mechanically after an agent edits. AdonisJS
 comes closest in spirit (`node ace list:routes`, generated type registries);
 the other stacks have no equivalent — verification is reading the diff.
 
+## Performance
+
+The two Inertia-SSR implementations (`guren/`, `adonisjs/`) also make a clean
+runtime benchmark: the same app on **Bun vs Node**. Interleaved `oha` rounds
+against production builds with identically seeded databases put Guren at
+**2.3× the throughput on the SSR HTML path and 3.5× on the Inertia JSON
+path**, with a 1.8× faster cold start (GitHub Actions, medians of 5 rounds).
+Methodology, caveats, and how to reproduce it yourself with one click:
+[BENCHMARK.md](./BENCHMARK.md).
+
 ## Fairness
 
 Each implementation is written idiomatically, the way its framework's own
