@@ -46,17 +46,22 @@ RUNS=5 ADONIS_NODE="mise exec node@24 -- node" scripts/bench.sh
 
 Requires `oha`, Bun ≥ 1.1, and Node ≥ 24 (AdonisJS 7).
 
-## Reference result (pilot, 2026-07-13, MacBook Air M-series, single round)
+## Reference results
 
-| Scenario | Guren rc (Bun 1.3) | AdonisJS 7 (Node 24) | Ratio |
-|----------|--------------------|----------------------|-------|
-| HTML SSR — req/s | 4,051 | 1,598 | **2.5×** |
-| Inertia JSON — req/s | 6,816 | 2,003 | **3.4×** |
-| Cold start → first 200 | 285 ms | 492 ms | 1.7× |
-| Idle RSS | ~175 MB | ~175 MB | = |
+GitHub Actions ([run 29214694030](https://github.com/gurenjs/framework-comparison/actions/runs/29214694030),
+2026-07-13, ubuntu-latest, 5 rounds × 10 s, Bun 1.3.14 / Node 24.18):
 
-Treat these as illustrative; cite numbers from a fresh Actions run (or your
-own) instead.
+| Scenario | Guren rc (Bun) | AdonisJS 7 (Node) | Ratio |
+|----------|----------------|-------------------|-------|
+| HTML SSR — req/s (median) | 1,443 | 624 | **2.3×** |
+| HTML SSR — p50 / p99 | 33.9 / 66.4 ms | 79.9 / 113.3 ms | |
+| Inertia JSON — req/s (median) | 2,708 | 765 | **3.5×** |
+| Inertia JSON — p50 / p99 | 19.1 / 28.0 ms | 65.5 / 77.2 ms | |
+| Cold start → first 200 | 560 ms | 1,015 ms | 1.8× |
+
+A local pilot on an M-series MacBook Air produced the same shape
+(2.5× HTML / 3.4× JSON, idle RSS equal at ~175 MB) — the ratio holds across
+OS, CPU architecture, and absolute-performance tiers.
 
 ## Caveats (read before quoting)
 
