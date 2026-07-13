@@ -116,6 +116,34 @@ were invoked 0–1 times per run (pull-based guidance goes unused).
 glob-scoped `.claude/rules/*.md` carrying exact, source-verified signatures —
 push-based and context-targeted, matching how agents actually consume docs.
 
+## Round 4 results (2026-07-13) — lean CLAUDE.md + glob-scoped rules
+
+guren only (trials 9–11), guidance v2 from gurenjs#86 commit 0f2e071:
+CLAUDE.md slimmed 295→173 lines, deep API reference moved to four
+glob-scoped `.claude/rules/*.md` files with source-verified exact signatures.
+All 3 trials passed typecheck + tests + hidden smoke.
+
+| guren median | r2 bare | r3 fat CLAUDE.md | r4 rules |
+|---|---|---|---|
+| Cost (USD) | 5.54 | 4.51 | **3.35** |
+| Turns | 104 | 95 | **77** |
+| Msgs to green | 156 | 143 | **109** |
+| vs hono ($2.03) | 2.7× | 2.2× | **1.65×** |
+| vs nextjs ($2.48) | 2.2× | 1.8× | **1.35×** |
+
+Best single run (guren-11): $2.87, 69 turns — inside the colocated stacks'
+range. The remaining archaeology share held at ~19–30%, but sessions got
+much shorter: with exact signatures pushed into context, the verification
+detours that remain are brief confirmations rather than exploratory digs.
+
+**Conclusion of the guidance arc:** documentation placement alone moved
+Guren from 2.7× to 1.65× the cheapest stack — a 40% cost reduction with
+zero framework-code changes — and every trial across all four rounds
+shipped a working feature. The residual gap now plausibly reflects real
+structural cost (more layers per feature) plus remaining unknown-API tax;
+further reduction likely needs the ORM/API additions in the backlog
+(firstOrCreate, pivot helpers) rather than more docs.
+
 ## Operational notes
 
 - Trials are disk-hungry (a worktree + node_modules each); run sequentially
