@@ -15,19 +15,29 @@ the agent never saw: seed data directly in SQLite, boot the app, and verify
 
 ## Headline results
 
-**Every framework shipped.** 30/30 scored trials across all rounds passed
-typecheck, the full test suite, and the hidden smoke. Modern agents complete
-this feature on any of these stacks; the differentiator is cost.
-
-Shipped-state medians (each framework exactly as its scaffold ships, N=3):
+**On the frameworks the model knows, every trial shipped** — 30/30 scored
+July trials passed typecheck, the full test suite, and the hidden smoke.
+The differentiator there is cost (July 2026 snapshot, the framework versions
+of that date, N=3 medians):
 
 | | hono | tanstack | nextjs | nestjs | guren¹ | adonisjs |
 |---|---|---|---|---|---|---|
 | Cost (USD) | **2.03** | 2.42 | 2.48 | 2.50 | 3.35 | 5.98 |
 | Turns | **61** | 67 | 62 | 74 | 77 | 104 |
 
-¹ guren with the agent guidance its scaffold now ships
+¹ guren with the agent guidance its scaffold shipped at the time
 ([gurenjs#86](https://github.com/gurenjs/guren/pull/86)); see the arc below.
+
+**On a framework version the model has never seen, guidance decides whether
+the trial ships at all.** The day Guren v2.0.0's breaking majors were
+published (August 2026), we re-ran both arms on it — with the scaffold's
+shipped harness agents went **3/3** at a **$4.90 median (−29%)**, while the
+stripped-guidance baseline passed only **1/3** ($6.94): the failing agents
+guessed v2 API shapes from stale training data and wrote tests around the
+wrong guesses. Lifetime acceptance stands at **43/45**; the only failures
+are that stripped-guidance baseline. Round-by-round history, including the
+re-measurement where an earlier harness iteration did *not* help:
+[PILOT.md](./PILOT.md).
 
 ## The interesting part: why the gap, and what closes it
 
@@ -38,13 +48,20 @@ reverse-engineering `@guren/*` APIs out of `node_modules` dist bundles**,
 because the model doesn't know Guren from training data the way it knows
 hono or Next.js. The gap was knowledge acquisition, not framework friction.
 
-So we fixed the docs and re-measured:
+So we fixed the docs and re-measured (July, rounds 2–4):
 
 | guren median | bare | + fat CLAUDE.md | + lean CLAUDE.md & glob-scoped rules |
 |---|---|---|---|
 | Cost | 5.54 | 4.51 | **3.35** |
 | Turns | 104 | 95 | **77** |
 | Msgs to first edit | 76–92 | 35–57 | 33–65 |
+
+The arc continued after the framework moved on: round 5 found that a later
+harness iteration had silently lost this win (glob-scoped rules attach on
+*edit*, but most API research happens before the first edit — the delivery
+regressed to −3%), which led to shipping the API-signature digest inside
+`guren context` itself, and round 6 measured the v2.0.0 day-one results
+above. Full history: [PILOT.md](./PILOT.md).
 
 Two findings we believe generalize beyond Guren:
 

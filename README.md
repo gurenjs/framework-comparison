@@ -101,13 +101,17 @@ the other stacks have no equivalent — verification is reading the diff.
 ## Agent evaluation
 
 We also measured what the same feature addition **costs an AI coding agent**
-(Claude Code / Sonnet 5, three scored trials per framework, blind automated
-acceptance including a hidden HTTP smoke). Every framework shipped a working
-feature in every trial; costs ranged from $2.03 (hono) to $5.98 (adonisjs)
-per feature, and the experiment doubles as a case study in **documentation
-engineering for agents** — push-based, glob-scoped guidance cut Guren's
-agent cost by 40% with zero framework changes. Full methodology, honest
-limitations, and reproduction scripts: [agent-eval/](./agent-eval/).
+(Claude Code / Sonnet 5, three scored trials per framework and arm, blind
+automated acceptance including a hidden HTTP smoke). On the July snapshot
+every framework shipped a working feature in every trial, with costs from
+$2.03 (hono) to $5.98 (adonisjs). The experiment then became a case study in
+**documentation engineering for agents**: when Guren v2.0.0's breaking majors
+were re-tested the day they were published — new APIs the model has no
+training data for — agents with the scaffold's shipped guidance went 3/3 at a
+29% lower median cost, while a stripped-guidance baseline passed only 1/3.
+Full methodology, round-by-round history (including the round where an
+earlier harness iteration did not help), honest limitations, and reproduction
+scripts: [agent-eval/](./agent-eval/).
 
 ## Performance
 
