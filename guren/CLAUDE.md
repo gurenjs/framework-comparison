@@ -12,6 +12,7 @@ Before exploring `node_modules`, use the built-in introspection commands:
 bunx guren context         # project map: models, routes, controllers, pages (add --json for JSON)
 bunx guren context User    # everything about one entity: model, routes, pages, linked docs — start entity work here
 bunx guren check           # validate route ↔ controller ↔ page consistency, doc links, and spec freshness — run after changes
+bunx guren docs:graph --path <file>  # which docs govern this file, which spec views derive from it — ask BEFORE renaming/moving
 bunx guren codegen         # regenerate .guren/*.gen.ts typed manifests (also runs via `bun run dev`)
 bunx guren spec:generate   # regenerate docs/spec/ views (ER, domain, screens, modules) after schema/model/route changes
 bunx guren make:adr "..."  # record an architecture decision under docs/adr/ (--entity <Model> links it)
@@ -21,16 +22,19 @@ This project ships with an agent harness wired into `.claude/settings.json`:
 a `SessionStart` hook injects the `guren context` project map, and a
 `PostToolUse` hook (`.claude/hooks/check-after-edit.ts`) re-runs `guren check`
 after edits to routes, controllers, models, schema, or pages and reports
-failures back immediately. Framework-managed files (`.claude/rules`, `skills`,
-`agents`, `hooks`) can be refreshed anytime with `bunx guren agent:sync`.
+failures back immediately. The injected map ends with a "Guren API Signatures"
+digest of the ORM, controller, and testing APIs — those signatures are already
+in your context before you write any code. Framework-managed files
+(`.claude/rules`, `skills`, `agents`, `hooks`) can be refreshed anytime with
+`bunx guren agent:sync`.
 
 Detailed, verified API rules live in `.claude/rules/*.md` and load automatically
 based on the files you are editing (glob-scoped): `orm-models.md` (models, queries,
 relations), `controllers-http.md` (validation, Inertia, auth), `routes-codegen.md`
 (route options, schema binding, codegen), `testing.md` (TestApp assertions),
 `docs-and-spec.md` (linked ADRs/docs, generated spec views).
-Read the matching rule file before reading `node_modules/@guren/*` — it covers the
-exact signatures.
+For framework signatures, check the session-start digest first, then the matching
+rule file; only read `node_modules/@guren/*` for APIs neither covers.
 
 ## Project Structure
 
@@ -123,6 +127,7 @@ http://localhost:3333/_guren/mcp
 | `guren_get_context` | プロジェクト構造マップ（models, routes, pages, controllers等） |
 | `guren_entity_context` | エンティティ単位のコンテキストバンドル（model, routes, pages, linked docs） |
 | `guren_check` | route↔controller↔page の整合性・docリンク・spec鮮度の検証 |
+| `guren_docs_graph` | OKF docsリレーショングラフ(entity/pathで近傍に絞り込み)— リネーム前の影響照会 |
 | `guren_list_models` | モデル一覧（リレーション、soft deletes、auth trait含む） |
 | `guren_generate_guidelines` | プロジェクト固有コーディング規約の自動生成 |
 | `guren_doctor` | プロジェクト健全性チェック + 次のアクション提案 |
