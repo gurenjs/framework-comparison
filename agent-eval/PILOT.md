@@ -184,6 +184,32 @@ the next release ships #279 and a scaffold-exact re-run confirms it. The
 per-trial spread (3.77–5.76 vs bare 4.47–10.04) still overlaps: N=3 medians
 locate the effect, they do not size it precisely.
 
+## Round 6 results (2026-08-02) — v2.0.0, released the day before
+
+Guren v2.0.0 (orm/server/cli majors — structural mass assignment, RFC 0006)
+was published hours before this round, so `claude-sonnet-5` has zero training
+data for the new APIs: the cleanest test yet of guidance vs. memorized
+knowledge. App migrated to v2 (commit dc081bc), same protocol, N=3 per arm,
+shipped arm now uses the released cli 2.0.0 digest natively.
+
+| guren median | r6 bare | r6 shipped harness |
+|---|---|---|
+| Acceptance (typecheck+tests+smoke) | **1/3** | **3/3** |
+| Cost (USD) | 6.94 | **4.90** |
+| Turns | 93 | 93 |
+
+**The headline is acceptance, not cost.** Both bare failures shipped a
+feature that passed the hidden HTTP smoke but failed the test gate: the
+agents guessed framework API shapes (paginated response structure, testing
+assertions) that v2 no longer matches, and wrote tests around the wrong
+guesses. The shipped harness — session-start context map ending in the API
+signature digest — went 3/3 with a −29% median cost. On a major the model
+has never seen, guidance stops being an optimization and becomes the
+difference between shipping and not.
+
+Lifetime acceptance is now **43/45**; the only two failures are stripped-
+guidance baseline arms on a day-old major.
+
 ## Operational notes
 
 - Trials are disk-hungry (a worktree + node_modules each); run sequentially
