@@ -144,6 +144,46 @@ structural cost (more layers per feature) plus remaining unknown-API tax;
 further reduction likely needs the ORM/API additions in the backlog
 (firstOrCreate, pivot helpers) rather than more docs.
 
+## Round 5 results (2026-08-01) — re-measurement on current releases
+
+The framework moved a lot since round 4 (rc.11 → cli 1.6.0 / core 1.4.0 /
+orm 1.3.0, Inertia v3, and the full `agent:init` harness with hooks, skills,
+and glob-scoped rules), so before publishing any number we re-measured on the
+updated app (commit 37094d4). Same protocol: `claude-sonnet-5`, N=3 medians,
+blind scoring. Note the host environment also changed since July (more
+user-level plugins/hooks in context), so absolute costs are not comparable
+across rounds — arms within a round are.
+
+| guren median | r5 bare | r5 shipped harness (as released) | r5 + signature digest (gurenjs#279) |
+|---|---|---|---|
+| Cost (USD) | 6.26 | 6.08 | **4.99** |
+| Turns | 94 | 102 | **81** |
+
+All 9 trials passed typecheck + tests + hidden smoke (39/39 lifetime).
+
+**The released harness's cost win had evaporated (−3%)** — stream analysis
+showed why: the round-4 win came from agents reading the rule files, but the
+current harness delivers rules as glob-scoped auto-attach on *edit*, while
+~75% of `node_modules` archaeology happens *before* the first edit. Skills
+went unused (0 invocations, again), and the CLAUDE.md pointer to the rules
+was ignored. Push beats pull, and attach-on-edit is pull with extra steps.
+
+**The fix (gurenjs#279) pushes a static API-signature digest into the
+`guren context` output**, which the harness's SessionStart hook already
+injects — signatures arrive before any work starts. Result: first edit moved
+from tool ~46 to ~34, pre-edit archaeology dropped 23–24 → ~10 actions, and
+the arm medians landed at −20% cost / −14% turns vs bare. Best run: 61 turns,
+$3.77. (Trials 18–20 deliver the digest as a committed file appended by the
+SessionStart hook — byte-identical to what the post-#279 `guren context`
+emits — because the released cli 1.6.0 predates the digest and the unreleased
+cli needs unreleased core internals.)
+
+**Reading:** the 40% arc of rounds 2→4 does not survive contact with the
+current, heavier environment; −20% with the digest is the honest number until
+the next release ships #279 and a scaffold-exact re-run confirms it. The
+per-trial spread (3.77–5.76 vs bare 4.47–10.04) still overlaps: N=3 medians
+locate the effect, they do not size it precisely.
+
 ## Operational notes
 
 - Trials are disk-hungry (a worktree + node_modules each); run sequentially
