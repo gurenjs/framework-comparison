@@ -81,6 +81,13 @@ case "$IMPL" in
     ;;
   *) echo "unknown impl: $IMPL"; exit 1 ;;
 esac
+
+# GUIDANCE=bare strips the agent-guidance files the scaffold ships, so the
+# same worktree can measure the undocumented baseline. Default: as committed.
+if [ "${GUIDANCE:-shipped}" = "bare" ]; then
+  echo "== guidance: bare (stripping CLAUDE.md / .claude / .mcp.json / AGENTS.md)"
+  rm -rf "$APP/CLAUDE.md" "$APP/.claude" "$APP/.mcp.json" "$APP/AGENTS.md"
+fi
 echo "== pre-check green; starting agent (model: $MODEL)"
 
 START=$(date +%s)
