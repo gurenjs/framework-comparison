@@ -13,7 +13,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bunx guren context 2>/dev/null; cat .claude/api-digest.md"
+            "command": "bunx guren context 2>/dev/null || true"
           }
         ]
       }

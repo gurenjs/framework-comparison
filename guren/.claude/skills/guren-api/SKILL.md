@@ -61,12 +61,10 @@ All throw `ValidationException` (HTTP 422) on failure.
 Source: `packages/orm/src/Model.ts`
 
 ```typescript
-import { Model } from '@guren/orm'
+import { defineModel } from '@guren/orm'
 import { posts } from '@/db/schema'
 
-export class Post extends Model<typeof posts.$inferSelect> {
-  static table = posts
-}
+export class Post extends defineModel(posts) {}
 
 // Usage
 await Post.find(1)                              // returns null if not found
@@ -85,25 +83,28 @@ export class Post extends defineModel(posts) {
   static fillable = ['title', 'excerpt', 'body', 'authorId']
 }
 
-export class User extends AuthenticatableModel<UserRecord> {
-  static override table = users
-  // Whitelist for mass assignment
+export class User extends defineModel(users, {
+  base: AuthenticatableModel,
+  // The model hashes a plain `password` into `passwordHash`
+  optionalOnCreate: ['passwordHash'],
+  requireOnCreate: ['password'],
+}) {
+  // Whitelist for mass assignment (credential columns are denied by the base class)
   static fillable = ['name', 'email', 'password']
-  // Blacklist: these fields are always stripped (ignored when fillable is set)
-  static guarded = ['id', 'passwordHash', 'rememberToken']
 }
 ```
 
-- `fillable` (whitelist) — only listed fields pass through to `create()` / `update()`; unlisted input keys **throw `MassAssignmentException`** (set `static strictFillable = false` for silent discarding). Use `forceCreate()` / `forceUpdate()` for trusted server-side data.
-- `guarded` (blacklist, default: `['id']`) — listed fields are silently stripped; ignored when `fillable` is set
-- Both are enforced by `Model.filterFillable()`, called automatically before persistence
+- `fillable` (whitelist) — only listed fields pass through to `create()` / `update()`; unlisted input keys **throw `MassAssignmentException`**. The primary key (`id`) is always silently stripped.
+- Credential columns (`passwordHash`, `rememberToken`) **always throw** on authenticatable models — the framework denies them; listing them in `fillable` does not open them
+- Enforced by `Model.filterFillable()`, called automatically before persistence
 - Always define `fillable` on models that accept user input — this is the second defense layer after Zod validation
+- `forceCreate()` / `forceUpdate()` bypass filtering for trusted server-side values (e.g. `passwordHash: 'oauth:...'`). **Never call them with request input**
 
 **Relationships** — declare once, eager-load anywhere:
 
 ```typescript
 // app/Models/User.ts
-export class User extends AuthenticatableModel<UserRecord> {
+export class User extends defineModel(users, { base: AuthenticatableModel, optionalOnCreate: ['passwordHash'] }) {
   static override relationTypes: { posts: HasManyRecord<PostRecord> } = { posts: [] }
 }
 User.hasMany('posts', () => import('./Post.js').then((m) => m.Post), 'authorId', 'id')
@@ -149,7 +150,7 @@ export function registerWebRoutes(router: Router): void {
 **Route contract options** — attach `body`, `params`, `query` schemas to routes:
 - Schemas are metadata for codegen (not double-validated for Controller actions)
 - `bunx guren codegen` extracts schemas → generates typed `ApiRoutes` interface
-- Frontend derives form types via `ApiRoutes['route.name']['body']`
+- Frontend derives form types via `RouteBody<ApiRoutes, 'route.name'>`
 
 ### End-to-End Type Safety
 Source: `packages/cli/src/api-client-types.ts`, `packages/inertia-client/src/typed-forms.ts`
@@ -160,6 +161,11 @@ Guren provides bidirectional type safety between frontend forms and backend vali
 Zod schema (Validator) → Route body option → codegen → ApiRoutes → Frontend form type
                        → Controller.validateBody() → Runtime validation (422 on failure)
 ```
+
+`ApiRoutes[...]['body']` is the **request** shape — what the browser sends, before
+validation. A coercing schema is rendered as it travels: `z.coerce.date()` is a
+`string` in the form and a `Date` in the controller. `['response']` is the other
+side, the parsed shape a client gets back.
 
 **1. Define schema once** (Validator file):
 ```typescript
@@ -174,10 +180,10 @@ router.post('/posts', { name: 'posts.store', body: PostPayloadSchema }, [PostCon
 **3. Frontend derives types** (after `bunx guren codegen`):
 ```typescript
 import type { ApiRoutes } from '@/.guren/api-client.gen'
-import type { RouteErrors } from '@guren/inertia-client/typed-forms'
+import type { RouteBody, RouteErrors } from '@guren/inertia-client/typed-forms'
 import { route } from '@/.guren/routes.gen'
 
-type PostFormData = ApiRoutes['posts.store']['body']    // { title: string; body: string }
+type PostFormData = RouteBody<ApiRoutes, 'posts.store'>  // { title: string; body: string }
 type PostErrors = RouteErrors<PostFormData>              // Partial<Record<'title' | 'body', string | string[]>>
 
 // Typed form submission

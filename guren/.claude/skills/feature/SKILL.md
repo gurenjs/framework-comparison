@@ -111,10 +111,10 @@ Generated views follow these patterns for end-to-end type safety:
 
 ```typescript
 import type { ApiRoutes } from '@/.guren/api-client.gen'
-import type { RouteErrors } from '@guren/inertia-client/typed-forms'
+import type { RouteBody, RouteErrors } from '@guren/inertia-client/typed-forms'
 import { route } from '@/.guren/routes.gen'
 
-type <Name>FormData = ApiRoutes['<names>.store']['body']
+type <Name>FormData = RouteBody<ApiRoutes, '<names>.store'>
 
 // Form submission uses route() helper
 form.post(route('<names>.store'))
@@ -152,12 +152,16 @@ export class <Name> extends defineModel(<names>) {
 }
 ```
 
-For User models, also define `guarded` to explicitly protect sensitive fields:
+For User models, credential columns (`passwordHash`, `rememberToken`) are denied from
+mass assignment by `AuthenticatableModel` itself — never list them in `fillable`:
 
 ```typescript
-export class User extends AuthenticatableModel<UserRecord> {
+export class User extends defineModel(users, {
+  base: AuthenticatableModel,
+  optionalOnCreate: ['passwordHash'],
+  requireOnCreate: ['password'],
+}) {
   static fillable = ['name', 'email', 'password']
-  static guarded = ['id', 'passwordHash', 'rememberToken']
 }
 ```
 
@@ -191,7 +195,12 @@ export const posts = pgTable('posts', {
   id: serial('id').primaryKey(),
   title: varchar('title', { length: 255 }).notNull(),
   content: text('content'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 })
 ```
+
+On PostgreSQL, always give timestamp columns `{ withTimezone: true }`. A
+`timestamp without time zone` stores a bare wall clock, so `defaultNow()`
+records it in the database session's zone while the app reads it back as UTC,
+and any client other than the app sees a different instant.

@@ -10,10 +10,9 @@ const { migrateDatabase } = await import('../config/database.js')
 const { default: app } = await import('../src/app.js')
 
 async function createUser(name: string, email: string, password = 'password123') {
-  const { ScryptHasher } = await import('@guren/core')
   const { User } = await import('../app/Models/User.js')
-  const passwordHash = await new ScryptHasher().hash(password)
-  return (await User.create({ name, email, passwordHash }))!
+  // AuthenticatableModel hashes the virtual `password` field into `passwordHash`
+  return (await User.create({ name, email, password }))!
 }
 
 let http: TestApp

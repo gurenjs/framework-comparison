@@ -22,8 +22,24 @@ export class Post extends defineModel(posts) {
 Post.belongsTo('author', () => import('./User.js').then((m) => m.User), 'authorId', 'id')
 ```
 
-`class Post extends Model<typeof posts> { static table = posts }` also works.
-Auth user models: `defineModel(users, { base: AuthenticatableModel })`.
+Auth user models use the same `defineModel()` call with `AuthenticatableModel` as the base, plus the
+options that reshape the create payload — the model hashes a plain `password` into `passwordHash`, so
+the column becomes optional and the virtual field becomes required:
+
+```typescript
+export class User extends defineModel(users, {
+  base: AuthenticatableModel,
+  optionalOnCreate: ['passwordHash'],
+  requireOnCreate: ['password'],
+}) {
+  static override hidden = ['passwordHash', 'rememberToken']
+}
+```
+
+Drop `requireOnCreate` when accounts can also be created without a password (OAuth-only sign-up).
+Optional means optional — passing `passwordHash` still type-checks. At runtime the base class
+denies the hash and remember-token columns from mass assignment entirely; `forceCreate()`/
+`forceUpdate()` is the path for trusted server-side values.
 
 ## Statics
 
@@ -63,7 +79,7 @@ const result = await Post.paginate({ page: 1, perPage: 15, where: {...}, orderBy
 ```
 
 For Inertia/HTTP pagination links wrap it with `paginate` from `@guren/core`:
-`paginate(result, { path, query?, fragment? })` — those three fields are `PaginatorOptions`.
+`paginate(result, { path?, query?, fragment? })` — those three fields are `PaginatorOptions`.
 
 ## Relations — declaration signatures
 
@@ -138,6 +154,9 @@ For concurrency safety add a unique index and catch the constraint error, or wra
 ## Mass assignment
 
 - With `static fillable = [...]` set, `create()`/`update()` **throw `MassAssignmentException`**
-  on any unlisted input key (`static strictFillable = false` restores silent discarding)
-- Without `fillable`, keys in `static guarded` (default `['id']`) are silently stripped
-- `forceCreate()` / `forceUpdate()` bypass filtering — trusted server-side data only
+  on any unlisted input key; the primary key (`id`) is always silently stripped
+- Credential columns (`passwordHash`, `rememberToken`) **always throw** on authenticatable
+  models — the framework denies them, listing them in `fillable` does not open them
+- `forceCreate()` / `forceUpdate()` bypass filtering — trusted server-side values only.
+  **Never call them with request input**; a `MassAssignmentException` is never fixed by
+  switching the same payload to `force*`

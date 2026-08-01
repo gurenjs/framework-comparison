@@ -1,4 +1,4 @@
-import { Controller, ScryptHasher, ValidationException } from '@guren/core'
+import { Controller, ValidationException } from '@guren/core'
 import { pages } from '../../../../.guren/pages.gen.js'
 import { SendWelcomeNotificationJob } from '../../../Jobs/SendWelcomeNotificationJob.js'
 import { User } from '../../../Models/User.js'
@@ -16,8 +16,9 @@ export default class RegisterController extends Controller {
       throw ValidationException.withMessages({ email: 'This email address is already registered.' })
     }
 
-    const passwordHash = await new ScryptHasher().hash(password)
-    const user = await User.create({ name, email, passwordHash })
+    // AuthenticatableModel hashes the virtual `password` field into
+    // `passwordHash` before persisting — see app/Models/User.ts.
+    const user = await User.create({ name, email, password })
 
     await SendWelcomeNotificationJob.dispatch({ userId: user?.id as number, name })
 
