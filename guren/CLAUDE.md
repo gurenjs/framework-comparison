@@ -1,4 +1,4 @@
-# Guren
+# Minilog Guren
 
 ## Overview
 
@@ -9,15 +9,26 @@ A fullstack TypeScript application built with the Guren framework (Laravel-inspi
 Before exploring `node_modules`, use the built-in introspection commands:
 
 ```bash
-bunx guren context     # project map: models, routes, controllers, pages (add --json for JSON)
-bunx guren check       # validate route ↔ controller ↔ page consistency — run after changes
-bunx guren codegen     # regenerate .guren/*.gen.ts typed manifests (also runs via `bun run dev`)
+bunx guren context         # project map: models, routes, controllers, pages (add --json for JSON)
+bunx guren context User    # everything about one entity: model, routes, pages, linked docs — start entity work here
+bunx guren check           # validate route ↔ controller ↔ page consistency, doc links, and spec freshness — run after changes
+bunx guren codegen         # regenerate .guren/*.gen.ts typed manifests (also runs via `bun run dev`)
+bunx guren spec:generate   # regenerate docs/spec/ views (ER, domain, screens, modules) after schema/model/route changes
+bunx guren make:adr "..."  # record an architecture decision under docs/adr/ (--entity <Model> links it)
 ```
+
+This project ships with an agent harness wired into `.claude/settings.json`:
+a `SessionStart` hook injects the `guren context` project map, and a
+`PostToolUse` hook (`.claude/hooks/check-after-edit.ts`) re-runs `guren check`
+after edits to routes, controllers, models, schema, or pages and reports
+failures back immediately. Framework-managed files (`.claude/rules`, `skills`,
+`agents`, `hooks`) can be refreshed anytime with `bunx guren agent:sync`.
 
 Detailed, verified API rules live in `.claude/rules/*.md` and load automatically
 based on the files you are editing (glob-scoped): `orm-models.md` (models, queries,
 relations), `controllers-http.md` (validation, Inertia, auth), `routes-codegen.md`
-(route options, schema binding, codegen), `testing.md` (TestApp assertions).
+(route options, schema binding, codegen), `testing.md` (TestApp assertions),
+`docs-and-spec.md` (linked ADRs/docs, generated spec views).
 Read the matching rule file before reading `node_modules/@guren/*` — it covers the
 exact signatures.
 
@@ -76,6 +87,10 @@ bunx guren make:listener <Name> --event=<EventName>
 bunx guren make:mail <Name>
 bunx guren make:test <Name>
 
+# Growing past a flat app/? Scaffold a self-contained module:
+bunx guren make:module <Name>                    # modules/<name>/{index.ts,routes.ts,db/schema.ts}, wired into src/app.ts
+bunx guren make:controller <Name> --module <name> # most make:* commands accept --module
+
 # Database workflow: edit db/schema.ts first, then
 bunx guren make:migration <name>   # generate SQL migration via drizzle-kit into db/migrations/
 bun run db:migrate                 # apply pending migrations
@@ -90,21 +105,24 @@ bun run test
 
 ## MCP Server (AI Agent Integration)
 
-`bun run dev` を実行すると、開発サーバーに MCP エンドポイントが自動的に起動します:
+`bun run dev` を実行すると、開発サーバーに MCP エンドポイントが起動します（`dev` スクリプトの `GUREN_MCP=1` で有効化。無い場合は `GUREN_MCP=1 bun run dev`、本番環境では付けても無効です）:
 
 ```
 http://localhost:3333/_guren/mcp
 ```
 
 `.mcp.json` が設定済みなので、Claude Code / Cursor は自動的に接続します。
-本番環境（`NODE_ENV=production`）では無効化されます。
+
+エンドポイントは同一マシンからのアクセスのみ許可します。他オリジンのブラウザページ
+（DNS rebinding 含む）と、LAN 上の別ホストからのリクエストは 403 で拒否されます。
 
 ### 利用可能なツール
 
 | Tool | 説明 |
 |------|------|
 | `guren_get_context` | プロジェクト構造マップ（models, routes, pages, controllers等） |
-| `guren_check` | route↔controller↔page の整合性検証 |
+| `guren_entity_context` | エンティティ単位のコンテキストバンドル（model, routes, pages, linked docs） |
+| `guren_check` | route↔controller↔page の整合性・docリンク・spec鮮度の検証 |
 | `guren_list_models` | モデル一覧（リレーション、soft deletes、auth trait含む） |
 | `guren_generate_guidelines` | プロジェクト固有コーディング規約の自動生成 |
 | `guren_doctor` | プロジェクト健全性チェック + 次のアクション提案 |
@@ -127,7 +145,7 @@ router.post('/posts', { name: 'posts.store', body: CreatePostSchema }, [PostCont
 export class PostController extends Controller {
   async store() {
     const data = await this.validateBody(CreatePostSchema)   // 422 on failure
-    const user = await this.auth.userOrFail()                // 401 if unauthenticated
+    const user = await this.auth.userOrFail<UserRecord>()    // 401 if unauthenticated
     const post = await Post.create({ ...data, authorId: user.id })
     return this.redirect('/posts')
   }

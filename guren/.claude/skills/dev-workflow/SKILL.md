@@ -22,12 +22,12 @@ bun run dev
 ```
 
 **Prerequisites check before starting:**
-1. Database running? If not: `bun run db:up`
+1. Database running? Container-backed projects start it with `bun run db:up`; SQLite needs nothing.
 2. Migrations applied? If not: `bun run db:migrate`
 
 **After startup:**
 - App: `http://localhost:3333`
-- MCP endpoint: `http://localhost:3333/_guren/mcp` (dev only, auto-enabled)
+- MCP endpoint: `http://localhost:3333/_guren/mcp` (dev only, enabled by `GUREN_MCP=1` in the `dev` script; reachable from this machine only)
 
 ### Build
 
