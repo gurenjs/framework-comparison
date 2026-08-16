@@ -85,3 +85,57 @@ Use the framework's idiomatic testing tooling.
 - Visual design, accessibility auditing, i18n.
 - Production deployment configuration.
 - Performance benchmarking (this repository measures code, not throughput).
+
+## Rule clarifications registered before new implementations
+
+These rules are fixed *before* the implementation they concern is written, so
+that the ruleset cannot be tuned to the result. Each entry records the date and
+the implementation that prompted it.
+
+### 2026-08-17 — registered before `wasp/`
+
+**Compiled-spec frameworks.** A framework whose app definition is compiled into
+generated output (Wasp: `main.wasp.ts` → `.wasp/out`) is implemented the way its
+own documentation prescribes. Editing generated output is out of scope, exactly
+as editing `.guren/` output would be.
+
+**ORM.** The first-party-ORM exception extends to a framework that is
+structurally bound to one ORM. Wasp generates its data layer from Prisma and
+cannot use Drizzle without leaving the framework, so `wasp/` uses Prisma.
+Schemas stay equivalent to the Drizzle schemas (`users`, `posts`, `comments`,
+`notifications`).
+
+**Database.** SQLite, as for every other implementation. Wasp documents SQLite
+as development-only and expects PostgreSQL in production. This repository
+measures code, not deployments, so SQLite is used and the constraint is
+footnoted rather than worked around.
+
+**Starter selection.** Where a framework offers several starters, the
+implementation uses the smallest one that satisfies the constraints above. For
+Wasp that is `wasp new --template minimal`: the `basic` starter ships Tailwind
+CSS, which the plain-CSS constraint forbids.
+
+**§4 validation errors is a behavioural requirement.** "Re-render with error
+messages next to the offending fields and previously entered values preserved"
+describes what the user sees, not how it is produced. A server-rendered
+re-render (Inertia) and a client component holding form state while an action
+returns a field-keyed error both satisfy it.
+
+**§2 unknown id → 404 is a behavioural requirement.** A server-side 404 response
+and a query that throws the framework's HTTP-404 error while the client renders
+a not-found state both satisfy it.
+
+**§6 tests, where the framework documents none.** If a framework's own
+documentation states that it provides no way to test the layer the spec requires
+tests for, its Test columns are reported as N/A with that citation, and are
+*not* filled in with a harness written for this repository. Spec compliance is
+still demonstrated: those tests live in `<impl>/verification/`, which is
+excluded from every metric. Filling the column with a hand-rolled harness would
+report a property of this repository's test code, not of the framework, which is
+what every other cell in that column measures.
+
+Wasp 0.25.0 is such a framework: "Wasp currently does not provide a way to test
+your server-side code, but we will be adding support soon."
+(`web/docs/project/testing.md` at tag `v0.25.0`). Its client-side Vitest support
+does not cover the register/login/authorization flows this spec requires tests
+for.

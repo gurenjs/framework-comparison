@@ -2,7 +2,7 @@
  * Produces the comparison table in README.md. See MEASUREMENT.md for the
  * definitions of every metric. Run with: bun scripts/measure.ts
  */
-import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync, existsSync, writeFileSync } from 'node:fs'
 import { join, relative, basename } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { getEncoding } from 'js-tiktoken'
@@ -17,6 +17,7 @@ const EXCLUDED_DIRS = new Set([
   'build',
   'out',
   '.guren', // Guren codegen output
+  '.wasp', // Wasp compiler output (.wasp/out)
   '.output', // TanStack Start / Nitro build output
   '.tanstack',
   '.nitro',
@@ -24,6 +25,9 @@ const EXCLUDED_DIRS = new Set([
   '.adonisjs',
   '.vercel',
   'coverage',
+  // Spec-compliance tests for a framework that documents no test support for
+  // the layer the spec requires. Excluded from every metric — see SPEC.md.
+  'verification',
 ])
 // Note: drizzle-kit migration dirs need no entry here — their .sql/.json files
 // are already outside COUNTED_EXTENSIONS. Hand-written migration classes
@@ -43,7 +47,9 @@ const EXCLUDED_RELATIVE_PATHS = new Set([
   'types/generated/routes.d.ts', // Guren: "DO NOT EDIT" output of `guren codegen`
 ])
 
-const COUNTED_EXTENSIONS = ['.ts', '.tsx', '.css']
+// .prisma: author-written data-model definitions count regardless of extension,
+// same as Drizzle/Lucid schemas in .ts. See MEASUREMENT.md.
+const COUNTED_EXTENSIONS = ['.ts', '.tsx', '.css', '.prisma']
 
 type FileKind = 'source' | 'config' | 'test'
 
@@ -192,4 +198,24 @@ rows.push(row('Test LOC', (metric) => metric.testLoc))
 rows.push(row('Direct dependencies', (metric) => metric.directDeps))
 rows.push(row('Context tokens (cl100k)', (metric) => metric.contextTokens))
 
-console.log(rows.join('\n'))
+const table = rows.join('\n')
+
+if (process.argv.includes('--write')) {
+  const readmePath = join(repoRoot, 'README.md')
+  const readme = readFileSync(readmePath, 'utf8')
+  const begin = '<!-- measure:begin'
+  const end = '<!-- measure:end -->'
+  const beginIndex = readme.indexOf(begin)
+  const endIndex = readme.indexOf(end)
+  if (beginIndex === -1 || endIndex === -1) {
+    console.error('README.md is missing the measure:begin / measure:end markers')
+    process.exit(1)
+  }
+  const beginLineEnd = readme.indexOf('\n', beginIndex)
+  const updated =
+    readme.slice(0, beginLineEnd + 1) + table + '\n' + readme.slice(endIndex)
+  writeFileSync(readmePath, updated)
+  console.error('README.md updated')
+}
+
+console.log(table)
