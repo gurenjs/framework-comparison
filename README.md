@@ -98,9 +98,13 @@ Actions requires notable setup).
 **Context tokens measure the full-read cost for an AI agent** — and reading
 everything is how an agent must approach most of these apps (17.3k tokens for
 AdonisJS, ~7–11k for the rest). Guren ships a cheaper path: `bunx guren
-context` emits a project map (routes, models, controllers, pages) that
-measures **404 tokens** against ~10,000 for reading the tree — and `bunx
-guren check` / `bunx guren audit` verify route↔controller↔page consistency
+context` emits a project map (routes, models, controllers, pages, and the
+signatures of the framework APIs they use) that measures **1,407 tokens**
+against 10,055 for reading the tree — 7× cheaper. That map was 404 tokens
+when this section was first written, before the output began carrying API
+signatures; the figure here is `guren context` tokenised with cl100k on
+`@guren/cli` 2.0.0, the version this implementation pins. `bunx guren check`
+/ `bunx guren audit` verify route↔controller↔page consistency
 and validation/auth coverage mechanically after an agent edits. AdonisJS
 comes closest in spirit (`node ace list:routes`, generated type registries);
 the other stacks have no equivalent — verification is reading the diff.
