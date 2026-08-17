@@ -6,32 +6,43 @@ All numbers in the README are produced by one command:
 bun scripts/measure.ts
 ```
 
-The script prints a Markdown table you can diff against the README. Numbers are
-never edited by hand.
+`bun scripts/measure.ts --write` rewrites the generated blocks in README.md in
+place; without the flag the script only prints them. Numbers in those blocks are
+never edited by hand — that is not an aspiration, it is why the flag exists: the
+blocks were hand-transcribed once and drifted from the code they described.
 
 ## What is counted
 
-For each implementation directory (`guren/`, `hono/`, `nextjs/`):
+For each implementation directory (`guren/`, `hono/`, `nextjs/`, `tanstack/`,
+`adonisjs/`, `nestjs/`). The script reads the working tree, not the index, so an
+uncommitted or untracked file inside an implementation is measured like any
+other:
 
 | Metric | Definition |
 |--------|------------|
-| Source files | Committed `*.ts` / `*.tsx` / `*.css` files, minus exclusions below |
+| Source files | `*.ts` / `*.tsx` / `*.css` / `*.prisma` files, minus exclusions below. `.prisma` is there because author-written data-model definitions count whatever their syntax — Drizzle and Lucid schemas are `.ts` and always counted |
 | Source LOC | Non-blank lines in those files |
 | Handwritten LOC | Non-blank lines **added relative to the pristine generator output** committed under [`baselines/`](./baselines) (computed with `git diff`). This separates "code you own" from "code you typed": scaffolds produce real code you maintain, but generating it took seconds, not hours. An implementation with no scaffold (`hono/`) has every line handwritten by definition. |
-| Config LOC | Non-blank lines in committed config files (`*.config.*`, `tsconfig*.json`, `.env.example`, `drizzle.config.ts`, …) |
+| Config LOC | Non-blank lines in config files (`*.config.*`, `tsconfig*.json`, `.env.example`, `drizzle.config.ts`, …) |
 | Direct dependencies | `dependencies` + `devDependencies` entries in the implementation's `package.json` |
 | Context tokens | Tokens (cl100k_base) required to read every counted source + config file — a proxy for how much an AI agent must load to understand the project |
+| External verification LOC | Non-blank lines under `<impl>/verification/`: spec-compliance tests this repository wrote for a framework that documents no support for the layer SPEC §6 tests. Reported apart from Test LOC because it measures this repository's harness, not the framework's test API — but reported, because the code exists and someone had to write it |
+| Agent guidance LOC / tokens | Non-blank lines and cl100k tokens of agent-harness instruction files (`CLAUDE.md`, `AGENTS.md`, `.claude/`, `.cursor/`, `.agents/`, `.github/instructions/`, `.cursorrules`) that are not already counted as code. Kept out of Source LOC and Context tokens, which measure the cost of reading the *app*, and reported on their own rows because a framework that ships a large harness would otherwise carry none of its weight in any column |
 
 ## What is excluded
 
 - `node_modules/`, lockfiles, and build output (`.next/`, `dist/`, `build/`).
 - **Generated artifacts marked as such** — files whose header says "do not edit"
   or that live in a documented codegen output directory (e.g. Guren's `.guren/`,
-  Drizzle's `drizzle/meta/`, Next.js' `next-env.d.ts`). Rationale: nobody reads
-  or maintains them; they are rebuilt by a command. Generated SQL migrations
-  fall out automatically (only `.ts`/`.tsx`/`.css` are counted) — but
-  hand-written migration *classes* (e.g. AdonisJS `database/migrations/*.ts`)
+  Drizzle's `drizzle/meta/`, Next.js' `next-env.d.ts`, Wasp's `.wasp/`).
+  Rationale: nobody reads or maintains them; they are rebuilt by a command.
+  Generated SQL migrations fall out because `.sql` is not a counted extension —
+  but hand-written migration *classes* (e.g. AdonisJS `database/migrations/*.ts`)
   are code the developer writes and DO count.
+- Committed build output, by path rather than by extension (`public/assets/`).
+  Bundles are excluded anyway for being `.js`; the hashed stylesheet emitted
+  beside them was being counted purely because `.css` is on the extension list,
+  which is an accident of the list rather than a rule.
 - Test files are counted **separately** and reported in their own column, since
   test verbosity is a property of the test API, not the app.
 
@@ -95,13 +106,17 @@ rather than as a number that looks like the others.
 **Handwritten LOC counts added lines only; deletions are free.** This has always
 been true of the metric and is now stated: an implementation that starts from a
 large starter and deletes most of it pays nothing for the deletion. The bias
-matters most where the starter is largest. Each `baselines/<impl>/README.md`
-records the exact generator invocation, template flags included, so the baseline
-is reproducible.
+matters most where the starter is largest. The generator invocation for each
+implementation is documented in that implementation's own README; `baselines/`
+holds the pristine output. Recording the invocation in `baselines/<impl>/README.md`
+as well is the intent going forward — today several of those files are still the
+starter's own README, and `baselines/adonisjs/` has none.
 
-**Results carry a version stamp, and implementations are pinned.** The table
-records, per implementation, the framework version measured and the date that
-implementation was last touched. This makes an asymmetry visible that was
+**Results carry a version stamp, and implementations are pinned.** The table is
+to record, per implementation, the framework version measured and the date that
+implementation was last touched. This is registered here before it is
+implemented: the current table carries neither, and the commit that adds the
+first compiled-spec implementation is expected to add them. This makes an asymmetry visible that was
 previously invisible: implementations are written once against the framework
 version current at the time and are not continuously upgraded, so an
 implementation that has received maintenance commits is being compared against
@@ -111,10 +126,11 @@ every measurement is not sustainable for one person. Pull requests upgrading any
 implementation to a newer framework version are welcome and are the intended
 correction mechanism.
 
-**The table is regenerated by the script, never by hand.** `bun scripts/measure.ts
---write` rewrites the block between the `measure:begin` / `measure:end` markers in
-README.md. Manual write-back is how the published table came to disagree with the
-code it described.
+**The tables are regenerated by the script, never by hand.** `bun
+scripts/measure.ts --write` rewrites the blocks between the `measure:begin` /
+`measure:end` and `areas:begin` / `areas:end` markers in README.md. Manual
+write-back is how the published tables came to disagree with the code they
+described.
 
 **Context tokens exclude generated output, for every implementation.** For a
 framework that compiles a spec, the counted files are therefore the spec and the

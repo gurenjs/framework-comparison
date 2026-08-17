@@ -25,9 +25,6 @@ const EXCLUDED_DIRS = new Set([
   '.adonisjs',
   '.vercel',
   'coverage',
-  // Spec-compliance tests for a framework that documents no test support for
-  // the layer the spec requires. Excluded from every metric — see SPEC.md.
-  'verification',
 ])
 // Note: drizzle-kit migration dirs need no entry here — their .sql/.json files
 // are already outside COUNTED_EXTENSIONS. Hand-written migration classes
@@ -47,11 +44,45 @@ const EXCLUDED_RELATIVE_PATHS = new Set([
   'types/generated/routes.d.ts', // Guren: "DO NOT EDIT" output of `guren codegen`
 ])
 
+// Committed Vite build output. Its .js siblings fall outside COUNTED_EXTENSIONS
+// already; counting the one hashed .css beside them was an accident of the
+// extension list, not a rule.
+const EXCLUDED_DIR_PREFIXES = ['public/assets/']
+
 // .prisma: author-written data-model definitions count regardless of extension,
 // same as Drizzle/Lucid schemas in .ts. See MEASUREMENT.md.
 const COUNTED_EXTENSIONS = ['.ts', '.tsx', '.css', '.prisma']
 
-type FileKind = 'source' | 'config' | 'test'
+/**
+ * Agent-harness guidance: the files a coding agent's harness loads as
+ * instructions rather than as application code. They are prose and settings, so
+ * no code metric can see them, yet they are exactly what an agent reads before
+ * touching the project — which makes leaving them uncounted the one omission
+ * most likely to flatter whichever implementation ships the most of them.
+ *
+ * Reported in their own rows, never folded into Source LOC or Context tokens:
+ * those measure the cost of reading the app, and mixing guidance in would
+ * destroy that meaning. Files here that ARE counted code (guren's hook is a
+ * .ts file) are left to the code metrics so nothing is counted twice.
+ */
+const AGENT_GUIDANCE_PATHS = [
+  'CLAUDE.md',
+  'AGENTS.md',
+  '.cursorrules',
+  '.claude/',
+  '.cursor/',
+  '.agents/',
+  '.github/instructions/',
+]
+
+function isAgentGuidance(relPath: string): boolean {
+  if (COUNTED_EXTENSIONS.some((ext) => relPath.endsWith(ext))) return false
+  return AGENT_GUIDANCE_PATHS.some(
+    (entry) => relPath === entry || relPath.startsWith(entry),
+  )
+}
+
+type FileKind = 'source' | 'config' | 'test' | 'verification'
 
 interface Metrics {
   sourceFiles: number
@@ -62,6 +93,11 @@ interface Metrics {
   directDeps: number
   contextTokens: number
   handwrittenLoc: number
+  verificationFiles: number
+  verificationLoc: number
+  guidanceFiles: number
+  guidanceLoc: number
+  guidanceTokens: number
 }
 
 const encoder = getEncoding('cl100k_base')
@@ -83,6 +119,10 @@ function isTest(path: string): boolean {
 }
 
 function classify(path: string): FileKind {
+  // Spec-compliance tests written by this repository for a framework that
+  // documents no support for the layer SPEC §6 tests. Reported on its own row
+  // rather than dropped: the code exists and someone had to write it.
+  if (path === 'verification' || path.startsWith('verification/')) return 'verification'
   if (isTest(path)) return 'test'
   if (isConfig(path)) return 'config'
   return 'source'
@@ -100,6 +140,18 @@ function* walk(dir: string): Generator<string> {
     if (COUNTED_EXTENSIONS.some((ext) => entry.endsWith(ext)) || isConfig(full)) {
       yield full
     }
+  }
+}
+
+/** Like walk(), but extension-agnostic — agent guidance is .md and .json. */
+function* walkAll(dir: string): Generator<string> {
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry)
+    if (statSync(full).isDirectory()) {
+      if (entry !== 'node_modules' && entry !== '.git') yield* walkAll(full)
+      continue
+    }
+    yield full
   }
 }
 
@@ -150,14 +202,14 @@ const AREAS = [
   'Auth',
   'Validation + serialization + authz',
   'Plumbing (bootstrap / providers)',
-  'Agent harness',
+  'Agent harness (hook)',
 ] as const
 
 type Area = (typeof AREAS)[number]
 
 const AREA_RULES: Record<string, Array<[string, Area]>> = {
   guren: [
-    ['.claude/', 'Agent harness'],
+    ['.claude/', 'Agent harness (hook)'],
     ['resources/', 'Frontend (React UI)'],
     ['public/', 'Frontend (React UI)'],
     ['app/Http/Controllers/', 'Routes / controllers / actions'],
@@ -208,6 +260,7 @@ function measureAreas(root: string, impl: string): Map<Area, number> {
   for (const file of walk(root)) {
     const rel = relative(root, file)
     if (EXCLUDED_RELATIVE_PATHS.has(rel)) continue
+    if (EXCLUDED_DIR_PREFIXES.some((prefix) => rel.startsWith(prefix))) continue
     if (classify(rel) !== 'source') continue
 
     const area = areaFor(impl, rel)
@@ -230,17 +283,29 @@ function measure(root: string, baselineDir: string | null): Metrics {
     directDeps: 0,
     contextTokens: 0,
     handwrittenLoc: 0,
+    verificationFiles: 0,
+    verificationLoc: 0,
+    guidanceFiles: 0,
+    guidanceLoc: 0,
+    guidanceTokens: 0,
   }
 
   for (const file of walk(root)) {
-    if (EXCLUDED_RELATIVE_PATHS.has(relative(root, file))) {
+    const relPath = relative(root, file)
+    if (EXCLUDED_RELATIVE_PATHS.has(relPath)) {
+      continue
+    }
+    if (EXCLUDED_DIR_PREFIXES.some((prefix) => relPath.startsWith(prefix))) {
       continue
     }
     const content = readFileSync(file, 'utf8')
     const loc = nonBlankLines(content)
-    const kind = classify(relative(root, file))
+    const kind = classify(relPath)
 
-    if (kind === 'test') {
+    if (kind === 'verification') {
+      metrics.verificationFiles += 1
+      metrics.verificationLoc += loc
+    } else if (kind === 'test') {
       metrics.testFiles += 1
       metrics.testLoc += loc
     } else if (kind === 'config') {
@@ -253,6 +318,15 @@ function measure(root: string, baselineDir: string | null): Metrics {
       metrics.contextTokens += encoder.encode(content).length
       metrics.handwrittenLoc += handwrittenLines(baselineDir, file, root)
     }
+  }
+
+  for (const file of walkAll(root)) {
+    const relPath = relative(root, file)
+    if (!isAgentGuidance(relPath)) continue
+    const content = readFileSync(file, 'utf8')
+    metrics.guidanceFiles += 1
+    metrics.guidanceLoc += nonBlankLines(content)
+    metrics.guidanceTokens += encoder.encode(content).length
   }
 
   const pkgPath = join(root, 'package.json')
@@ -290,6 +364,9 @@ rows.push(row('Test files', (metric) => metric.testFiles))
 rows.push(row('Test LOC', (metric) => metric.testLoc))
 rows.push(row('Direct dependencies', (metric) => metric.directDeps))
 rows.push(row('Context tokens (cl100k)', (metric) => metric.contextTokens))
+rows.push(row('External verification LOC', (metric) => metric.verificationLoc))
+rows.push(row('Agent guidance LOC', (metric) => metric.guidanceLoc))
+rows.push(row('Agent guidance tokens (cl100k)', (metric) => metric.guidanceTokens))
 
 const table = rows.join('\n')
 

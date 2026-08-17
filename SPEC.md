@@ -134,10 +134,12 @@ a not-found state both satisfy it.
 documentation states that it provides no way to test the layer the spec requires
 tests for, its Test columns are reported as N/A with that citation, and are
 *not* filled in with a harness written for this repository. Spec compliance is
-still demonstrated: those tests live in `<impl>/verification/`, which is
-excluded from every metric. Filling the column with a hand-rolled harness would
-report a property of this repository's test code, not of the framework, which is
-what every other cell in that column measures.
+still demonstrated, and its cost is still published: those tests live in
+`<impl>/verification/` and are reported on their own **External verification
+LOC** row. Filling the Test column itself with a hand-rolled harness would report
+a property of this repository's test code, not of the framework, which is what
+every other cell in that column measures — but erasing the harness entirely would
+hide real work behind an N/A, so it gets a row of its own instead.
 
 This is the case for Wasp 0.25.0, which documents server-side testing as work
 that is planned rather than absent, with an open tracking issue: "Wasp currently
