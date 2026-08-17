@@ -92,6 +92,11 @@ These rules are fixed *before* the implementation they concern is written, so
 that the ruleset cannot be tuned to the result. Each entry records the date and
 the implementation that prompted it.
 
+Naming a framework here is a record of which implementation forced a rule to be
+written down, not a claim about that framework. Every implementation in this
+repository is meant to be a fair representation of its framework, and the
+[Fairness](./README.md#fairness) note applies to all of them equally.
+
 ### 2026-08-17 — registered before `wasp/`
 
 **Compiled-spec frameworks.** A framework whose app definition is compiled into
@@ -134,8 +139,11 @@ excluded from every metric. Filling the column with a hand-rolled harness would
 report a property of this repository's test code, not of the framework, which is
 what every other cell in that column measures.
 
-Wasp 0.25.0 is such a framework: "Wasp currently does not provide a way to test
-your server-side code, but we will be adding support soon."
-(`web/docs/project/testing.md` at tag `v0.25.0`). Its client-side Vitest support
-does not cover the register/login/authorization flows this spec requires tests
-for.
+This is the case for Wasp 0.25.0, which documents server-side testing as work
+that is planned rather than absent, with an open tracking issue: "Wasp currently
+does not provide a way to test your server-side code, but we will be adding
+support soon." (`web/docs/project/testing.md` at tag `v0.25.0`). Its client-side
+Vitest support is real and unaffected by this rule; it simply is not the layer
+§6 asks for. The rule exists so that a status a framework already documents is
+reported as that status, on a date, rather than replaced by a number this
+repository made up.

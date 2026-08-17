@@ -116,7 +116,8 @@ correction mechanism.
 README.md. Manual write-back is how the published table came to disagree with the
 code it described.
 
-**Context tokens exclude generated output, for every implementation.** Wasp's
-number is therefore small: an agent reading a Wasp project reads the spec and
-the operations, not `.wasp/out`. An agent *debugging* through generated code
-would read more. The number is published unadjusted and the caveat is footnoted.
+**Context tokens exclude generated output, for every implementation.** For a
+framework that compiles a spec, the counted files are therefore the spec and the
+operations, not the generated tree. Whatever the resulting number is, it is
+published unadjusted, footnoted with the fact that an agent *debugging* through
+generated code would read more than the count suggests.
