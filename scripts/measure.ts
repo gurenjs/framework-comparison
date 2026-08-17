@@ -7,7 +7,7 @@ import { join, relative, basename } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { getEncoding } from 'js-tiktoken'
 
-const IMPLEMENTATIONS = ['guren', 'hono', 'nextjs', 'tanstack', 'adonisjs', 'nestjs'] as const
+const IMPLEMENTATIONS = ['guren', 'hono', 'nextjs', 'tanstack', 'adonisjs', 'wasp', 'nestjs'] as const
 
 const EXCLUDED_DIRS = new Set([
   'node_modules',
@@ -232,6 +232,25 @@ const AREA_RULES: Record<string, Array<[string, Area]>> = {
     ['src/server/auth/', 'Auth'],
     ['src/server/validation.ts', 'Validation + serialization + authz'],
     ['src/server/', 'Plumbing (bootstrap / providers)'],
+  ],
+  // main.wasp.ts and post.wasp.ts declare routes, pages, auth and operations,
+  // which is what routes/web.ts declares in guren/ — hence Routes, not Config.
+  // The auth *pages* are Frontend, as guren/'s login and register pages are;
+  // the auth *wiring* is Auth, as hono/'s and nextjs/' server auth is.
+  wasp: [
+    ['src/auth/LoginPage.tsx', 'Frontend (React UI)'],
+    ['src/auth/SignupPage.tsx', 'Frontend (React UI)'],
+    ['src/auth/', 'Auth'],
+    ['src/posts/queries.ts', 'Routes / controllers / actions'],
+    ['src/posts/actions.ts', 'Routes / controllers / actions'],
+    ['src/posts/post.wasp.ts', 'Routes / controllers / actions'],
+    ['src/posts/', 'Frontend (React UI)'],
+    ['src/Layout.tsx', 'Frontend (React UI)'],
+    ['src/Main.css', 'Frontend (React UI)'],
+    ['src/validation.ts', 'Validation + serialization + authz'],
+    ['src/vite-env.d.ts', 'Plumbing (bootstrap / providers)'],
+    ['main.wasp.ts', 'Routes / controllers / actions'],
+    ['schema.prisma', 'DB + models'],
   ],
   nextjs: [
     ['src/app/api/auth/', 'Auth'],
