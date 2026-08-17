@@ -149,3 +149,35 @@ Vitest support is real and unaffected by this rule; it simply is not the layer
 §6 asks for. The rule exists so that a status a framework already documents is
 reported as that status, on a date, rather than replaced by a number this
 repository made up.
+
+### 2026-08-18 — registered before implementing `wasp/`
+
+Two decisions the framework forces, registered before the code exists for the
+same reason as everything above.
+
+**Auth method.** §1 asks for register/login/logout with a unique email, a name,
+and a hashed password. Wasp offers `usernameAndPassword`, `email`, `google` and
+`github`. `wasp/` uses `usernameAndPassword` with the email as the username and
+`name` attached through `userSignupFields`, because that covers exactly §1's
+surface. Wasp's `email` method is the closer name-match but adds a verification
+flow and an email-provider dependency that §1 does not ask for and that no other
+implementation carries; adopting it would make `wasp/` do strictly more work than
+its peers and report worse numbers for a requirement that was never made. The
+general rule: **where a framework offers several mechanisms, the implementation
+uses the one whose surface matches the spec, not the one whose name matches.**
+Uniqueness is asserted behaviourally (a second signup with the same email is
+rejected) rather than as a schema property, because Wasp stores the auth identity
+separately from the user entity.
+
+**Deferred work under §5, where the framework's mechanism needs a database this
+spec does not use.** Wasp's `job` runs on pg-boss, which "requires that your
+database provider is set to `"postgresql"`" (`web/docs/advanced/jobs.md` at tag
+`v0.25.0`). Every implementation here runs on SQLite, which §5's own wording
+anticipates: it asks for "the framework's idiomatic mechanism for deferred work
+(queue, job, `after`/`waitUntil`, etc.)" and accepts a row in a `notifications`
+table. So `wasp/` defers the welcome notification without `job`, and the
+implementation's README says so next to the citation. This is a deviation in
+mechanism, not in observable behaviour, and it is a property of the spec's
+database choice rather than of Wasp: on PostgreSQL the same app would declare a
+`job`. Any implementation whose idiomatic deferral mechanism is unavailable under
+these constraints is handled the same way.
