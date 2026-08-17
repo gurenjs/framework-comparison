@@ -127,6 +127,99 @@ function handwrittenLines(baselineDir: string | null, file: string, root: string
     .length
 }
 
+/**
+ * Per-area LOC, for the "Where the lines go" table in README.md.
+ *
+ * The rules below were recovered from the tree at 75be922 (the commit that
+ * first published that table by hand) and reproduce every row of it except
+ * Plumbing, which was computed inconsistently there: config files were folded
+ * into it for `nextjs/` but not for the others, and the guren/hono figures were
+ * 2 and 4 lines low. Config LOC has its own column in the main table, so areas
+ * cover Source files only, and two checks keep them honest: a source file that
+ * matches no rule is a hard error (so a new file has to be classified, not
+ * silently absorbed), and the area totals must sum to Source LOC. There is
+ * deliberately no catch-all rule — one would make the first check unreachable.
+ *
+ * First matching prefix wins, so order matters (nextjs' auth route handler
+ * lives under src/app/ and must be claimed before the Frontend rule).
+ */
+const AREAS = [
+  'Frontend (React UI)',
+  'Routes / controllers / actions',
+  'DB + models',
+  'Auth',
+  'Validation + serialization + authz',
+  'Plumbing (bootstrap / providers)',
+  'Agent harness',
+] as const
+
+type Area = (typeof AREAS)[number]
+
+const AREA_RULES: Record<string, Array<[string, Area]>> = {
+  guren: [
+    ['.claude/', 'Agent harness'],
+    ['resources/', 'Frontend (React UI)'],
+    ['public/', 'Frontend (React UI)'],
+    ['app/Http/Controllers/', 'Routes / controllers / actions'],
+    ['routes/', 'Routes / controllers / actions'],
+    ['app/Models/', 'DB + models'],
+    ['db/', 'DB + models'],
+    ['app/Http/Validators/', 'Validation + serialization + authz'],
+    ['app/Http/Resources/', 'Validation + serialization + authz'],
+    ['app/Policies/', 'Validation + serialization + authz'],
+    ['app/Providers/', 'Plumbing (bootstrap / providers)'],
+    ['app/Jobs/', 'Plumbing (bootstrap / providers)'],
+    ['bin/', 'Plumbing (bootstrap / providers)'],
+    ['config/', 'Plumbing (bootstrap / providers)'],
+    ['src/', 'Plumbing (bootstrap / providers)'],
+  ],
+  hono: [
+    ['src/client/', 'Frontend (React UI)'],
+    ['src/server/routes/', 'Routes / controllers / actions'],
+    ['src/server/db/', 'DB + models'],
+    ['src/server/auth/', 'Auth'],
+    ['src/server/validation.ts', 'Validation + serialization + authz'],
+    ['src/server/', 'Plumbing (bootstrap / providers)'],
+  ],
+  nextjs: [
+    ['src/app/api/auth/', 'Auth'],
+    ['src/auth.ts', 'Auth'],
+    ['src/app/', 'Frontend (React UI)'],
+    ['src/lib/actions/', 'Routes / controllers / actions'],
+    ['src/db/', 'DB + models'],
+    ['src/lib/data.ts', 'DB + models'],
+    ['src/lib/validation.ts', 'Validation + serialization + authz'],
+    ['src/proxy.ts', 'Plumbing (bootstrap / providers)'],
+  ],
+}
+
+const AREA_IMPLEMENTATIONS = Object.keys(AREA_RULES)
+
+function areaFor(impl: string, relPath: string): Area | null {
+  for (const [prefix, area] of AREA_RULES[impl]) {
+    if (relPath.startsWith(prefix)) return area
+  }
+  return null
+}
+
+function measureAreas(root: string, impl: string): Map<Area, number> {
+  const totals = new Map<Area, number>(AREAS.map((area) => [area, 0]))
+
+  for (const file of walk(root)) {
+    const rel = relative(root, file)
+    if (EXCLUDED_RELATIVE_PATHS.has(rel)) continue
+    if (classify(rel) !== 'source') continue
+
+    const area = areaFor(impl, rel)
+    if (!area) {
+      throw new Error(`${impl}: no area rule matches ${rel} — add one to AREA_RULES`)
+    }
+    totals.set(area, totals.get(area)! + nonBlankLines(readFileSync(file, 'utf8')))
+  }
+
+  return totals
+}
+
 function measure(root: string, baselineDir: string | null): Metrics {
   const metrics: Metrics = {
     sourceFiles: 0,
@@ -200,6 +293,34 @@ rows.push(row('Context tokens (cl100k)', (metric) => metric.contextTokens))
 
 const table = rows.join('\n')
 
+const areaRows: string[] = []
+areaRows.push('| Area | ' + AREA_IMPLEMENTATIONS.map((impl) => `\`${impl}/\``).join(' | ') + ' |')
+areaRows.push('|------|' + AREA_IMPLEMENTATIONS.map(() => '---------:').join('|') + '|')
+
+const areaTotals = AREA_IMPLEMENTATIONS.map((impl) => measureAreas(join(repoRoot, impl), impl))
+
+// Reconciliation: areas cover exactly the Source files, so they must sum to
+// Source LOC. This is what the hand-built table got wrong.
+AREA_IMPLEMENTATIONS.forEach((impl, index) => {
+  const sum = [...areaTotals[index].values()].reduce((a, b) => a + b, 0)
+  const expected = results[IMPLEMENTATIONS.indexOf(impl as (typeof IMPLEMENTATIONS)[number])]?.sourceLoc
+  if (sum !== expected) {
+    console.error(`${impl}: area total ${sum} does not reconcile with Source LOC ${expected}`)
+    process.exit(1)
+  }
+})
+
+for (const area of AREAS) {
+  const cells = areaTotals.map((totals) => {
+    const value = totals.get(area)!
+    return value === 0 ? '—' : value.toLocaleString('en-US')
+  })
+  if (cells.every((cell) => cell === '—')) continue
+  areaRows.push(`| ${area} | ${cells.join(' | ')} |`)
+}
+
+const areaTable = areaRows.join('\n')
+
 if (process.argv.includes('--write')) {
   const readmePath = join(repoRoot, 'README.md')
   const readme = readFileSync(readmePath, 'utf8')
@@ -212,10 +333,24 @@ if (process.argv.includes('--write')) {
     process.exit(1)
   }
   const beginLineEnd = readme.indexOf('\n', beginIndex)
-  const updated =
-    readme.slice(0, beginLineEnd + 1) + table + '\n' + readme.slice(endIndex)
+  let updated = readme.slice(0, beginLineEnd + 1) + table + '\n' + readme.slice(endIndex)
+
+  const areaBegin = updated.indexOf('<!-- areas:begin')
+  const areaEnd = updated.indexOf('<!-- areas:end -->')
+  if (areaBegin === -1 || areaEnd === -1) {
+    console.error('README.md is missing the areas:begin / areas:end markers')
+    process.exit(1)
+  }
+  const areaBeginLineEnd = updated.indexOf('\n', areaBegin)
+  updated =
+    updated.slice(0, areaBeginLineEnd + 1) + areaTable + '\n' + updated.slice(areaEnd)
+
   writeFileSync(readmePath, updated)
   console.error('README.md updated')
 }
 
 console.log(table)
+if (process.argv.includes('--areas')) {
+  console.log()
+  console.log(areaTable)
+}
