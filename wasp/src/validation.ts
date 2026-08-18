@@ -1,40 +1,16 @@
-import { HttpError } from "wasp/server";
-
 /**
- * SPEC §4 field rules, in one place. Operations validate before touching an
- * entity and throw a 422 carrying a field-keyed map, which the forms render
- * next to the offending input while keeping what the user typed.
+ * Client-safe half of the §4 validation contract: the shape of the field map and
+ * how to read it back off a rejected operation.
+ *
+ * Deliberately imports nothing from `wasp/server`. The throwing helpers live in
+ * `src/serverValidation.ts` — when both halves shared one module, the pages
+ * imported it, that pulled `wasp/server` into the client graph, and the server
+ * ended up with two copies of `HttpError`: the one bundled into the server and
+ * the one resolved from the SDK. `err instanceof HttpError` was then false in
+ * Wasp's error handler, so every 4xx came back as an HTML error page instead of
+ * the JSON body carrying `data`, and no field error ever reached a form.
  */
 export type FieldErrors = Record<string, string>;
-
-export function invalid(errors: FieldErrors): never {
-  throw new HttpError(422, "Validation failed", { fieldErrors: errors });
-}
-
-export function requireLength(
-  value: unknown,
-  field: string,
-  min: number,
-  max: number,
-  label: string,
-): string {
-  if (typeof value !== "string" || value.trim().length < min) {
-    invalid({ [field]: `${label} is required.` });
-  }
-  const trimmed = (value as string).trim();
-  if (trimmed.length > max) {
-    invalid({ [field]: `${label} must be at most ${max} characters.` });
-  }
-  return trimmed;
-}
-
-export function requireId(value: unknown, field: string): number {
-  const id = Number(value);
-  if (!Number.isInteger(id) || id <= 0) {
-    invalid({ [field]: "Invalid identifier." });
-  }
-  return id;
-}
 
 /** Pulls the field map back out of the error a failed operation rejects with. */
 export function fieldErrorsOf(error: unknown): FieldErrors {

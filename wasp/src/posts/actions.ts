@@ -7,7 +7,7 @@ import type {
   DeletePost,
   UpdatePost,
 } from "wasp/server/operations";
-import { requireId, requireLength } from "../validation";
+import { requireId, requireLength } from "../serverValidation";
 
 function requireUser(context: { user?: { id: number } }): { id: number } {
   if (!context.user) {

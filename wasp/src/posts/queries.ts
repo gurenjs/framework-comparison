@@ -1,7 +1,7 @@
 import type { Comment, Post, User } from "wasp/entities";
 import { HttpError } from "wasp/server";
 import type { GetPost, GetPosts } from "wasp/server/operations";
-import { requireId } from "../validation";
+import { requireId } from "../serverValidation";
 
 export const PAGE_SIZE = 10;
 
