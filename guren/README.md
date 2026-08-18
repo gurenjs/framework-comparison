@@ -3,7 +3,10 @@
 The [SPEC.md](../SPEC.md) blog implemented on [Guren](https://github.com/gurenjs/guren).
 
 Generator commands used (their pristine output is committed as
-[`baselines/guren`](../baselines/guren) for the handwritten-LOC metric):
+[`baselines/guren`](../baselines/guren) for the handwritten-LOC metric). The
+app was later upgraded in place to Guren 2.x (commit `dc081bc`), so the
+`@guren/*` pins in `package.json` are newer than the generator version below
+on purpose:
 
 ```bash
 bunx create-guren-app@1.0.0-rc.30 guren --mode ssr --database sqlite --auth

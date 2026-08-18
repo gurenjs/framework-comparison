@@ -5,8 +5,8 @@ Inertia + React 19 SSR, SQLite, session middleware on every request. This is
 deliberately *not* a hello-world benchmark — the request path exercises
 routing, session handling, ORM pagination (Drizzle-backed models vs Lucid),
 serialization, and React SSR. Since the app code is held constant, the
-comparison is essentially **the same app on Bun vs on Node** — which is the
-claim; phrase it that way, not as "framework X is slow".
+comparison is essentially **the same app on Bun vs on Node** — that is the
+claim being made here, not "framework X is slow".
 
 **The ratio is the claim, not the absolute numbers.** Rounds are interleaved
 (guren, adonis, guren, adonis, …) on the same host so environment noise lands
@@ -41,7 +41,7 @@ the repo and press *Run workflow* to reproduce — no local setup, no cost.
   && cp .env build/.env && mkdir -p build/tmp)
 bun scripts/bench-seed.ts
 cp adonisjs/tmp/db.sqlite3 adonisjs/build/tmp/db.sqlite3
-RUNS=5 ADONIS_NODE="mise exec node@24 -- node" scripts/bench.sh
+RUNS=5 scripts/bench.sh   # ADONIS_NODE="mise exec node@24 -- node" if Node 24 is not on PATH
 ```
 
 Requires `oha`, Bun ≥ 1.1, and Node ≥ 24 (AdonisJS 7).

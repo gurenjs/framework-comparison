@@ -1,7 +1,8 @@
 # Where Guren agents lost their turns — stumble analysis (2026-07-13)
 
-Source: the three round-2 guren trial streams (`guren-{2,3,4}.stream.jsonl`),
-cross-checked against hono/nextjs streams. Method: chronological digest of
+Source: the three round-2 guren trial streams (`guren-{2,3,4}.stream.jsonl`,
+local artifacts of `run-trial.sh` under the gitignored `agent-eval/results/`,
+not committed), cross-checked against hono/nextjs streams. Method: chronological digest of
 every tool call, error results annotated.
 
 ## Headline

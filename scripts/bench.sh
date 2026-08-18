@@ -9,7 +9,7 @@
 #   RUNS=5                 measurement rounds per scenario (default 3)
 #   DURATION=10s           oha duration per round
 #   CONCURRENCY=50         oha connections
-#   ADONIS_NODE="node"     node launcher; locally use "mise exec node@24 -- node"
+#   ADONIS_NODE="node"     node launcher; e.g. "mise exec node@24 -- node" if Node 24 is not on PATH
 #
 # Outputs: bench-results.csv (raw rounds), bench-summary.md (medians + ratios)
 set -euo pipefail
@@ -24,9 +24,11 @@ ADONIS_NODE=${ADONIS_NODE:-node}
 CSV=bench-results.csv
 SUMMARY=bench-summary.md
 
+# Kill only the servers this script started (tracked by PID), never by
+# process-name pattern — a pattern kill would take down unrelated servers.
+SERVER_PIDS=()
 cleanup() {
-  pkill -f "bun bin/serve.ts" 2>/dev/null || true
-  pkill -f "node bin/server.js" 2>/dev/null || true
+  for pid in "${SERVER_PIDS[@]:-}"; do [ -n "$pid" ] && kill "$pid" 2>/dev/null || true; done
 }
 trap cleanup EXIT
 cleanup
@@ -46,13 +48,14 @@ wait_ready() { # url
 echo "framework,scenario,run,rps,p50_ms,p99_ms,status_200" > "$CSV"
 
 START=$(now_ms)
-(cd guren && NODE_ENV=production PORT=$GUREN_PORT bun bin/serve.ts > /tmp/bench-guren.log 2>&1 &)
+LOG_DIR="$(mktemp -d "${TMPDIR:-/tmp}/bench.XXXXXX")"
+(cd guren && exec env NODE_ENV=production PORT=$GUREN_PORT bun bin/serve.ts > "$LOG_DIR/guren.log" 2>&1) & SERVER_PIDS+=($!)
 wait_ready "http://127.0.0.1:$GUREN_PORT/posts"
 GUREN_COLD=$(( $(now_ms) - START ))
 
 START=$(now_ms)
-(cd adonisjs/build && NODE_ENV=production PORT=$ADONIS_PORT HOST=127.0.0.1 \
-  $ADONIS_NODE bin/server.js > /tmp/bench-adonis.log 2>&1 &)
+(cd adonisjs/build && exec env NODE_ENV=production PORT=$ADONIS_PORT HOST=127.0.0.1 \
+  $ADONIS_NODE bin/server.js > "$LOG_DIR/adonis.log" 2>&1) & SERVER_PIDS+=($!)
 wait_ready "http://127.0.0.1:$ADONIS_PORT/posts"
 ADONIS_COLD=$(( $(now_ms) - START ))
 

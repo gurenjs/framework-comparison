@@ -16,7 +16,9 @@ the agent never saw: seed data directly in SQLite, boot the app, and verify
 ## Headline results
 
 **On the frameworks the model knows, every trial shipped** — 30/30 scored
-July trials passed typecheck, the full test suite, and the hidden smoke.
+July trials passed typecheck, the full test suite, and the hidden smoke
+(round 2: 18, round 3: 6, round 4: 3, plus the three round-1 trials that
+finished before the turn cap; see [PILOT.md](./PILOT.md)).
 The differentiator there is cost (July 2026 snapshot, the framework versions
 of that date, N=3 medians):
 
