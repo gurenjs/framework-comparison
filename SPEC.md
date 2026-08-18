@@ -84,7 +84,9 @@ Use the framework's idiomatic testing tooling.
 
 - Visual design, accessibility auditing, i18n.
 - Production deployment configuration.
-- Performance benchmarking (this repository measures code, not throughput).
+- Performance benchmarking as part of the LOC / agent comparison (those
+  measure code, not throughput). The separate Bun-vs-Node HTTP benchmark of the
+  two Inertia apps lives in [BENCHMARK.md](./BENCHMARK.md).
 
 ## Rule clarifications registered before new implementations
 

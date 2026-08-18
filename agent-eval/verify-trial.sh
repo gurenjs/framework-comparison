@@ -9,7 +9,8 @@ IMPL="$1"
 TRIAL="$2"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 RESULTS="$REPO/agent-eval/results"
-WT="/tmp/agent-eval-worktrees/verify-$IMPL-$TRIAL"
+WT_ROOT="${WT_ROOT:-/tmp/agent-eval-worktrees}"
+WT="$WT_ROOT/verify-$IMPL-$TRIAL"
 
 rm -rf "$WT"
 git -C "$REPO" worktree remove --force "$WT" 2>/dev/null || true
@@ -49,12 +50,12 @@ case "$IMPL" in
     TESTCOUNT=$(echo "$OUT" | grep -oE "Tests +[0-9]+ passed" | head -1)
     ;;
   adonisjs)
-    export PATH="$(/opt/homebrew/bin/mise where node@24.18.0)/bin:$PATH"
+    # AdonisJS needs Node 24; pick it up from mise when present, else trust PATH.
+    if command -v mise >/dev/null 2>&1; then export PATH="$(mise where node@24.18.0)/bin:$PATH"; fi
     npm install --silent >/dev/null 2>&1; cp .env.example .env
     node ace generate:key >/dev/null 2>&1; mkdir -p tmp
-    (node ace serve >/dev/null 2>&1 & echo $! > /tmp/adonis-barrel-v.pid)
-    sleep 25; kill "$(cat /tmp/adonis-barrel-v.pid)" 2>/dev/null || true
-    lsof -ti:3333 | xargs kill 2>/dev/null || true
+    node ace serve >/dev/null 2>&1 & ADONIS_PID=$!
+    sleep 25; kill "$ADONIS_PID" 2>/dev/null || true; wait "$ADONIS_PID" 2>/dev/null || true
     node ace migration:run >/dev/null 2>&1
     npm run typecheck >/dev/null 2>&1 && TYPECHECK=pass
     OUT=$(node ace test 2>&1); echo "$OUT" | grep -q "PASSED" && TESTS=pass; TESTCOUNT=$(echo "$OUT" | grep -oE "Tests +[0-9]+ passed" | head -1)

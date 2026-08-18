@@ -93,7 +93,7 @@ case "$IMPL" in
   nextjs)   DB="$APP/minilog.db";      LIST_PATH="/" ;;
   tanstack) DB="$APP/minilog.db";      LIST_PATH="/" ;;
   adonisjs) DB="$APP/tmp/db.sqlite3";  LIST_PATH="/posts"
-            export PATH="$(/opt/homebrew/bin/mise where node@24.18.0)/bin:$PATH" ;;
+            if command -v mise >/dev/null 2>&1; then export PATH="$(mise where node@24.18.0)/bin:$PATH"; fi ;;
   nestjs)   DB="$APP/minilog.db";      LIST_PATH="/api/posts" ;;
   *) fail "unknown impl: $IMPL" ;;
 esac

@@ -62,16 +62,16 @@ case "$IMPL" in
     npm run typecheck >/dev/null && npx vitest run >/dev/null 2>&1 || { echo "PRE-CHECK FAILED"; exit 1; }
     ;;
   adonisjs)
-    export PATH="$(/opt/homebrew/bin/mise where node@24.18.0)/bin:$PATH"
+    # AdonisJS needs Node 24; pick it up from mise when present, else trust PATH.
+    if command -v mise >/dev/null 2>&1; then export PATH="$(mise where node@24.18.0)/bin:$PATH"; fi
     npm install --silent >/dev/null 2>&1
     cp .env.example .env
     node ace generate:key >/dev/null
     mkdir -p tmp # gitignored SQLite directory
     # .adonisjs/ type registries are gitignored; a dev-server boot regenerates
     # them, and every other ace command (incl. migration:run) needs them.
-    (node ace serve >/dev/null 2>&1 & echo $! > /tmp/adonis-barrel.pid)
-    sleep 25; kill "$(cat /tmp/adonis-barrel.pid)" 2>/dev/null || true
-    lsof -ti:3333 | xargs kill 2>/dev/null || true
+    node ace serve >/dev/null 2>&1 & ADONIS_PID=$!
+    sleep 25; kill "$ADONIS_PID" 2>/dev/null || true; wait "$ADONIS_PID" 2>/dev/null || true
     node ace migration:run >/dev/null 2>&1
     npm run typecheck >/dev/null 2>&1 && node ace test >/dev/null 2>&1 || { echo "PRE-CHECK FAILED"; exit 1; }
     ;;
