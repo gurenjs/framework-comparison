@@ -10,10 +10,9 @@
     "skipLibCheck": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./app/*"
+        "./*"
       ]
     },
     "types": [

@@ -1,5 +1,5 @@
 import { Controller, ValidationException } from '@guren/core'
-import { LoginSchema } from '@/Http/Validators/LoginValidator'
+import { LoginSchema } from '@/app/Http/Validators/LoginValidator'
 import { pages } from '../../../../.guren/pages.gen.js'
 
 export default class LoginController extends Controller {
