@@ -3,23 +3,43 @@
 # Applies the trial's saved patch to a fresh worktree, sets the app up, and
 # scores it: typecheck + full test suite. Appends a verdict line to
 # results/verdicts.txt, then removes the worktree.
+#
+# Env: LABEL (default <impl>) names results/<label>-<trial>.*, as in
+# run-trial.sh. The worktree is cut at the commit the patch was made against:
+# REF if set, else app_commit from <label>-<trial>.meta.json, else HEAD (older
+# results carry no meta). A patch applied to another commit can still apply
+# cleanly and be scored against the wrong dependencies.
 set -uo pipefail
 
-IMPL="$1"
-TRIAL="$2"
+IMPL="${1:-${IMPL:-}}"
+TRIAL="${2:-${TRIAL:-}}"
+[ -n "$IMPL" ] && [ -n "$TRIAL" ] || { echo "usage: verify-trial.sh <impl> <trial-number>"; exit 2; }
+LABEL="${LABEL:-$IMPL}"
+[[ "$LABEL" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "LABEL must match [A-Za-z0-9._-]+: $LABEL"; exit 2; }
+[[ "$TRIAL" =~ ^[0-9]+$ ]] || { echo "trial must be a number: $TRIAL"; exit 2; }
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 RESULTS="$REPO/agent-eval/results"
+CELL="$LABEL-$TRIAL"
 WT_ROOT="${WT_ROOT:-/tmp/agent-eval-worktrees}"
-WT="$WT_ROOT/verify-$IMPL-$TRIAL"
+WT="$WT_ROOT/verify-$CELL"
+
+BASE="${REF:-}"
+if [ -z "$BASE" ] && [ -f "$RESULTS/$CELL.meta.json" ]; then
+  BASE="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("app_commit") or "")' "$RESULTS/$CELL.meta.json" 2>/dev/null || true)"
+fi
+if [ -z "$BASE" ]; then
+  echo "!! $CELL: no REF and no app_commit in meta; verifying against HEAD"
+  BASE=HEAD
+fi
 
 rm -rf "$WT"
 git -C "$REPO" worktree remove --force "$WT" 2>/dev/null || true
 git -C "$REPO" worktree prune
-git -C "$REPO" worktree add --detach "$WT" HEAD >/dev/null
+git -C "$REPO" worktree add --detach "$WT" "$BASE" >/dev/null || { echo "$CELL WORKTREE-FAILED ($BASE)" >> "$RESULTS/verdicts.txt"; exit 1; }
 APP="$WT/$IMPL"
 cd "$APP"
 git apply --whitespace=nowarn --exclude='*.db' --exclude='*.db-shm' --exclude='*.db-wal' --exclude='*.sqlite3' \
-  "$RESULTS/$IMPL-$TRIAL.patch" || { echo "$IMPL-$TRIAL PATCH-APPLY-FAILED" >> "$RESULTS/verdicts.txt"; exit 1; }
+  "$RESULTS/$CELL.patch" || { echo "$CELL PATCH-APPLY-FAILED" >> "$RESULTS/verdicts.txt"; exit 1; }
 
 TYPECHECK=fail; TESTS=fail; TESTCOUNT=""
 case "$IMPL" in
@@ -69,10 +89,10 @@ case "$IMPL" in
 esac
 
 SMOKE=fail
-bash "$REPO/agent-eval/smoke-trial.sh" "$IMPL" "$APP" >> "$RESULTS/$IMPL-$TRIAL.smoke.log" 2>&1 && SMOKE=pass
+bash "$REPO/agent-eval/smoke-trial.sh" "$IMPL" "$APP" >> "$RESULTS/$CELL.smoke.log" 2>&1 && SMOKE=pass
 
-echo "$IMPL-$TRIAL typecheck=$TYPECHECK tests=$TESTS ($TESTCOUNT) smoke=$SMOKE" >> "$RESULTS/verdicts.txt"
+echo "$CELL typecheck=$TYPECHECK tests=$TESTS ($TESTCOUNT) smoke=$SMOKE" >> "$RESULTS/verdicts.txt"
 cd /
 git -C "$REPO" worktree remove --force "$WT" 2>/dev/null || rm -rf "$WT"
 git -C "$REPO" worktree prune
-echo "verified $IMPL-$TRIAL: typecheck=$TYPECHECK tests=$TESTS $TESTCOUNT"
+echo "verified $CELL: typecheck=$TYPECHECK tests=$TESTS $TESTCOUNT"

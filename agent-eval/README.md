@@ -96,7 +96,18 @@ bash agent-eval/verify-trial.sh guren 12
 
 # aggregate session metrics + turns-to-green from the event streams
 bun agent-eval/summarize.ts 12
+
+# an app at an older commit under today's runner, under its own results prefix
+REF=716117a LABEL=guren-july bash agent-eval/run-trial.sh guren 1
+LABEL=guren-july bash agent-eval/verify-trial.sh guren 1
 ```
+
+Every trial runs with `--strict-mcp-config`, `--setting-sources project,local`,
+auto-memory off, and WebFetch/WebSearch denied, so no arm sees the operator's
+MCP servers, plugins, hooks, or the web. `results/<label>-<trial>.meta.json`
+records the CLI version, flags, tools, app and runner commits, and the
+installed framework versions of each cell. Rounds 1–6 ran without that
+isolation.
 
 Requires Claude Code with an API key; each trial costs roughly $2–6.
 Full lab notes: [PILOT.md](./PILOT.md) (round-by-round results, protocol

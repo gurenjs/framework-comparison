@@ -7,7 +7,7 @@
  * the first point where the implementation's full test suite passed with new
  * tests included (i.e. more tests passing than the pre-trial baseline).
  */
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 const IMPLEMENTATIONS = ['guren', 'hono', 'nextjs', 'tanstack', 'adonisjs', 'nestjs'] as const
@@ -71,9 +71,24 @@ function isTestCommand(impl: string, command: string): boolean {
   return false
 }
 
-function summarize(impl: string, trial: number, resultsDir: string): TrialSummary | null {
-  const streamPath = join(resultsDir, `${impl}-${trial}.stream.jsonl`)
+// run-trial.sh's LABEL names a cell apart from its impl (guren-july runs guren);
+// the meta file says which impl's parse rules and baseline apply.
+function readMeta(resultsDir: string, label: string, trial: number): { impl?: string; baseline_tests?: number | null } {
+  const metaPath = join(resultsDir, `${label}-${trial}.meta.json`)
+  if (!existsSync(metaPath)) return {}
+  try {
+    return JSON.parse(readFileSync(metaPath, 'utf8'))
+  } catch {
+    return {}
+  }
+}
+
+function summarize(label: string, trial: number, resultsDir: string): TrialSummary | null {
+  const streamPath = join(resultsDir, `${label}-${trial}.stream.jsonl`)
   if (!existsSync(streamPath)) return null
+  const meta = readMeta(resultsDir, label, trial)
+  const impl = meta.impl ?? label
+  const baselineTests = meta.baseline_tests ?? BASELINE_TESTS[impl] ?? 0
 
   const events = readFileSync(streamPath, 'utf8')
     .trim()
@@ -116,7 +131,7 @@ function summarize(impl: string, trial: number, resultsDir: string): TrialSummar
           ? block.content.map((c: { text?: string }) => c.text ?? '').join('')
           : String(block.content ?? '')
         const parsed = parseTestOutput(impl, out)
-        if (parsed && !parsed.failed && parsed.pass > (BASELINE_TESTS[impl] ?? 0)) {
+        if (parsed && !parsed.failed && parsed.pass > baselineTests) {
           green = { atMessage: meta.atMessage, outputTokens: meta.outputTokens }
         }
       }
@@ -124,7 +139,7 @@ function summarize(impl: string, trial: number, resultsDir: string): TrialSummar
   }
 
   return {
-    impl,
+    impl: label,
     trial,
     subtype: result?.subtype ?? 'missing',
     turns: result?.num_turns ?? 0,
@@ -145,7 +160,13 @@ rows.push('| impl | trial | end | turns | dur(s) | cost($) | out-tokens | green@
 rows.push('|------|-------|-----|-------|--------|---------|------------|-----------|------------|')
 
 const medians: Record<string, number[]> = {}
-for (const impl of IMPLEMENTATIONS) {
+const labels: string[] = [...IMPLEMENTATIONS]
+for (const file of readdirSync(resultsDir).sort()) {
+  const match = file.match(/^(.+)-\d+\.meta\.json$/)
+  if (match && !labels.includes(match[1])) labels.push(match[1])
+}
+
+for (const impl of labels) {
   for (const trial of trialNumbers) {
     const s = summarize(impl, trial, resultsDir)
     if (!s) continue
