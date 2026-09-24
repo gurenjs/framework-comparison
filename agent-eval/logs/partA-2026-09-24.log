@@ -1,0 +1,62 @@
+== partA start 2026-09-24 23:47:05 | load: 3.06 3.41 4.09 | df: 9.5Gi free
+== 23:47:05 run guren-shipped-1 (impl=guren guidance=shipped ref=HEAD)
+== 23:48:56 verify guren-shipped-1
+   verdict: guren-shipped-1 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 37 0.595982
+   df: 9.4Gi free | load: 3.68 3.45 4.00
+== 23:49:04 run guren-bare-1 (impl=guren guidance=bare ref=HEAD)
+== 23:51:37 verify guren-bare-1
+   verdict: guren-bare-1 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 59 0.7867299999999999
+   df: 9.1Gi free | load: 7.77 4.79 4.43
+== 23:51:46 run hono-sep-1 (impl=hono guidance=shipped ref=HEAD)
+== 23:53:51 verify hono-sep-1
+   verdict: hono-sep-1 typecheck=pass tests=pass (21 pass) smoke=pass
+   turns/cost: 38 0.3940146
+   df: 9.0Gi free | load: 14.74 9.44 6.37
+== 23:54:04 run guren-july-1 (impl=guren guidance=shipped ref=716117a)
+== 23:56:13 verify guren-july-1
+   verdict: guren-july-1 typecheck=pass tests=pass ( pass) smoke=pass
+   turns/cost: 46 0.6213868000000001
+   df: 9.1Gi free | load: 11.25 10.03 7.08
+== 23:56:27 run guren-shipped-2 (impl=guren guidance=shipped ref=HEAD)
+== 23:59:28 verify guren-shipped-2
+   verdict: guren-shipped-2 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 52 0.8249182000000002
+   df: 8.9Gi free | load: 19.98 17.09 10.85
+== 23:59:42 run guren-bare-2 (impl=guren guidance=bare ref=HEAD)
+== 00:02:02 verify guren-bare-2
+   verdict: guren-bare-2 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 47 0.5913216
+   df: 9.2Gi free | load: 11.90 14.12 10.66
+== 00:02:20 run hono-sep-2 (impl=hono guidance=shipped ref=HEAD)
+== 00:04:48 verify hono-sep-2
+   verdict: hono-sep-2 typecheck=pass tests=pass (22 pass) smoke=pass
+   turns/cost: 42 0.4792542
+   df: 9.2Gi free | load: 4.39 10.47 9.78
+== 00:04:56 run guren-july-2 (impl=guren guidance=shipped ref=716117a)
+== 00:06:53 verify guren-july-2
+   verdict: guren-july-2 typecheck=pass tests=pass ( pass) smoke=pass
+   turns/cost: 35 0.5576956
+   df: 9.2Gi free | load: 2.69 7.75 8.78
+== 00:07:02 run guren-shipped-3 (impl=guren guidance=shipped ref=HEAD)
+== 00:08:53 verify guren-shipped-3
+   verdict: guren-shipped-3 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 41 0.6032308000000001
+   df: 9.2Gi free | load: 3.09 6.15 8.00
+== 00:09:01 run guren-bare-3 (impl=guren guidance=bare ref=HEAD)
+== 00:11:20 verify guren-bare-3
+   verdict: guren-bare-3 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 53 0.7055741999999999
+   df: 9.1Gi free | load: 3.24 5.21 7.34
+== 00:11:28 run hono-sep-3 (impl=hono guidance=shipped ref=HEAD)
+== 00:13:32 verify hono-sep-3
+   verdict: hono-sep-3 typecheck=pass tests=pass (22 pass) smoke=pass
+   turns/cost: 36 0.41894319999999996
+   df: 9.1Gi free | load: 3.00 4.38 6.70
+== 00:13:41 run guren-july-3 (impl=guren guidance=shipped ref=716117a)
+== 00:15:28 verify guren-july-3
+   verdict: guren-july-3 typecheck=pass tests=pass ( pass) smoke=pass
+   turns/cost: 37 0.5014700000000001
+   df: 9.1Gi free | load: 2.52 3.70 6.13
+== partA end 2026-09-25 00:15:37
