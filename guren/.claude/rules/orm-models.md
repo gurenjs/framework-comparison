@@ -1,22 +1,27 @@
 ---
-description: Guren ORM (@guren/orm) — model definition, queries, relations, pagination, mass assignment
+description: Guren ORM models — model definition, queries, relations, pagination, mass assignment
 globs:
   - "app/Models/**"
   - "db/**"
 ---
 
-# ORM Models (@guren/orm)
+# ORM Models
+
+Import models, database factories and seeders from `@guren/core`. The only `@guren/orm` import app code writes is `@guren/orm/drizzle/<dialect>`, in `db/schema.ts`.
 
 ## Defining a model
 
 ```typescript
-import { defineModel, type BelongsToRecord } from '@guren/orm'
+import { defineModel, type BelongsToRecord } from '@guren/core'
 import { posts } from '../../db/schema.js'
 
 export type PostRecord = typeof posts.$inferSelect
 
-export class Post extends defineModel(posts) {
-  static fillable = ['title', 'body', 'authorId']
+export class Post extends defineModel(posts, {
+  // Typed against the table's columns — a typo is a compile error.
+  // (`static fillable = [...]` on the class also works and shadows the option.)
+  fillable: ['title', 'body', 'authorId'],
+}) {
   static override relationTypes: { author: BelongsToRecord<UserRecord> } = { author: null }
 }
 Post.belongsTo('author', () => import('./User.js').then((m) => m.User), 'authorId', 'id')
@@ -31,9 +36,8 @@ export class User extends defineModel(users, {
   base: AuthenticatableModel,
   optionalOnCreate: ['passwordHash'],
   requireOnCreate: ['password'],
-}) {
-  static override hidden = ['passwordHash', 'rememberToken']
-}
+  hidden: ['passwordHash', 'rememberToken'],
+}) {}
 ```
 
 Drop `requireOnCreate` when accounts can also be created without a password (OAuth-only sign-up).
@@ -54,9 +58,19 @@ denies the hash and remember-token columns from mass assignment entirely; `force
 await Post.where({ status: 'active', authorId: 1 }).get()  // object form = AND
 await Post.where({ id: [1, 2, 3] }).get()                  // array value = IN
 await Post.where('views', '>', 100).orWhere('featured', true).get()
+
+// Callback form groups conditions in parentheses — required when an OR
+// chain must sit next to AND filters, or the ANDs get OR'd away:
+// (title LIKE ? OR excerpt LIKE ?) AND published = true
+await Post.where((q) => q.where('title', 'like', p).orWhere('excerpt', 'like', p))
+  .where('published', true)
+  .get()
 ```
 
 Operators (exact set): `=` `!=` `>` `<` `>=` `<=` `like` `in` `not in` `is null` `is not null`
+
+An empty `in` array compiles to SQL `false` — the query matches nothing and never throws,
+so guarding `if (ids.length === 0)` before a `where in` is optional, not required.
 
 ## QueryBuilder chain
 
@@ -80,6 +94,9 @@ const result = await Post.paginate({ page: 1, perPage: 15, where: {...}, orderBy
 
 For Inertia/HTTP pagination links wrap it with `paginate` from `@guren/core`:
 `paginate(result, { path?, query?, fragment? })` — those three fields are `PaginatorOptions`.
+The wrapped paginator serializes as `{ data, meta, links }`; the raw `PaginatedResult`
+has no `links`. In tests, assert against the shape the route actually returns
+(e.g. `assertJsonPath('meta.total', 3)`, `assertJsonCount(2, 'data')`).
 
 ## Relations — declaration signatures
 
@@ -153,8 +170,11 @@ For concurrency safety add a unique index and catch the constraint error, or wra
 
 ## Mass assignment
 
-- With `static fillable = [...]` set, `create()`/`update()` **throw `MassAssignmentException`**
-  on any unlisted input key; the primary key (`id`) is always silently stripped
+- With a fillable allowlist set — the typed `defineModel(table, { fillable: [...] })` option
+  (preferred) or `static fillable = [...]` — `create()`/`update()` **throw
+  `MassAssignmentException`** on any unlisted input key; the primary key (`id`) is always
+  silently stripped. The same typed options exist for `hidden`, `visible`, `accessors`,
+  and `appends`
 - Credential columns (`passwordHash`, `rememberToken`) **always throw** on authenticatable
   models — the framework denies them, listing them in `fillable` does not open them
 - `forceCreate()` / `forceUpdate()` bypass filtering — trusted server-side values only.

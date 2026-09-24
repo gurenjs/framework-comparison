@@ -28,6 +28,7 @@ If the plugin's manifest omits `provider` (common for `definePlugin()`-based plu
 import { somePlugin } from 'guren-plugin-something'
 
 export const app = createApp({
+  // oxlint-disable-next-line guren/no-unvalidated-env-read -- plugin options are built before createApp() parses the environment
   providers: [somePlugin({ apiKey: process.env.SOME_API_KEY! })],
 })
 ```
@@ -47,15 +48,15 @@ mkdir guren-plugin-<name> && cd guren-plugin-<name> && bun init
   "name": "guren-plugin-<name>",
   "version": "0.1.0",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.mts",
   "gurenPlugin": { "compatibility": ">=1.0.0" },
   "peerDependencies": { "@guren/core": ">=1.0.0" },
   "devDependencies": {
     "@guren/core": "^1.0.0",
     "@guren/testing": "^1.0.0",
     "typescript": "^5.0.0",
-    "tsup": "^8.0.0"
+    "tsdown": "^0.22.0"
   }
 }
 ```
@@ -88,7 +89,7 @@ export const myPlugin = definePlugin<MyConfig>({
 })
 ```
 
-For plugins needing no configuration or full class-based lifecycle control, export a `ServiceProvider` subclass directly instead — that contract is unchanged. **What plugins may touch:** the DI container (`this.container` / the `container` passed to `definePlugin`) and, from `boot()`, the shared Hono instance via `container.make('hono')` for middleware. Never reach into framework internals via deep imports (e.g. `@guren/server/src/http/Application`) — only import from public package entry points.
+For plugins needing no configuration or full class-based lifecycle control, export a `ServiceProvider` subclass directly instead — that contract is unchanged. **What plugins may touch:** the DI container (`this.container` / the `container` passed to `definePlugin`) and, from `boot()`, the shared Hono instance via `container.make('hono')` for middleware. Never reach into framework internals via deep imports (e.g. `@guren/<package>/src/...`) — only import from public package entry points.
 
 Export it: `export { myPlugin } from './plugin'`.
 
@@ -109,7 +110,7 @@ The manifest is pure data — installers never execute plugin code from it.
 ### 4. Optional: contribute a `guren` CLI command
 
 ```json
-{ "gurenPlugin": { "commands": { "entry": "./dist/commands.js", "names": ["my-plugin:sync"] } } }
+{ "gurenPlugin": { "commands": { "entry": "./dist/commands.mjs", "names": ["my-plugin:sync"] } } }
 ```
 
 ```typescript
@@ -152,7 +153,7 @@ bunx guren plugin guren-plugin-<name>
 ### 7. Build and publish
 
 ```json
-{ "scripts": { "build": "tsup src/index.ts --format esm --dts" } }
+{ "scripts": { "build": "tsdown src/index.ts --dts" } }
 ```
 
 ```bash

@@ -12,11 +12,14 @@ globs:
 ```typescript
 import { Router, requireAuthenticated } from '@guren/core'
 
-export function registerWebRoutes(router: Router): void {
+export function registerWebRoutes(baseRouter: Router): void {
+  // aliasMiddleware() returns a Router carrying the alias name in its type —
+  // capture it, or a later .middleware('auth') will not compile.
+  const router = baseRouter.aliasMiddleware('auth', requireAuthenticated({ redirectTo: '/login' }))
+
   router.get('/posts', [PostController, 'index']).name('posts.index')
   router.post('/posts', { name: 'posts.store', body: CreatePostSchema }, [PostController, 'store'])
 
-  router.aliasMiddleware('auth', requireAuthenticated({ redirectTo: '/login' }))
   router.middleware('auth').group((group) => {
     group.get('/dashboard', [DashboardController, 'index'])
   })
@@ -26,7 +29,8 @@ export function registerWebRoutes(router: Router): void {
 
 Options object (second arg) is `RouteContractOptions`:
 `name?` · `middlewares?: MiddlewareHandler[]` · `params?` / `query?` / `body?` / `output?`
-(Zod schemas) · `bind?: Record<string, BindableModel>` · plus OpenAPI metadata
+(Zod schemas) · `bind?: Record<string, RouteModelBinding>` (`Post` or `[Post, 'slug']`) ·
+`agent?: AgentRouteMetadata` · plus OpenAPI metadata
 (`summary?`, `description?`, `tags?`, `operationId?`, `deprecated?`).
 
 Schemas attached here do double duty: requests are **validated automatically**
@@ -34,7 +38,27 @@ Schemas attached here do double duty: requests are **validated automatically**
 
 `router.resource('/posts', PostController, { name?, param?, only?, except? })` registers
 index/create/store/show/edit/update/destroy (GET/POST/PUT/DELETE, `:id` param) named `posts.index` etc.
-Model binding: `bind: { id: Post }` + `this.model(Post)` in the controller.
+Model binding: `bind: { id: Post }` (primary key) or `bind: { slug: [Post, 'slug'] }` (another column)
++ `this.model(Post)` in the controller. See `controllers-http.md` for router-level `router.bind()`.
+
+Verbs: `get / post / put / patch / delete / query` (all with the same overloads), plus
+`router.on(method, path, ...)` for anything else. `query()` registers the HTTP QUERY
+method (RFC 10008): safe and idempotent like GET but carries a request body — use it
+for complex search/filter endpoints, never for mutations (CSRF skips it on that
+assumption). Not expressible in OpenAPI 3.1 output, and Inertia forms cannot send it —
+call it via `createApiClient` or `fetch`.
+
+## Agent tools
+
+`.agent({ description })` (or `agent:` in the options object) exposes a route as an MCP tool;
+the tool's schemas are derived from the route's own `params`/`query`/`body`/`output`, never restated.
+Per-action on a resource: `router.resource('/posts', PostController, { agent: { index: {...} } })` —
+an action not listed is **not** exposed. One declaration per route — declaring it in the options
+*and* chaining `.agent()` throws. A route with no `.name()` cannot be a tool, and the name is used
+as the tool name verbatim.
+**Authentication is not authorization**: `guren check` fails a non-read-only agent route that has
+neither `authorizeMiddleware(...)` on the chain nor `this.authorize(...)` in the action, even when
+`this.auth.userOrFail()` is present.
 
 ## Route Schema Binding: concrete input → output
 

@@ -10,7 +10,17 @@ Controllers extend `Controller` and expose one async method per route action.
 
 ## Validation — exact signatures
 
-Any Zod-like schema (anything with `safeParse`) is accepted:
+A route declaring `params`, `query` or `body` schemas is validated before the
+action runs (422 on failure, same errors shape as below). Read the parsed values
+instead of validating again:
+
+```typescript
+protected validated(): { params; query; body }                          // untyped
+protected validated<N extends ContractRouteName>(route: N | readonly N[]): ValidatedInput<N>  // typed after codegen
+// const { body } = this.validated('posts.store'); an undeclared segment is undefined
+```
+
+For a route without a contract, any Zod-like schema (anything with `safeParse`) is accepted:
 
 ```typescript
 protected async validateBody<T>(schema: ZodLikeSchema<T>): Promise<T>   // request body
@@ -51,6 +61,43 @@ Optional third arg: `InertiaResponseOptions` (e.g. `{ status: 422 }`).
 
 **No global shared props by default.** `shareInertiaProps(resolverFn)` (from `@guren/core`) can inject data (e.g. `auth.user`) into every Inertia response, but a fresh scaffold never calls it. `usePage<{ auth: {...} }>()` on the frontend silently resolves to `undefined` — it type-checks but is wrong at runtime. Pass everything a page needs explicitly through `this.inertia(page, { ... })` and declare it in that page's `interface Props`; only reach for `usePage()` for props you have actually wired up via `shareInertiaProps`.
 
+## Server-rendered content pages (`this.view()`)
+
+The non-hydrating counterpart to `this.inertia()` for public, read-mostly
+pages (blog posts, docs, marketing) — plain SSR HTML, no client framework,
+no Inertia page-payload script in the document:
+
+```typescript
+import { ShowPage } from '../../View/ShowPage.js'
+return this.view(ShowPage, { post })                       // props compile-checked at the call site
+return this.view(ShowPage, { post: null }, { status: 404 })
+```
+
+- **View components live in `app/View/*.tsx` (module-local:
+  `modules/<name>/app/View/`), never under `resources/js/pages/`**
+  (codegen claims that directory for Inertia pages). They start with the
+  pragma `/** @jsxImportSource @guren/core */` and import
+  `type { FC, PropsWithChildren }` and `viteAsset` from `@guren/core` — the
+  app never declares `hono`.
+- **Pass page metadata through a Layout `head` slot, not the body.** Tags
+  rendered literally inside `<head>` skip hono's hoisting pass; hoisting
+  (`<title>`/`<meta>`/`<link>` from anywhere) still works as the safety net
+  for deeply nested tags, but it rescans the document per hoisted tag —
+  measured quadratic in tag count, so a 15-tag SEO block in the body costs
+  ~1 ms per render and grows with page size. The Layout's own `<head>` must
+  carry only what pages never restate (charset, viewport, stylesheet) — a
+  hard-coded default `<title>` there silently shadows every page's.
+- **`viteAsset('resources/css/app.css')`** resolves the stylesheet URL in
+  both dev and production; the CSS file must be an explicit Vite build input.
+- **A page that forgets its Layout throws** a descriptive error instead of
+  shipping an unstyled document; pass `{ doctype: false }` for intentional
+  fragments.
+- **Escaping covers markup, not URL schemes** — a `javascript:` href from
+  user data passes through verbatim; sanitize upstream
+  (`@guren/plugin-markdown`'s allowlist).
+- Inline JSON-LD needs `dangerouslySetInnerHTML` with `<` escaped as
+  `\u003c` (text children are HTML-escaped).
+
 ## Route model binding
 
 ```typescript
@@ -59,6 +106,17 @@ async show() {
   const post = this.model(Post)   // typed record, already resolved via findOrFail (404 on miss)
 }
 ```
+
+`bind: { id: Post }` always looks up by primary key. For a slug (or any other unique column) bind a
+`[Model, column]` tuple — `bind: { slug: [Post, 'slug'] }` — and `this.model(Post)` returns the record
+resolved by that column. Never adapt around this with a custom `{ findOrFail }` object.
+
+Router-level `router.bind('post', Post | [Post, 'slug'] | async (value) => ...)` binds every
+controller-action route whose path has `:post` (inline handlers never receive bindings); the resolved
+value reaches the action as a **positional argument after the context**
+(`async show(_ctx: Context, post: PostRecord)`), and model bindings are also available via `this.model(Post)`.
+A custom resolver's value is positional-only. Nothing is stored on the Hono context — `this.ctx.get('post')` is `undefined`.
+When a param is bound at both levels, or two params bind the same model class, the route's own `bind` is what `this.model()` returns.
 
 ## Auth helpers
 
@@ -104,11 +162,12 @@ NotFoundHttpException.forModel('User', 123)
 
 Use `AuthorizationException.deny(...)` for manual ownership checks that don't go through `this.authorize()`/policies.
 
-**`Model.findOrFail()` throws `ModelNotFoundException` from `@guren/orm`** — a separate class that does *not* extend `HttpException`; the handler picks it up via its duck-typed `statusCode: 404`. `forModel()` exists only on `NotFoundHttpException`.
+**`Model.findOrFail()` throws `ModelNotFoundException` (exported from `@guren/core`)** — a separate class that does *not* extend `HttpException`; the handler picks it up via its duck-typed `statusCode: 404`. `forModel()` exists only on `NotFoundHttpException`.
 
 ## Response helpers
 
 - `this.json(data, init?)` / `this.text(body, init?)`
+- `this.view(Component, props, options?)` — server-rendered content page (see the section above)
 - `this.redirect(url, { status?, headers? })` — defaults 302 for GET, **303 for non-GET** (correct for Inertia form posts)
 - `await this.files('avatar')` → `File[]` (uploaded files, empties filtered)
 
@@ -117,12 +176,19 @@ Use `AuthorizationException.deny(...)` for manual ownership checks that don't go
 ```typescript
 import { Resource } from '@guren/core'
 
-export class PostResource extends Resource<PostRecord> {
-  toArray() {                       // abstract — must implement; typed toArray is exported as Data.Post by codegen
+export interface PostResourceData extends Record<string, unknown> {
+  id: PostRecord['id']
+  title: string
+}
+
+// Resource<TRecord, TPayload> — the second argument makes toJSON() report the
+// payload type too; it defaults to Record<string, unknown> when omitted.
+export class PostResource extends Resource<PostRecord, PostResourceData> {
+  toArray(): PostResourceData {     // abstract — must implement; the annotated type is exported as Data.Post by codegen
     return { id: this.resource.id, title: this.resource.title }
   }
 }
-new PostResource(post).toJSON()          // toArray() + additional() data
+new PostResource(post).toJSON()          // PostResourceData: toArray() + additional() data
 PostResource.collection(posts)           // ResourceData[]
 new PostResource(post).additional({ meta: 1 })
 this.when(cond, value)                   // conditional field inside toArray()

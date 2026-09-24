@@ -4,6 +4,7 @@
       "Bash(bunx guren:*)",
       "Bash(bun run codegen:*)",
       "Bash(bun run typecheck:*)",
+      "Bash(bun run lint:*)",
       "Bash(bun test:*)"
     ]
   },
@@ -25,6 +26,17 @@
           {
             "type": "command",
             "command": "bun .claude/hooks/check-after-edit.ts"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .claude/hooks/gate-on-stop.ts",
+            "timeout": 300
           }
         ]
       }

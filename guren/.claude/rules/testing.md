@@ -13,19 +13,51 @@ Requests run in-process through `app.fetch()` — no server, no port.
 ```typescript
 import { TestApp } from '@guren/testing'
 
-const app = await TestApp.create()             // boots the real Application
-const app = await TestApp.create({ boot, providers, routes })  // all optional
-const app = TestApp.fromFetch(app.fetch)       // wrap an existing fetch fn (not async)
+const http = await TestApp.create()             // boots a fresh Application
+const http = await TestApp.create({ boot, providers, routes })  // all optional
+const http = await TestApp.fromApp(app)         // wrap the app exported by src/app.ts
 ```
 
-Both set `GUREN_TESTING=1` so `actingAs()` header auth is accepted.
+**Prefer wrapping the real app.** Scaffolded apps export the configured
+application from `src/app.ts` — wrap it so tests exercise the app's actual
+configuration (providers, auth, i18n, security defaults) instead of
+reconstructing a subset that silently drifts:
+
+```typescript
+import app from '../src/app.js'
+
+const http = await TestApp.fromApp(app)
+```
+
+`fromApp()` boots the app for you and binds its `fetch` to the instance.
+It is `async` — `await` it. Calling it from several test files is fine:
+`Application.boot()` is idempotent and reuses the first boot.
+
+Keep `TestApp.create({ ... })` for isolated slices (a single route or
+middleware under test).
+
+`TestApp.fromFetch(fn)` — the only one of the three that is *not* async —
+wraps an arbitrary fetch function, e.g. a bare Hono app:
+
+```typescript
+const hono = new Hono()
+const http = TestApp.fromFetch((request) => hono.fetch(request))
+```
+
+Do not reach for it to wrap a Guren `Application`; use `fromApp()`. Hand-wiring
+one is where the footgun lives: `Application.fetch` reads instance state, so
+`fromFetch(app.fetch)` throws `undefined is not an object (evaluating
+'this.hono')` at the first request. It has to be an arrow —
+`fromFetch((request) => app.fetch(request))` — which is exactly what
+`fromApp()` does for you.
+
+All three set `GUREN_TESTING=1` so `actingAs()` header auth is accepted.
 
 **Session + CSRF in tests.** `TestApp.create()` accepts `auth` just like `createApp({ auth: {} })`. Without it, session + CSRF middleware are **not** mounted — JSON requests (`app.json().post(...)`) pass with no CSRF check at all, which is fine for quick validation/auth-guard checks but not representative of production. To exercise real CSRF behavior (and for `withCsrf()` to work — it throws `"did not set an XSRF-TOKEN cookie"` otherwise):
 
 ```typescript
 const app = await TestApp.create({
   auth: {},
-  providers: [DatabaseProvider],
   routes: registerWebRoutes,
 })
 const csrf = await app.withCsrf()
@@ -38,17 +70,17 @@ const csrf = await app.withCsrf()
 `bun test` sets `NODE_ENV=test` automatically. A current scaffold's `config/database.ts` branches on it so tests never touch the dev DB:
 
 ```typescript
-function resolveDatabaseFilename(): string {
-  if (process.env.NODE_ENV === 'test') {
-    return process.env.TEST_DATABASE_URL ?? './data/guren.test.db'
-  }
-  return process.env.DATABASE_URL ?? './data/guren.db'
-}
+filename: (context) => {
+  const values = context?.env ?? env.parse(undefined, { mode: 'report' }).values
+  return process.env.NODE_ENV === 'test'
+    ? values.TEST_DATABASE_URL ?? './data/guren.test.db'
+    : values.DATABASE_URL ?? './data/guren.db'
+},
 ```
 
-Default test file: `./data/guren.test.db`. Override with `TEST_DATABASE_URL` (e.g. per CI shard). If `config/database.ts` writes straight to `DATABASE_URL`/`./data/guren.db` with no `NODE_ENV` check (pre-1.2.0 scaffold), retrofit it by adding the function above AND pointing `createSqliteDatabase({ filename: ... })` at it — replace `filename: () => process.env.DATABASE_URL ?? './data/guren.db'` with `filename: resolveDatabaseFilename`. Adding the function alone does nothing; `filename` still has to reference it.
+Default test file: `./data/guren.test.db`. Override with `TEST_DATABASE_URL` (e.g. per CI shard). If `config/database.ts` writes straight to `DATABASE_URL`/`./data/guren.db` with no `NODE_ENV` check (pre-1.2.0 scaffold), retrofit its `filename` to branch on `NODE_ENV` the same way. With `config/env.ts`, declare `DATABASE_URL` and `TEST_DATABASE_URL` there and read them from `values` as above: `guren/no-unvalidated-env-read` reports a `process.env.DATABASE_URL` read in `config/`. Without `config/env.ts`, read `process.env` and branch the same way.
 
-**Cleanup between tests:** prefer `resetDatabase()`/`migrateDatabase()` (both exported from `config/database.ts`) in `beforeEach` — they operate on the same connection your models use. `useTruncateTables(tables)`/`useDatabaseTransactions()` from `@guren/testing` need a `DatabaseConnection` (`query`/`execute`/`beginTransaction`/`commit`/`rollback`) registered via `setTestDatabase()` — Guren's SQLite adapter doesn't expose one (`getDatabase()` resolves to the raw Drizzle instance, not this shape), so you'd have to hand-write an adapter. Only `useDatabaseTransactions()` requires that adapter to wrap the *same* connection your models write through (it begins/rolls back a transaction on it); `useTruncateTables()` just runs `DELETE FROM` per table, which commits immediately regardless of connection. `resetDatabase()`/`migrateDatabase()` avoids the adapter question entirely.
+**Cleanup between tests:** prefer `resetDatabase()` (exported from `config/database.ts`) in `beforeEach` — it operates on the same connection your models use, and drops every table then re-applies migrations, so the tables are queryable straight after (same end state as `guren db:reset`; an extra `migrateDatabase()` call is harmless but redundant). `useTruncateTables(tables)`/`useDatabaseTransactions()` from `@guren/testing` need a `DatabaseConnection` (`query`/`execute`/`beginTransaction`/`commit`/`rollback`) registered via `setTestDatabase()` — Guren's SQLite adapter doesn't expose one (`getDatabase()` resolves to the raw Drizzle instance, not this shape), so you'd have to hand-write an adapter. Only `useDatabaseTransactions()` requires that adapter to wrap the *same* connection your models write through (it begins/rolls back a transaction on it); `useTruncateTables()` just runs `DELETE FROM` per table, which commits immediately regardless of connection. `resetDatabase()` avoids the adapter question entirely.
 
 ## Generating test files
 
@@ -64,6 +96,7 @@ name with `Controller` and writes to `tests/controllers/${ClassName}.test.ts`, m
 app.get(path)                 // → PendingTestResponse (awaitable AND chainable)
 app.post(path, body?)         // body auto-JSON-encoded unless FormData
 app.put(path, body?) / app.patch(path, body?) / app.delete(path, body?)
+app.query(path, body?)        // HTTP QUERY (RFC 10008) — safe method with a body
 
 app.actingAs(user)            // returns a NEW TestApp with the user injected
 app.json()                    // returns a NEW TestApp with Accept: application/json
@@ -113,19 +146,27 @@ await res.assertBodyContains('text')
 import { describe, test, expect, beforeAll } from 'bun:test'
 
 describe('PostController', () => {
-  let app: TestApp
-  beforeAll(async () => { app = await TestApp.create() })
+  let http: TestApp
+  beforeAll(async () => { http = await TestApp.fromApp(app) })
 
   test('store validates input', async () => {
-    await app.json().post('/posts', {}).assertUnprocessable()
+    const csrf = await http.withCsrf()
+    await csrf.json().post('/posts', {}).assertUnprocessable()
   })
 
   test('store creates post for authed user', async () => {
-    const csrf = await app.actingAs(user).withCsrf()
+    const csrf = await http.actingAs(user).withCsrf()
     await csrf.post('/posts', { title: 'Hi', body: '...' }).assertRedirect('/posts')
   })
 })
 ```
+
+**Under `fromApp()`, every mutating request needs `withCsrf()`** — a JSON one
+included. The real app mounts session and CSRF, so an unprimed POST/PUT/DELETE
+answers **403**: a 422 assertion goes red for the wrong reason, and an
+`assertForbidden()` passes whatever the policy decides. Prime after `actingAs()`,
+so the token belongs to that user's session. `TestApp.create()` without `auth`
+mounts neither, which is why its examples above need no priming.
 
 Validation failures return 422 with `{ message, errors: Record<string, string[]> }` —
 assert with `assertJsonPath('errors.title.0', 'Title is required')`.
