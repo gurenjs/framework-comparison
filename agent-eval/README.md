@@ -59,16 +59,16 @@ So we fixed the docs and re-measured (July, rounds 2–4):
 | Msgs to first edit | 76–92 | 35–57 | 33–65 |
 
 The arc continued after the framework moved on: round 5 found that a later
-harness iteration had silently lost this win (glob-scoped rules attach on
-*edit*, but most API research happens before the first edit — the delivery
-regressed to −3%), which led to shipping the API-signature digest inside
-`guren context` itself, and round 6 measured the v2.0.0 day-one results
-above. Full history: [PILOT.md](./PILOT.md).
+harness iteration had lost this win (the delivery regressed to −3%), which led
+to shipping the API-signature digest inside `guren context` itself, and round
+6 measured the v2.0.0 day-one results above. Round 5 explained the loss by
+rules that attach on edit; round 7 contradicts that (see below). Full
+history: [PILOT.md](./PILOT.md).
 
 Two findings we believe generalize beyond Guren:
 
-1. **Push beats pull.** Auto-loaded guidance (CLAUDE.md, glob-scoped
-   `.claude/rules/`) changed agent behavior; skill files the agent must
+1. **Push beats pull.** Auto-loaded guidance (CLAUDE.md, `.claude/rules/`)
+   changed agent behavior; skill files the agent must
    choose to invoke were used 0–1 times across every run.
 2. **The control matters.** Next.js ships its own agent guidance
    (AGENTS.md/CLAUDE.md); restoring it changed nothing (±0) — guidance only
@@ -76,10 +76,38 @@ Two findings we believe generalize beyond Guren:
    real, measurable moat for established frameworks, and documentation
    engineering is how a young framework rents it back.
 
+## September 2026 re-run (round 7)
+
+The same task, re-run under an isolated runner (no operator MCP servers,
+plugins, user settings, web tools or auto memory; provenance recorded per
+cell) on the current Guren releases, with Hono and the round-6 Guren app as
+controls. Claude Code 2.1.281, N=3 per arm, all 21 cells pass. Absolute
+costs are not comparable with the July rounds; arms within this round are.
+
+| arm | model | turns (median) | cost USD (median / mean) | × hono (median) |
+|---|---|---|---|---|
+| guren shipped (cli 2.27) | sonnet-5 | 41 | 0.60 / 0.68 | 1.44 |
+| guren bare (cli 2.27) | sonnet-5 | 53 | 0.71 / 0.70 | 1.68 |
+| hono | sonnet-5 | 38 | 0.42 / 0.43 | 1.00 |
+| guren, round-6 app (716117a) | sonnet-5 | 37 | 0.56 / 0.56 | 1.33 |
+| guren shipped, rules with `paths:` | sonnet-5 | 31 | 0.53 / 0.58 | 1.27 |
+| guren shipped (cli 2.27) | opus-5-5 | 40 | 1.32 / 1.39 | 1.49 |
+| hono | opus-5-5 | 40 | 0.88 / 0.87 | 1.00 |
+
+The current app is not cheaper than the round-6 app under the same runner,
+so no time-series claim follows. A token-weighted breakdown of the Sonnet
+cells ([ARCHAEOLOGY-2026-09.md](./ARCHAEOLOGY-2026-09.md)) puts about 80% of
+the remaining gap to Hono in guidance loaded at session start. The harness's
+rule files used a `globs:` key that Claude Code ignores (it reads only
+`paths`), so all six rules loaded at launch; scoping them with `paths:`
+narrowed the gap by about 40% in this sample. Details and caveats:
+[PILOT.md, round 7](./PILOT.md).
+
 ## Honest limitations
 
-- One model (claude-sonnet-5), one task, N=3 — medians are stable but this
-  is not a benchmark suite.
+- One task, N=3 per arm, one runner (Claude Code). Rounds 1–6 used
+  claude-sonnet-5 only; round 7 adds an Opus 5.5 pair. Medians locate an
+  effect; with overlapping ranges they do not size it.
 - Frameworks the model knows from training data have a structural advantage
   no scaffold can fully erase; that advantage is part of what we measured.
 - The task favors nothing intentionally, but any single task has a shape.
@@ -93,6 +121,10 @@ bash agent-eval/run-trial.sh guren 12
 
 # score it (typecheck + tests + hidden smoke on a clean worktree)
 bash agent-eval/verify-trial.sh guren 12
+
+# a list of arms (LABEL:IMPL:GUIDANCE:REF), trial-outermost, resumable;
+# REF runs an older app commit under today's runner, LABEL names its results
+bash agent-eval/run-arms.sh
 
 # aggregate session metrics + turns-to-green from the event streams
 bun agent-eval/summarize.ts 12

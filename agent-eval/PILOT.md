@@ -184,6 +184,13 @@ the next release ships #279 and a scaffold-exact re-run confirms it. The
 per-trial spread (3.77–5.76 vs bare 4.47–10.04) still overlaps: N=3 medians
 locate the effect, they do not size it precisely.
 
+> **Note (2026-09-25).** The attach-on-edit explanation above is contradicted
+> by round 7. The rule files used a `globs:` frontmatter key, and Claude Code
+> reads only `paths` from a rule; a rule without it loads at session start.
+> So these rules were probably loaded at launch in round 5 too, unless Claude
+> Code treated the key differently in August. The digest result stands on its
+> own measurement. See round 7 below.
+
 ## Round 6 results (2026-08-02) — v2.0.0, released the day before
 
 Guren v2.0.0 (orm/server/cli majors — structural mass assignment, RFC 0006)
@@ -209,6 +216,74 @@ difference between shipping and not.
 
 Lifetime acceptance is now **43/45**; the only two failures are stripped-
 guidance baseline arms on a day-old major.
+
+
+## Round 7 results (2026-09-24/25): September re-run under an isolated runner
+
+Three things changed since round 6, so this round re-measures rather than
+extends:
+
+- **Runner.** Every arm now runs with `--strict-mcp-config`,
+  `--setting-sources project,local`, WebFetch/WebSearch denied, `curl`
+  removed from the allowlist and auto memory off. Rounds 1–6 loaded the
+  operator's own MCP servers, plugins and skills into every cell. Each cell
+  writes `results/<label>-<n>.meta.json` (CLI version, model, flags, app
+  commit, installed framework versions, what the init event loaded).
+- **App.** `guren/` is on cli 2.27.0 / core 1.21.0 / server 2.26.0 / orm
+  2.12.0 with the 2.27 harness (commits 7ae605c, dae2973).
+- **Controls.** Hono re-run under the same runner, and the round-6 Guren app
+  (commit 716117a, cli 2.0, labelled `guren-july`) re-run as well, so a
+  change in the Guren/Hono ratio can be read against the older app.
+
+Claude Code 2.1.281, N=3 per arm, all 21 cells pass typecheck, tests and the
+hidden smoke.
+
+| arm | model | turns (median, range) | cost USD (median, range) | cost mean | × hono (median) |
+|---|---|---|---|---|---|
+| guren shipped (cli 2.27) | sonnet-5 | 41 (37–52) | 0.603 (0.60–0.82) | 0.675 | 1.44 |
+| guren bare (cli 2.27) | sonnet-5 | 53 (47–59) | 0.706 (0.59–0.79) | 0.695 | 1.68 |
+| hono | sonnet-5 | 38 (36–42) | 0.419 (0.39–0.48) | 0.431 | 1.00 |
+| guren-july (716117a, cli 2.0) | sonnet-5 | 37 (35–46) | 0.558 (0.50–0.62) | 0.560 | 1.33 |
+| guren shipped, rules with `paths:` (1e756eb) | sonnet-5 | 31 (30–50) | 0.532 (0.53–0.68) | 0.583 | 1.27 |
+| guren shipped (cli 2.27) | opus-5-5 | 40 (38–45) | 1.317 (1.31–1.55) | 1.392 | 1.49 |
+| hono | opus-5-5 | 40 (38–41) | 0.881 (0.83–0.91) | 0.874 | 1.00 |
+
+**Reading, within this round only.**
+
+- Guren costs more than plain Hono on this task: 1.44× on Sonnet and 1.49×
+  on Opus 5.5, in about the same number of turns.
+- Shipped against bare: −23% turns and −15% cost on medians, but only −3%
+  cost on means. The ranges overlap.
+- The current app is not cheaper than the July app under the same runner
+  (41 turns / $0.60 against 37 / $0.56). Absolute costs fell for every arm
+  since July, Hono included ($2.03 → $0.42), and the July app fell with the
+  rest, so the drop does not come from Guren's releases. That it comes from
+  the runner, most likely the isolation, is a hypothesis: nothing here
+  isolates the runner, and the models may have moved as well. No
+  time-series claim is made from these numbers.
+
+**Where the remaining gap goes.** [ARCHAEOLOGY-2026-09.md](./ARCHAEOLOGY-2026-09.md)
+attributes each Sonnet cell's cost to its tool actions (heuristic
+classification, output tokens reconstructed from characters, shared-prefix
+cost split equally; the totals reconcile to each cell's cost within $0.01).
+In the shipped arm, about 80% of the gap to Hono is guidance loaded at
+session start (CLAUDE.md, all six rule files, the startup hook output:
+25.5k tokens). No package-name confusion was detected in the shipped arm
+under that classifier; the bare arm repeats one `paginate()` search.
+
+**The `globs:` finding.** The six rule files scoped themselves with a
+`globs:` frontmatter key. Claude Code reads only `paths` from a rule
+([memory docs](https://code.claude.com/docs/en/memory), "Rule frontmatter
+reference"); any other key is ignored, and a rule without `paths` loads at
+launch. The `paths:` arm (branch `exp/rules-paths`, commit 1e756eb) cut the
+first call's context from 53k to 37k tokens and narrowed the gap to Hono by
+about 40% on means ($0.244 → $0.152). That is a sample estimate: the ranges
+overlap, and one `paths:` trial cost more than one shipped trial. The
+template fix landed in gurenjs as #1056.
+
+Lifetime acceptance is now **64/66**. Per-cell results (`agent-eval/results/`)
+are gitignored; they and the event streams will be attached to the release.
+The runner used for this round is `agent-eval/run-arms.sh`.
 
 ## Operational notes
 
