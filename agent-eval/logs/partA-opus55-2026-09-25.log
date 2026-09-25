@@ -1,0 +1,32 @@
+== partA-opus start 2026-09-25 08:49:49 | load: 4.52 3.99 3.96 | df: 16Gi free
+== 08:49:49 run guren-shipped-opus55-1 (impl=guren guidance=shipped ref=HEAD model=claude-opus-5-5)
+== 08:53:41 verify guren-shipped-opus55-1
+   verdict: guren-shipped-opus55-1 typecheck=pass tests=pass (17 pass) smoke=pass
+   turns/cost: 45 1.5535767999999999
+   df: 15Gi free | load: 8.11 5.57 4.58
+== 08:53:50 run hono-opus55-1 (impl=hono guidance=shipped ref=HEAD model=claude-opus-5-5)
+== 08:56:29 verify hono-opus55-1
+   verdict: hono-opus55-1 typecheck=pass tests=pass (29 pass) smoke=pass
+   turns/cost: 41 0.8270874
+   df: 14Gi free | load: 4.06 4.83 4.45
+== 08:56:39 run guren-shipped-opus55-2 (impl=guren guidance=shipped ref=HEAD model=claude-opus-5-5)
+== 08:59:38 verify guren-shipped-opus55-2
+   verdict: guren-shipped-opus55-2 typecheck=pass tests=pass (15 pass) smoke=pass
+   turns/cost: 40 1.3060290000000003
+   df: 14Gi free | load: 4.13 4.46 4.36
+== 08:59:47 run hono-opus55-2 (impl=hono guidance=shipped ref=HEAD model=claude-opus-5-5)
+== 09:02:41 verify hono-opus55-2
+   verdict: hono-opus55-2 typecheck=pass tests=pass (28 pass) smoke=pass
+   turns/cost: 40 0.8813139999999999
+   df: 14Gi free | load: 5.01 4.79 4.51
+== 09:02:52 run guren-shipped-opus55-3 (impl=guren guidance=shipped ref=HEAD model=claude-opus-5-5)
+== 09:05:42 verify guren-shipped-opus55-3
+   verdict: guren-shipped-opus55-3 typecheck=pass tests=pass (15 pass) smoke=pass
+   turns/cost: 38 1.316512
+   df: 14Gi free | load: 6.44 5.26 4.74
+== 09:05:51 run hono-opus55-3 (impl=hono guidance=shipped ref=HEAD model=claude-opus-5-5)
+== 09:08:57 verify hono-opus55-3
+   verdict: hono-opus55-3 typecheck=pass tests=pass (30 pass) smoke=pass
+   turns/cost: 38 0.9132776000000001
+   df: 14Gi free | load: 5.32 5.35 4.88
+== partA-opus end 2026-09-25 09:09:07
