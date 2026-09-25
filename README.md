@@ -135,8 +135,8 @@ were re-tested the day they were published — new APIs the model has no
 training data for — agents with the scaffold's shipped guidance went 3/3 at a
 29% lower median cost, while a stripped-guidance baseline passed only 1/3.
 A September 2026 re-run under an isolated runner puts Guren at 1.44× Hono
-on Sonnet and 1.49× on Opus 5.5 (medians, N=3), with most of the gap in
-guidance loaded at session start. Full methodology, round-by-round history
+on Sonnet and 1.49× on Opus 5.5 (medians, N=3); a token breakdown of the
+Sonnet cells puts most of that gap in guidance loaded at session start. Full methodology, round-by-round history
 (including the round where an earlier harness iteration did not help), honest
 limitations, and reproduction scripts: [agent-eval/](./agent-eval/).
 
