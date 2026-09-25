@@ -96,8 +96,11 @@ exports) and found the helper in
 - bare-3: 4 actions (msgs 33–36)
 
 All 13 happen after the first edit, while the agent writes the controller.
-The shipped and july arms never searched: their pushed guidance already
-states the signature. No other core/server hop was found. The
+The shipped and july arms never searched. Both state the signature
+(`paginate(result, { path?, query?, fragment? })` from `@guren/core`, "those
+three fields are `PaginatorOptions`") in the SessionStart `guren context`
+output and in `.claude/rules/orm-models.md`. No other core/server hop was
+found. The
 `belongsToMany` searches go from core to `@guren/orm`, which RFC 0024 does
 not merge, so they are (b).
 
@@ -169,18 +172,25 @@ guidance, written into the cache at the start and re-read on each of its
 count matches the size of that guidance, at 2.38 characters per token:
 
 - CLAUDE.md: 10.5 KB
-- all six `.claude/rules/*.md` files: 42.1 KB
-- the SessionStart `guren context` output: 7.9 KB
+- all six `.claude/rules/*All six rule files appear to load at session start. The rules scope
+themselves with a `globs:` frontmatter key. The Claude Code memory docs
+(code.claude.com/docs/en/memory) say `paths` is the only field a rule is
+read for, other fields are ignored without an error, and a rule without
+`paths` loads at launch with CLAUDE.md's priority. Two measurements agree:
 
-July's 18.6k tokens match its own CLAUDE.md, rules and hook output at 2.36
-characters per token.
+- the token arithmetic above, in both arms;
+- the shipped arm's injections after edits stay small ($0.018 per cell
+  against hono's $0.013), whereas attach-on-edit would add the rules there.
 
-This suggests every rule file is loaded at session start. The rules scope
-themselves with a `globs:` frontmatter key, and Claude Code's documented
-scoping key for `.claude/rules` is `paths:`. The same key is in gurenjs
-`packages/cli/templates/agent/core/rules/*.md` today. This is an inference
-from token arithmetic and should be confirmed directly. If it holds, the
-rules alone are about 70% of the pushed cost, roughly $0.13 per cell.
+gurenjs `packages/cli/templates/agent/core/rules/*.md` uses `globs:` today.
+On this reading the rules are about 70% of the pushed cost, roughly $0.13
+per cell.
+
+This contradicts PILOT.md round 5. That round explained the lost harness win
+by rules that "auto-attach on edit". The round-5 app (37094d4) used the same
+`globs:` key, so its rules were probably loaded at launch as well, unless
+Claude Code treated the key differently in August. Round 5's working fix,
+the signature digest in `guren context`, stands on its own measurement.
 
 **In the bare arm, the gap is API learning pulled from dist, plus more
 turns.** Bare runs 32 calls against hono's 13. It pays (b) $0.114 and (a)
@@ -192,9 +202,22 @@ pushed.** It is 17% in shipped, and july's (c) is lower than hono's. The
 extra layers (model, validator, resource, pages, codegen) show up as a few
 more calls, not as a cost that dominates.
 
+**The pushed guidance roughly pays for itself.** Shipped and bare differ by
+$0.02 on means ($0.675 vs $0.695) and by $0.10 on medians. The guidance
+removes bare's (a), its (b) reads and half its calls, at about the price of
+those reads. It is not dead weight, and dropping it brings back the
+`paginate` hunt.
+
 For RFC 0024 this points to the plan's second branch: leave 0024 where it
-is, and fix the digest and rules. The first thing to try is cutting what the
-shipped harness pushes into every call, for example rules that load only for
+is, and work on the digest and rules. What to try next is a measurement,
+not a fix. Keep the digest, which carries the signatures in about 3k tokens.
+Trim the 42 KB of rules, or scope them with `paths:`. Then run N=3 shipped
+against the current harness. It has to be measured because round 5 is the
+counterexample: rules that arrive only when a matching file is touched came
+too late for archaeology that happens before the first edit. The same gate
+applies to any package merge.
+
+hat load only for
 their paths, and to measure that before any package merge. The guidance
 still has to carry the `paginate` signature: bare is what happens without
 it.
