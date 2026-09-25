@@ -1,0 +1,14 @@
+== partA-paths start 2026-09-25 09:09:17 | load: 5.04 5.29 4.87 | df: 14Gi free
+== 09:09:17 run guren-shipped-paths-1 (impl=guren guidance=shipped ref=1e756eb model=claude-sonnet-5)
+== 09:11:35 verify guren-shipped-paths-1
+   verdict: guren-shipped-paths-1 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 50 0.6844426
+== 09:11:45 run guren-shipped-paths-2 (impl=guren guidance=shipped ref=1e756eb model=claude-sonnet-5)
+== 09:13:53 verify guren-shipped-paths-2
+   verdict: guren-shipped-paths-2 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 30 0.5315808000000001
+== 09:14:02 run guren-shipped-paths-3 (impl=guren guidance=shipped ref=1e756eb model=claude-sonnet-5)
+== 09:15:56 verify guren-shipped-paths-3
+   verdict: guren-shipped-paths-3 typecheck=pass tests=pass (13 pass) smoke=pass
+   turns/cost: 31 0.5320527999999999
+== partA-paths end 2026-09-25 09:16:06
