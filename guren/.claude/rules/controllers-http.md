@@ -1,6 +1,6 @@
 ---
 description: Guren controllers — validation signatures, 422 shape, Inertia pages, auth helpers, resources
-globs:
+paths:
   - "app/Http/**"
 ---
 

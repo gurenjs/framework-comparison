@@ -1,6 +1,6 @@
 ---
 description: Guren ORM models — model definition, queries, relations, pagination, mass assignment
-globs:
+paths:
   - "app/Models/**"
   - "db/**"
 ---
