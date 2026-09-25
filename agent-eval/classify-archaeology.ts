@@ -63,7 +63,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const RESULTS = join(import.meta.dirname, 'results')
-const ARMS = ['guren-shipped', 'guren-bare', 'hono-sep', 'guren-july'] as const
+const ARMS = ['guren-shipped', 'guren-shipped-paths', 'guren-bare', 'hono-sep', 'guren-july'] as const
 const TRIALS = [1, 2, 3]
 // USD per million tokens for claude-sonnet-5; 1h cache writes (all writes here are 1h).
 const PRICE = { input: 2, cacheWrite: 4, cacheRead: 0.2, output: 10 }

@@ -2,7 +2,10 @@
 
 Source: the 12 Part A cells of the September re-run
 (`results/{guren-shipped,guren-bare,hono-sep,guren-july}-{1,2,3}.stream.jsonl`,
-`claude-sonnet-5`, isolated runner, N=3 per arm). Script:
+`claude-sonnet-5`, isolated runner, N=3 per arm), plus a fifth arm run
+afterwards: `guren-shipped-paths-{1,2,3}`. That arm is the same app and the
+same shipped harness, except that the six rule files scope themselves with
+`paths:` instead of `globs:` (branch exp/rules-paths, 1e756eb). Script:
 [`classify-archaeology.ts`](./classify-archaeology.ts)
 (`bun agent-eval/classify-archaeology.ts`). The question comes from §6 of the
 round-2 plan: is the remaining Guren-vs-hono cost gap name confusion between
@@ -53,6 +56,7 @@ header has the details. It also prints two variants:
 | arm | cost | API calls | actions | (a) n | (b) n | (c) n | (a) $ | (b) $ actions | b-pushed $ | (c) $ | a/b/c share of action $ | marginal (a) / (b) $ | literal a/b/c | first edit (msg) | (a)+(b) $ before first edit |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | guren shipped | 0.603 | 16 | 40 | 0 | 1.0 | 40.0 | 0.000 | 0.003 | 0.179 | 0.371 | 0/1/99% | 0.000 / 0.004 | 0/4/96% | 9 | 0.000 |
+| guren shipped, `paths:` rules | 0.532 | 18 | 30 | 0 | 1.1 | 28.3 | 0.000 | 0.027 | 0.069 | 0.390 | 0/6/94% | 0.000 / 0.030 | 0/3/97% | 8 | 0.027 |
 | guren bare | 0.706 | 32 | 52 | 4.0 | 6.0 | 42.0 | 0.031 | 0.092 | 0.004 | 0.491 | 6/18/77% | 0.055 / 0.115 | 14/20/62% | 11 | 0.048 |
 | hono | 0.419 | 13 | 37 | 0 | 0 | 37.0 | 0.000 | 0.000 | 0.000 | 0.367 | 0/0/100% | 0 / 0 | 0/0/100% | 7 | 0.000 |
 | guren july | 0.558 | 16 | 36 | 0 | 0 | 36.0 | 0.000 | 0.000 | 0.131 | 0.372 | 0/0/100% | 0 / 0 | 0/0/100% | 6 | 0.000 |
@@ -64,19 +68,23 @@ app reads with package reads.
 
 **Gap to hono, arm means.** Unlike medians, means add up.
 
-| bucket | shipped − hono | bare − hono | july − hono |
-|---|---|---|---|
-| (a) name confusion | 0.000 | 0.033 | 0.000 |
-| (b) actions | 0.003 | 0.114 | 0.009 |
-| (b) pushed guidance | 0.192 | 0.004 | 0.133 |
-| (c) denied actions | −0.029 | −0.012 | −0.052 |
-| (c) other | 0.071 | 0.100 | 0.036 |
-| call-1 prefix, injections, text, residual | 0.007 | 0.025 | 0.003 |
-| **gap** | **0.244** | **0.264** | **0.129** |
+| bucket | shipped − hono | paths − hono | bare − hono | july − hono |
+|---|---|---|---|---|
+| (a) name confusion | 0.000 | 0.000 | 0.033 | 0.000 |
+| (b) actions | 0.003 | 0.025 | 0.114 | 0.009 |
+| (b) pushed guidance | 0.192 | 0.071 | 0.004 | 0.133 |
+| (c) denied actions | −0.029 | −0.037 | −0.012 | −0.052 |
+| (c) other | 0.071 | 0.060 | 0.100 | 0.036 |
+| call-1 prefix, injections, text, residual | 0.007 | 0.033 | 0.025 | 0.003 |
+| **gap** | **0.244** | **0.152** | **0.264** | **0.129** |
 
 As shares of each gap:
 
 - **shipped**: (a) 0%, (b) 80% (79% of it pushed guidance), (c) 17%.
+- **paths**: (a) 0%, (b) 63% (47% pushed, 16% reads), (c) 15%, other 22%.
+  Most of that "other" is rule text Claude Code attached after a file read,
+  which lands in the injections bucket (+$0.032 over hono). Counted as (b),
+  it brings (b) to about 80%.
 - **bare**: (a) 12% (22% on the removal estimate), (b) 45%, (c) 33%.
 - **july**: (b) pushed guidance is 103% of its gap. Its (c) runs below hono
   because fewer of its actions were denied.
@@ -96,7 +104,7 @@ exports) and found the helper in
 - bare-3: 4 actions (msgs 33–36)
 
 All 13 happen after the first edit, while the agent writes the controller.
-The shipped and july arms never searched. Both state the signature
+The shipped, paths and july arms never searched. All three state the signature
 (`paginate(result, { path?, query?, fragment? })` from `@guren/core`, "those
 three fields are `PaginatorOptions`") in the SessionStart `guren context`
 output and in `.claude/rules/orm-models.md`. No other core/server hop was
@@ -107,6 +115,7 @@ not merge, so they are (b).
 ## Top files read under node_modules
 
 - **guren shipped**: none.
+- **guren shipped, `paths:` rules**: none.
 - **hono**: none.
 - **guren july**: `@guren/orm/dist/index.js` (3 actions, 1 cell: the
   `belongsToMany` pivot loader), `@guren/orm/dist/*.js` (1).
@@ -137,6 +146,7 @@ migration files are excluded, because every arm writes drizzle there.
 | cell | Model markers | drizzle markers |
 |---|---|---|
 | guren-shipped-1 / 2 / 3 | 6 / 5 / 6 | 0 / 0 / 0 |
+| guren-shipped-paths-1 / 2 / 3 | 7 / 6 / 6 | 0 / 0 / 0 |
 | guren-bare-1 / 2 / 3 | 5 / 5 / 6 | **15** / 0 / 0 |
 | guren-july-1 / 2 / 3 | 6 / 9 / 6 | 0 / 0 / 0 |
 | hono-sep-1 / 2 / 3 (control) | 0 / 0 / 0 | 9 / 9 / 9 |
@@ -147,11 +157,11 @@ migration files are excluded, because every arm writes drizzle there.
 - **drizzle markers**: `db.select`/`insert`/`update`/`delete`, an import
   from `drizzle-orm`, `eq`/`inArray`/`and`, and `getDatabase`.
 
-Eight of the nine guren patches built tags on the Model API alone.
+Eleven of the twelve guren patches built tags on the Model API alone.
 guren-bare-1 dropped to raw drizzle in `Tag.ts` (`getDatabase`,
 `db.select`/`db.delete`, `eq`, `inArray`), after grepping the orm `.d.ts`
-for `getDatabase`. Only three patches used `belongsToMany` (shipped-3,
-july-1, july-2); the rest wrote the pivot by hand through a `PostTag` model.
+for `getDatabase`. Only five patches used `belongsToMany` (shipped-3,
+paths-1, paths-3, july-1, july-2); the rest wrote the pivot by hand through a `PostTag` model.
 
 ## Reading
 
@@ -208,19 +218,50 @@ removes bare's (a), its (b) reads and half its calls, at about the price of
 those reads. It is not dead weight, and dropping it brings back the
 `paginate` hunt.
 
-For RFC 0024 this points to the plan's second branch: leave 0024 where it
-is, and work on the digest and rules. What to try next is a measurement,
-not a fix. Keep the digest, which carries the signatures in about 3k tokens.
-Trim the 42 KB of rules, or scope them with `paths:`. Then run N=3 shipped
-against the current harness. It has to be measured because round 5 is the
-counterexample: rules that arrive only when a matching file is touched came
-too late for archaeology that happens before the first edit. The same gate
-applies to any package merge.
+**Scoping the rules with `paths:` (the fifth arm).**
 
-hat load only for
-their paths, and to measure that before any package merge. The guidance
-still has to carry the `paginate` signature: bare is what happens without
-it.
+- **The saving comes from smaller startup guidance.** The call-1 prefix
+  drops from 53.4k to 37.2k tokens. The part beyond hono's goes from 25.5k
+  to 9.3k tokens: CLAUDE.md, the `guren context` output, and the skill and
+  agent listings. That cuts the guidance loaded at start from $0.192 to
+  $0.071 per cell (means).
+- **Part of that is paid back.** The agents read the rules they were
+  pointed to by hand: CLAUDE.md names `orm-models.md`, and all three cells
+  `cat` it and/or `comments.md` before the first edit (+$0.021 in (b)
+  reads). The rule text Claude Code attached itself adds +$0.032 in
+  injections.
+- **Net effect:** mean cost $0.583 vs $0.675 (−$0.092); median $0.532 vs
+  $0.603. The gap to hono narrows from $0.244 to $0.152 on means.
+- **The scoped rules did not arrive before the first edit on their own.**
+  The stream does not show attached rule text, so this is read from token
+  counts. In cells 1 and 3, the call after the one `Read` of `db/schema.ts`
+  writes about 6.4k tokens that no tool result accounts for. That is the
+  size of `orm-models.md`, `docs-and-spec.md` and `comments.md` together
+  (about 6.9k tokens at 2.4 characters per token, all matching
+  `db/schema.ts`). That `Read` came at msg 13 and msg 10, after the first
+  edits at msg 11 and msg 8. Cell 2 never used `Read`, and nothing of that
+  size appears in it.
+- **`controllers-http.md`, `routes-codegen.md` and `testing.md` show no
+  sign of arriving.** Files read through Bash `cat` and edited with `Edit`
+  left no rule-sized writes. The one exception is an unexplained 3.6k-token
+  write in cell 1 at msg 55, about the size of `testing.md`.
+- **The round-5 worry did not recur.** No (a) and no `node_modules` reads
+  showed up without the rules at launch. The SessionStart digest carries the
+  signatures the agents need, and the one rule they want they `cat`
+  themselves.
+- **The ranges overlap.** Paths runs $0.53–0.68 against shipped's
+  $0.60–0.82; paths-1 ($0.684) costs more than shipped-1 ($0.596). N=3
+  shows the direction, which matches the $0.12 the accounting predicts. It
+  does not show the size.
+
+For RFC 0024 this points to the plan's second branch: leave 0024 where it
+is, and work on the digest and rules. The fifth arm supports this and does
+not contradict any earlier conclusion. Scoping the rules removes about half
+of shipped's remaining gap to hono without touching package names, and
+(a) stays at zero. The next change to measure is the gurenjs template fix
+(`globs:` to `paths:` in `packages/cli/templates/agent/core/rules/*.md`),
+at a larger N, before any package merge. The guidance still has to carry
+the `paginate` signature: bare is what happens without it.
 
 ## Limits
 
@@ -243,5 +284,8 @@ it.
   braces, `python3`). This is runner friction, not framework cost. It is
   roughly equal across arms, so it does not explain the gap, but it inflates
   every absolute number.
-- **Cells in scope.** The Opus 5.5 cells in `results/` were running when
-  this was written and are not included.
+- **Cells in scope.** 15 Sonnet cells in five arms. The Opus 5.5 cells in
+  `results/` are not included.
+- **Rule attachment is inferred.** stream-json does not show the text Claude
+  Code attaches for a path-scoped rule. Where and when rules arrived in the
+  paths arm is read from unexplained cache writes, not observed directly.
