@@ -182,7 +182,7 @@ guidance, written into the cache at the start and re-read on each of its
 count matches the size of that guidance, at 2.38 characters per token:
 
 - CLAUDE.md: 10.5 KB
-- all six `.claude/rules/*All six rule files appear to load at session start. The rules scope
+- all six `.claude/rules/*.md` files: 42.1 KB. All six rule files appear to load at session start. The rules scope
 themselves with a `globs:` frontmatter key. The Claude Code memory docs
 (code.claude.com/docs/en/memory) say `paths` is the only field a rule is
 read for, other fields are ignored without an error, and a rule without
@@ -256,8 +256,8 @@ those reads. It is not dead weight, and dropping it brings back the
 
 For RFC 0024 this points to the plan's second branch: leave 0024 where it
 is, and work on the digest and rules. The fifth arm supports this and does
-not contradict any earlier conclusion. Scoping the rules removes about half
-of shipped's remaining gap to hono without touching package names, and
+not contradict any earlier conclusion. Scoping the rules removes about 40%
+of shipped's remaining gap to hono ($0.244 to $0.152 on means) without touching package names, and
 (a) stays at zero. The next change to measure is the gurenjs template fix
 (`globs:` to `paths:` in `packages/cli/templates/agent/core/rules/*.md`),
 at a larger N, before any package merge. The guidance still has to carry
