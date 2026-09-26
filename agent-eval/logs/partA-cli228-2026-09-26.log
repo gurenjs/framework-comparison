@@ -1,0 +1,17 @@
+== partA start 2026-09-26 11:34:18 | load: 6.27 6.36 7.02 | df: 9.4Gi free
+== 11:34:18 run guren-cli228-1 (impl=guren guidance=shipped ref=306824b)
+== 11:36:14 verify guren-cli228-1
+   verdict: guren-cli228-1 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 36 0.5360792
+   df: 9.3Gi free | load: 5.64 5.92 6.74
+== 11:36:28 run guren-cli228-2 (impl=guren guidance=shipped ref=306824b)
+== 11:38:34 verify guren-cli228-2
+   verdict: guren-cli228-2 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 39 0.5851486
+   df: 9.1Gi free | load: 5.53 5.88 6.61
+== 11:38:42 run guren-cli228-3 (impl=guren guidance=shipped ref=306824b)
+== 11:40:42 verify guren-cli228-3
+   verdict: guren-cli228-3 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 30 0.5299734
+   df: 9.2Gi free | load: 6.35 5.89 6.50
+== partA end 2026-09-26 11:40:50

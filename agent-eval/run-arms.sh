@@ -5,7 +5,7 @@
 set -uo pipefail
 EVAL=~/Development/framework-comparison/agent-eval
 cd "$EVAL" || exit 2
-ARMS=("guren-shipped:guren:shipped:HEAD" "guren-bare:guren:bare:HEAD" "hono-sep:hono:shipped:HEAD" "guren-july:guren:shipped:716117a")   # round 2 arms; edit per round
+ARMS=("guren-cli228:guren:shipped:306824b")   # cli 2.28.0 re-run of the shipped arm; edit per round
 echo "== partA start $(date '+%F %T') | load: $(uptime | sed 's/.*load averages*: *//') | df: $(df -h /System/Volumes/Data | tail -1 | awk '{print $4}') free"
 for TRIAL in 1 2 3; do
   for ARM in "${ARMS[@]}"; do
