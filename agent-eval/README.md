@@ -81,7 +81,7 @@ Two findings we believe generalize beyond Guren:
 The same task, re-run under an isolated runner (no operator MCP servers,
 plugins, user settings, web tools or auto memory; provenance recorded per
 cell) on the current Guren releases, with Hono and the round-6 Guren app as
-controls. Claude Code 2.1.281, N=3 per arm, all 21 cells pass. Absolute
+controls. Claude Code 2.1.281, N=3 per arm, all 24 cells pass. Absolute
 costs are not comparable with the July rounds; arms within this round are.
 
 | arm | model | turns (median) | cost USD (median / mean) | × hono (median) |
@@ -91,6 +91,7 @@ costs are not comparable with the July rounds; arms within this round are.
 | hono | sonnet-5 | 38 | 0.42 / 0.43 | 1.00 |
 | guren, round-6 app (716117a) | sonnet-5 | 37 | 0.56 / 0.56 | 1.33 |
 | guren shipped, rules with `paths:` | sonnet-5 | 31 | 0.53 / 0.58 | 1.27 |
+| guren shipped (cli 2.28, released) | sonnet-5 | 36 | 0.54 / 0.55 | 1.28 |
 | guren shipped (cli 2.27) | opus-5-5 | 40 | 1.32 / 1.39 | 1.49 |
 | hono | opus-5-5 | 40 | 0.88 / 0.87 | 1.00 |
 
@@ -100,7 +101,8 @@ cells ([ARCHAEOLOGY-2026-09.md](./ARCHAEOLOGY-2026-09.md)) puts about 80% of
 the remaining gap to Hono in guidance loaded at session start. The harness's
 rule files used a `globs:` key that Claude Code ignores (it reads only
 `paths`), so all six rules loaded at launch; scoping them with `paths:`
-narrowed the gap by about 40% in this sample. Details and caveats:
+narrowed the gap by about 40% in this sample, and the released harness
+(cli 2.28.0, which carries the fix) lands at the same 1.28×. Details and caveats:
 [PILOT.md, round 7](./PILOT.md).
 
 ## Honest limitations

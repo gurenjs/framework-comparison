@@ -235,7 +235,7 @@ extends:
   (commit 716117a, cli 2.0, labelled `guren-july`) re-run as well, so a
   change in the Guren/Hono ratio can be read against the older app.
 
-Claude Code 2.1.281, N=3 per arm, all 21 cells pass typecheck, tests and the
+Claude Code 2.1.281, N=3 per arm, all 24 cells pass typecheck, tests and the
 hidden smoke.
 
 | arm | model | turns (median, range) | cost USD (median, range) | cost mean | × hono (median) |
@@ -245,6 +245,7 @@ hidden smoke.
 | hono | sonnet-5 | 38 (36–42) | 0.419 (0.39–0.48) | 0.431 | 1.00 |
 | guren-july (716117a, cli 2.0) | sonnet-5 | 37 (35–46) | 0.558 (0.50–0.62) | 0.560 | 1.33 |
 | guren shipped, rules with `paths:` (1e756eb) | sonnet-5 | 31 (30–50) | 0.532 (0.53–0.68) | 0.583 | 1.27 |
+| guren shipped (cli 2.28, 306824b) | sonnet-5 | 36 (30–39) | 0.536 (0.53–0.59) | 0.550 | 1.28 |
 | guren shipped (cli 2.27) | opus-5-5 | 40 (38–45) | 1.317 (1.31–1.55) | 1.392 | 1.49 |
 | hono | opus-5-5 | 40 (38–41) | 0.881 (0.83–0.91) | 0.874 | 1.00 |
 
@@ -280,6 +281,15 @@ first call's context from 53k to 37k tokens and narrowed the gap to Hono by
 about 40% on means ($0.244 → $0.152). That is a sample estimate: the ranges
 overlap, and one `paths:` trial cost more than one shipped trial. The
 template fix landed in gurenjs as #1056.
+
+**The released harness.** #1056 shipped in cli 2.28.0 (2026-09-26) together
+with other harness changes: API token and rate limit sections in the digest,
+a plan-writing skill, hooks anchored to the project directory. The shipped arm
+re-run on it (commit 306824b: cli 2.28.0 / core 1.22.0 / orm 2.13.0, harness
+resynced, label `guren-cli228`) starts from 35k tokens and lands at 1.28×
+Hono on the median and on the mean, with a narrower range than either earlier
+Guren arm. It measures the released harness as a whole, not the `paths:` fix
+alone; the `paths:` estimate holds for what an app installs.
 
 Lifetime acceptance is now **64/66**. Per-cell results (`agent-eval/results/`)
 are gitignored; they and the event streams will be attached to the release.
