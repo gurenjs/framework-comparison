@@ -5,10 +5,10 @@
     "": {
       "name": "guren",
       "dependencies": {
-        "@guren/cli": "^2.27.0",
-        "@guren/core": "^1.21.0",
+        "@guren/cli": "^2.28.0",
+        "@guren/core": "^1.22.0",
         "@guren/inertia-client": "^1.2.2",
-        "@guren/orm": "^2.12.0",
+        "@guren/orm": "^2.13.0",
         "@inertiajs/react": "^3.6.1",
         "drizzle-orm": "1.0.0-rc.4",
         "react": "^19.0.0",
@@ -16,7 +16,7 @@
         "zod": "^4.4.3",
       },
       "devDependencies": {
-        "@guren/testing": "^1.14.0",
+        "@guren/testing": "^1.14.1",
         "@types/react": "^19.0.0",
         "@types/react-dom": "^19.0.0",
         "@vitejs/plugin-react": "^6.0.0",
@@ -90,17 +90,17 @@
 
     "@esbuild/win32-x64": ["@esbuild/win32-x64@0.25.12", "", { "os": "win32", "cpu": "x64" }, "sha512-alJC0uCZpTFrSL0CCDjcgleBXPnCrEAhTBILpeAp7M/OFgoqtAetfBzX0xM00MUsVVPpVjlPuMbREqnZCXaTnA=="],
 
-    "@guren/cli": ["@guren/cli@2.27.0", "", { "dependencies": { "@babel/parser": "^7.24.7", "@guren/orm": "^2.12.0", "@guren/server": "^2.26.0", "@modelcontextprotocol/server": "^2.0.0", "citty": "^0.1.6", "consola": "^3.4.2", "zod": "^4.4.3" }, "peerDependencies": { "@guren/openapi": ">=1.3.0", "@guren/plugin-ai": ">=0.2.0", "oxlint": "~1.81.0", "vite": ">=7.0.0" }, "optionalPeers": ["@guren/openapi", "@guren/plugin-ai", "oxlint"], "bin": { "guren": "dist/bin.js" } }, "sha512-F1Opp5UejlNdpIvNA8wVI4BJm0s4ckB5epCvvxW9tWfR6Feu52A92trCQXiJbWRPOVX03GQxP1ipiC4MPr+MGg=="],
+    "@guren/cli": ["@guren/cli@2.28.0", "", { "dependencies": { "@babel/parser": "^7.24.7", "@guren/orm": "^2.13.0", "@guren/server": "^2.27.0", "@modelcontextprotocol/server": "^2.0.0", "citty": "^0.1.6", "consola": "^3.4.2", "zod": "^4.4.3" }, "peerDependencies": { "@guren/openapi": ">=1.3.0", "@guren/plugin-ai": ">=0.2.0", "oxlint": "~1.81.0", "vite": ">=7.0.0" }, "optionalPeers": ["@guren/openapi", "@guren/plugin-ai", "oxlint"], "bin": { "guren": "dist/bin.js" } }, "sha512-hGh7kWihG8DcmUvn3nTjrRJ7JbwL6eLy1JFBXeoupwtL1SKGKZJWof9Uwrlnknc30/SiuLJGnhlnDakTOLKmBg=="],
 
-    "@guren/core": ["@guren/core@1.21.0", "", { "dependencies": { "@guren/cli": "^2.27.0", "@guren/orm": "^2.12.0", "@guren/server": "^2.26.0" }, "bin": { "guren": "dist/bin.js" } }, "sha512-+aB/gd/AgBf9Y0wWO5H3QoTf66HwSGF1uDu9XbbLpwbk6r17ViHlYSbeehcjevwvHd/Pd/FSSbRsyZzeXvQ8pw=="],
+    "@guren/core": ["@guren/core@1.22.0", "", { "dependencies": { "@guren/cli": "^2.28.0", "@guren/orm": "^2.13.0", "@guren/server": "^2.27.0" }, "bin": { "guren": "dist/bin.js" } }, "sha512-xP+99yhbF6EhUYLDqIlkcpa1LgVpwYzr96PU6DR0tvqEHjLSf8UzKKUpiHZ71EUeWzK/YcdP+2gTJyCxaBsoFQ=="],
 
     "@guren/inertia-client": ["@guren/inertia-client@1.2.2", "", { "dependencies": { "@inertiajs/core": "^3.6.1", "@inertiajs/react": "^3.6.1" }, "peerDependencies": { "hono": "^4.13.0", "react": "^19.0.0", "react-dom": "^19.0.0" }, "optionalPeers": ["hono"] }, "sha512-irm4Rh7/yAXqy1PclU2Kq/0fnsrVKX77tpjKmiN+i9+eUtYQKz5K/OUAoZNEPNVBHLYqYwKMMjbb3Y6SzFtMsQ=="],
 
-    "@guren/orm": ["@guren/orm@2.12.0", "", { "dependencies": { "drizzle-orm": "1.0.0-rc.4" }, "peerDependencies": { "@aws-sdk/client-rds-data": "^3.0.0", "mysql2": "^3.11.3", "postgres": "^3.4.3" }, "optionalPeers": ["@aws-sdk/client-rds-data", "mysql2", "postgres"] }, "sha512-oqK3tP7g1/KPdpe0cRO4murTH775gtuYDk7+ulq1CpDFjhesLpqR+dZUNdYPMwzCgQSH5RKf7x2hqp0vOKexag=="],
+    "@guren/orm": ["@guren/orm@2.13.0", "", { "dependencies": { "drizzle-orm": "1.0.0-rc.4" }, "peerDependencies": { "@aws-sdk/client-rds-data": "^3.0.0", "mysql2": "^3.11.3", "postgres": "^3.4.3" }, "optionalPeers": ["@aws-sdk/client-rds-data", "mysql2", "postgres"] }, "sha512-376W0KoDsDNZGkJkiZ5ii6DCmnXWMiC2/cVtxw8/a0mWdhiKvvVMbAvJJehlOw7O7FZLVij6ZBvERh5YNW+z1g=="],
 
-    "@guren/server": ["@guren/server@2.26.0", "", { "dependencies": { "@guren/orm": "^2.12.0", "chalk": "^5.3.0", "consola": "^3.4.2", "figlet": "^1.7.0", "hono": "^4.13.7", "ioredis": "^5.11.1", "nodemailer": "^9.1.1" }, "peerDependencies": { "@aws-sdk/client-s3": "^3.0.0", "@aws-sdk/client-sqs": "^3.0.0", "@aws-sdk/s3-request-presigner": "^3.0.0", "@guren/inertia-client": "^1.0.0", "vite": ">=7.0.0" }, "optionalPeers": ["@aws-sdk/client-s3", "@aws-sdk/client-sqs", "@aws-sdk/s3-request-presigner", "@guren/inertia-client"] }, "sha512-S0UC5neehto3aItMhGVBqDp+kWbxSdb1C3HrUG2JODm3+VRIY4l7WHcjToi7zpB3rD24nk0VnlVSbTZEoWLzhg=="],
+    "@guren/server": ["@guren/server@2.27.0", "", { "dependencies": { "@guren/orm": "^2.13.0", "chalk": "^5.3.0", "consola": "^3.4.2", "figlet": "^1.7.0", "hono": "^4.13.7", "ioredis": "^5.11.1", "nodemailer": "^9.1.1" }, "peerDependencies": { "@aws-sdk/client-s3": "^3.0.0", "@aws-sdk/client-sqs": "^3.0.0", "@aws-sdk/s3-request-presigner": "^3.0.0", "@guren/inertia-client": "^1.0.0", "vite": ">=7.0.0" }, "optionalPeers": ["@aws-sdk/client-s3", "@aws-sdk/client-sqs", "@aws-sdk/s3-request-presigner", "@guren/inertia-client"] }, "sha512-FWuYLZaPLbhxG6lCTD/pi8ldaKfTw0cK+6vTUQfTlzCsSLzZ6t0XU18LFqA2oNkuyfl1G8cqSTYPydLrGp7tuw=="],
 
-    "@guren/testing": ["@guren/testing@1.14.0", "", { "peerDependencies": { "@guren/core": ">=1.8.0", "@guren/plugin-ai": ">=0.1.0", "@guren/server": ">=2.26.0", "@inertiajs/react": "^3.6.1", "@testing-library/react": "^14.0.0 || ^15.0.0 || ^16.0.0", "ai": "^7.0.106", "hono": "^4.13.7", "react": "^18.0.0 || ^19.0.0", "vitest": "^3.2.6 || ^4.1.11 || ^5.0.0" }, "optionalPeers": ["@guren/core", "@guren/plugin-ai", "@inertiajs/react", "@testing-library/react", "ai", "react", "vitest"] }, "sha512-T5NR9ZV/PtdJFEd8r2RVau34mLxSwOUci7kvr0wWkBYZ8tHGoWI0eQ9zc7mLYhmWaYxYmKHlq4ER4l7eWAC1Gw=="],
+    "@guren/testing": ["@guren/testing@1.14.1", "", { "peerDependencies": { "@guren/core": ">=1.8.0", "@guren/plugin-ai": ">=0.1.0", "@guren/server": ">=2.26.0", "@inertiajs/react": "^3.6.1", "@testing-library/react": "^14.0.0 || ^15.0.0 || ^16.0.0", "ai": "^7.0.106", "hono": "^4.13.7", "react": "^18.0.0 || ^19.0.0", "vitest": "^3.2.6 || ^4.1.11 || ^5.0.0" }, "optionalPeers": ["@guren/core", "@guren/plugin-ai", "@inertiajs/react", "@testing-library/react", "ai", "react", "vitest"] }, "sha512-Te0tbuqjns3JD45ycRWsoV8qZEqFxSE1+HMC7BQ1AEEp2+rURno8/jo7N0xyY62YOfQ/WnRR+iz3TGMMmgUzwA=="],
 
     "@inertiajs/core": ["@inertiajs/core@3.6.1", "", { "dependencies": { "@jridgewell/trace-mapping": "^0.3.31", "es-toolkit": "^1.33.0", "laravel-precognition": "^2.0.0" }, "peerDependencies": { "axios": "^1.15.2" }, "optionalPeers": ["axios"] }, "sha512-h6+qqkKfpcoZvxWENy/F5yyiD00PIm8lK+ruQkt6HGk4d3N0LMS9GeUbWVQ4+TDZzIxP/vQLurPktnYvDhYeew=="],
 
