@@ -1,0 +1,88 @@
+== partA start 2026-09-30 02:42:29 | load: 2.34 1.77 1.64 | df: 58Gi free
+-- skip guren-shipped-s55-1 (verdict exists)
+== 02:42:29 run guren-bare-s55-1 (impl=guren guidance=bare ref=dae2973)
+== 02:44:17 verify guren-bare-s55-1
+   verdict: guren-bare-s55-1 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 51 0.5834356000000002
+   df: 58Gi free | load: 2.31 1.85 1.68
+== 02:44:25 run hono-sep-s55-1 (impl=hono guidance=shipped ref=dae2973)
+== 02:46:12 verify hono-sep-s55-1
+   verdict: hono-sep-s55-1 typecheck=pass tests=pass (21 pass) smoke=pass
+   turns/cost: 42 0.4563029999999999
+   df: 58Gi free | load: 2.42 1.99 1.75
+== 02:46:21 run guren-july-s55-1 (impl=guren guidance=shipped ref=716117a)
+== 02:48:13 verify guren-july-s55-1
+   verdict: guren-july-s55-1 typecheck=pass tests=pass ( pass) smoke=pass
+   turns/cost: 37 0.6448946
+   df: 58Gi free | load: 1.82 1.87 1.73
+== 02:48:22 run guren-shipped-paths-s55-1 (impl=guren guidance=shipped ref=1e756eb)
+== 02:50:23 verify guren-shipped-paths-s55-1
+   verdict: guren-shipped-paths-s55-1 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 41 0.7024332
+   df: 58Gi free | load: 1.60 1.73 1.69
+== 02:50:31 run guren-cli228-s55-1 (impl=guren guidance=shipped ref=306824b)
+== 02:52:05 verify guren-cli228-s55-1
+   verdict: guren-cli228-s55-1 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 37 0.5032783999999999
+   df: 58Gi free | load: 4.07 2.26 1.88
+== 02:52:14 run guren-shipped-s55-2 (impl=guren guidance=shipped ref=dae2973)
+== 02:53:46 verify guren-shipped-s55-2
+   verdict: guren-shipped-s55-2 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 41 0.614158
+   df: 58Gi free | load: 2.28 2.10 1.85
+== 02:53:54 run guren-bare-s55-2 (impl=guren guidance=bare ref=dae2973)
+== 02:56:18 verify guren-bare-s55-2
+   verdict: guren-bare-s55-2 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 52 0.6913567999999999
+   df: 58Gi free | load: 2.60 2.25 1.94
+== 02:56:26 run hono-sep-s55-2 (impl=hono guidance=shipped ref=dae2973)
+== 02:57:59 verify hono-sep-s55-2
+   verdict: hono-sep-s55-2 typecheck=pass tests=pass (21 pass) smoke=pass
+   turns/cost: 40 0.381551
+   df: 58Gi free | load: 2.65 2.25 1.96
+== 02:58:08 run guren-july-s55-2 (impl=guren guidance=shipped ref=716117a)
+== 02:59:46 verify guren-july-s55-2
+   verdict: guren-july-s55-2 typecheck=pass tests=pass ( pass) smoke=pass
+   turns/cost: 32 0.5677962
+   df: 58Gi free | load: 1.36 1.91 1.86
+== 02:59:56 run guren-shipped-paths-s55-2 (impl=guren guidance=shipped ref=1e756eb)
+== 03:01:26 verify guren-shipped-paths-s55-2
+   verdict: guren-shipped-paths-s55-2 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 29 0.466522
+   df: 58Gi free | load: 3.62 2.25 1.98
+== 03:01:34 run guren-cli228-s55-2 (impl=guren guidance=shipped ref=306824b)
+== 03:03:25 verify guren-cli228-s55-2
+   verdict: guren-cli228-s55-2 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 43 0.6306842000000001
+   df: 58Gi free | load: 1.98 2.02 1.92
+== 03:03:33 run guren-shipped-s55-3 (impl=guren guidance=shipped ref=dae2973)
+== 03:04:58 verify guren-shipped-s55-3
+   verdict: guren-shipped-s55-3 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 30 0.5612805999999999
+   df: 58Gi free | load: 1.91 1.96 1.90
+== 03:05:07 run guren-bare-s55-3 (impl=guren guidance=bare ref=dae2973)
+== 03:07:11 verify guren-bare-s55-3
+   verdict: guren-bare-s55-3 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 47 0.6324119999999999
+   df: 58Gi free | load: 1.55 1.86 1.87
+== 03:07:20 run hono-sep-s55-3 (impl=hono guidance=shipped ref=dae2973)
+== 03:09:02 verify hono-sep-s55-3
+   verdict: hono-sep-s55-3 typecheck=pass tests=pass (22 pass) smoke=pass
+   turns/cost: 29 0.41024859999999996
+   df: 58Gi free | load: 1.43 1.76 1.83
+== 03:09:11 run guren-july-s55-3 (impl=guren guidance=shipped ref=716117a)
+== 03:10:54 verify guren-july-s55-3
+   verdict: guren-july-s55-3 typecheck=pass tests=pass ( pass) smoke=pass
+   turns/cost: 33 0.48816459999999995
+   df: 58Gi free | load: 1.65 1.72 1.80
+== 03:11:03 run guren-shipped-paths-s55-3 (impl=guren guidance=shipped ref=1e756eb)
+== 03:12:47 verify guren-shipped-paths-s55-3
+   verdict: guren-shipped-paths-s55-3 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 33 0.5700528
+   df: 58Gi free | load: 2.26 1.84 1.83
+== 03:12:56 run guren-cli228-s55-3 (impl=guren guidance=shipped ref=306824b)
+== 03:14:33 verify guren-cli228-s55-3
+   verdict: guren-cli228-s55-3 typecheck=pass tests=pass (14 pass) smoke=pass
+   turns/cost: 38 0.5181282
+   df: 58Gi free | load: 2.27 1.91 1.85
+== partA end 2026-09-30 03:14:42
