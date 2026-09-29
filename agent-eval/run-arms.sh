@@ -5,7 +5,14 @@
 set -uo pipefail
 EVAL=~/Development/framework-comparison/agent-eval
 cd "$EVAL" || exit 2
-ARMS=("guren-cli228:guren:shipped:306824b")   # cli 2.28.0 re-run of the shipped arm; edit per round
+ARMS=(   # Sonnet 5.5 re-run of round 7's Sonnet arms (MODEL=claude-sonnet-5-5); edit per round
+  "guren-shipped-s55:guren:shipped:dae2973"
+  "guren-bare-s55:guren:bare:dae2973"
+  "hono-sep-s55:hono:shipped:dae2973"
+  "guren-july-s55:guren:shipped:716117a"
+  "guren-shipped-paths-s55:guren:shipped:1e756eb"
+  "guren-cli228-s55:guren:shipped:306824b"
+)
 echo "== partA start $(date '+%F %T') | load: $(uptime | sed 's/.*load averages*: *//') | df: $(df -h /System/Volumes/Data | tail -1 | awk '{print $4}') free"
 for TRIAL in 1 2 3; do
   for ARM in "${ARMS[@]}"; do
@@ -13,7 +20,7 @@ for TRIAL in 1 2 3; do
     OUT="results/$LABEL-$TRIAL"
     if [ -f "$OUT.verdict.json" ] || grep -q "^$LABEL-$TRIAL[ :]" results/verdicts.txt 2>/dev/null; then echo "-- skip $LABEL-$TRIAL (verdict exists)"; continue; fi
     echo "== $(date '+%T') run $LABEL-$TRIAL (impl=$IMPL guidance=$GUIDANCE ref=$REF)"
-    LABEL="$LABEL" GUIDANCE="$GUIDANCE" REF="$REF" MODEL="${MODEL:-claude-sonnet-5}" bash run-trial.sh "$IMPL" "$TRIAL" > "results/$LABEL-$TRIAL.driver-run.log" 2>&1
+    LABEL="$LABEL" GUIDANCE="$GUIDANCE" REF="$REF" MODEL="${MODEL:-claude-sonnet-5-5}" bash run-trial.sh "$IMPL" "$TRIAL" > "results/$LABEL-$TRIAL.driver-run.log" 2>&1
     RC=$?
     if [ $RC -ne 0 ]; then echo "!! run failed rc=$RC $LABEL-$TRIAL: $(tail -1 "results/$LABEL-$TRIAL.driver-run.log")"; fi
     if [ -f "$OUT.result.json" ] && python3 - "$OUT.result.json" <<'PY'
