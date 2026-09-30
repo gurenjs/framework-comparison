@@ -312,9 +312,11 @@ Sonnet 5. Arm means, gap to Hono ($0.416):
 - Name confusion is again the `paginate()` hunt, in two of three bare cells
   (five actions), and absent from every other arm.
 - The `paths:` fix does what it is for: guidance at start falls from 25.5k
-  to 9.2k tokens ($0.179 → $0.069 per cell). On Sonnet 5.5 the saving does
-  not reach the total, because those cells spent about as much on
-  implementation, denied actions and rule injections. The cli 2.28 harness
-  starts from 7.1k tokens and has the smallest gap.
-- Permission denials are as frequent as in round 7 (3–8 per cell, every
-  arm), so they do not explain the difference.
+  to 9.2k tokens ($0.179 → $0.069 per cell). On Sonnet 5.5 the $0.110 went
+  elsewhere: denied actions +$0.041 (5–7 refusals per cell against the
+  shipped arm's 4–5), rule injections +$0.024, other implementation +$0.024,
+  `b` actions +$0.019. A path-scoped rule arrives when a matching file is
+  touched, so part of the guidance moved later rather than going away. The
+  cli 2.28 harness starts from 7.1k tokens and has the smallest gap.
+- Refusals run 3–8 per cell in every arm, as in round 7; the `paths:` arm
+  has the most.
