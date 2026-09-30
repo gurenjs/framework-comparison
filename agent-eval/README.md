@@ -105,6 +105,28 @@ narrowed the gap by about 40% in this sample, and the released harness
 (cli 2.28.0, which carries the fix) lands at the same 1.28×. Details and caveats:
 [PILOT.md, round 7](./PILOT.md).
 
+## September 2026, Sonnet 5.5 (round 8)
+
+Round 7's six Sonnet arms re-run on `claude-sonnet-5-5` under the same
+runner, Claude Code 2.1.284, N=3 per arm; all 18 cells pass. Sonnet 5.5 is
+priced like Sonnet 5. The Opus 5.5 arms of round 7 were not re-run.
+
+| arm | model | turns (median) | cost USD (median / mean) | × hono (median) |
+|---|---|---|---|---|
+| guren shipped (cli 2.27) | sonnet-5-5 | 38 | 0.57 / 0.58 | 1.40 |
+| guren bare (cli 2.27) | sonnet-5-5 | 51 | 0.63 / 0.64 | 1.54 |
+| hono | sonnet-5-5 | 40 | 0.41 / 0.42 | 1.00 |
+| guren, round-6 app (716117a) | sonnet-5-5 | 33 | 0.57 / 0.57 | 1.38 |
+| guren shipped, rules with `paths:` | sonnet-5-5 | 33 | 0.57 / 0.58 | 1.39 |
+| guren shipped (cli 2.28, released) | sonnet-5-5 | 38 | 0.52 / 0.55 | 1.26 |
+
+The released harness stays at about 1.26–1.28× Hono on both models, and the
+shipped harness stays cheaper than none. The `paths:` arm no longer stands
+apart: its guidance at session start still falls from 25.5k to 9.2k tokens,
+but on Sonnet 5.5 the saving did not reach the total. Details:
+[PILOT.md, round 8](./PILOT.md) and
+[ARCHAEOLOGY-2026-09.md](./ARCHAEOLOGY-2026-09.md#sonnet-55-round-8-2026-09-30).
+
 ## Honest limitations
 
 - One task, N=3 per arm, one runner (Claude Code). Rounds 1–6 used

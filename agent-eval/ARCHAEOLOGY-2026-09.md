@@ -289,3 +289,32 @@ the `paginate` signature: bare is what happens without it.
 - **Rule attachment is inferred.** stream-json does not show the text Claude
   Code attaches for a path-scoped rule. Where and when rules arrived in the
   paths arm is read from unexplained cache writes, not observed directly.
+
+## Sonnet 5.5 (round 8, 2026-09-30)
+
+The same classifier over the six arms re-run on `claude-sonnet-5-5`
+(`results/*-s55-{1,2,3}`, Claude Code 2.1.284):
+`ARM_SUFFIX=-s55 bun agent-eval/classify-archaeology.ts`. The price vector
+reproduces every cell's reported cost exactly, so Sonnet 5.5 is priced like
+Sonnet 5. Arm means, gap to Hono ($0.416):
+
+| arm | gap | name confusion | API learning (of it at start) | implementation | other |
+|---|---|---|---|---|---|
+| shipped (cli 2.27) | $0.167 | 0% | 107% (107%) | −8% | 1% |
+| rules with `paths:` | $0.164 | 0% | 53% (42%) | 32% | 15% |
+| bare | $0.220 | 6% (10% if removed) | 44% (2%) | 42% | 8% |
+| round-6 app (716117a) | $0.151 | 0% | 87% (85%) | 12% | 1% |
+| released harness (cli 2.28) | $0.135 | 0% | 55% (39%) | 21% | 25% |
+
+- The shipped gap is the guidance loaded at session start and nothing else:
+  25.5k tokens re-read on 15–18 calls, $0.17–0.19 per cell. Its
+  implementation actions cost slightly less than Hono's.
+- Name confusion is again the `paginate()` hunt, in two of three bare cells
+  (five actions), and absent from every other arm.
+- The `paths:` fix does what it is for: guidance at start falls from 25.5k
+  to 9.2k tokens ($0.179 → $0.069 per cell). On Sonnet 5.5 the saving does
+  not reach the total, because those cells spent about as much on
+  implementation, denied actions and rule injections. The cli 2.28 harness
+  starts from 7.1k tokens and has the smallest gap.
+- Permission denials are as frequent as in round 7 (3–8 per cell, every
+  arm), so they do not explain the difference.

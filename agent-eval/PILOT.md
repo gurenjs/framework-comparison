@@ -295,6 +295,45 @@ Lifetime acceptance is now **64/66**. Per-cell results (`agent-eval/results/`)
 are gitignored; they and the event streams will be attached to the release.
 The runner used for this round is `agent-eval/run-arms.sh`.
 
+## Round 8 results (2026-09-29/30): round 7's Sonnet arms on Sonnet 5.5
+
+The six Sonnet arms of round 7, re-run on `claude-sonnet-5-5` with nothing
+else changed: same runner and flags, same app commits, labels suffixed
+`-s55`. Claude Code 2.1.284 (2.1.283 did not recognise the model id and could
+not price it). N=3 per arm, all 18 cells pass typecheck, tests and the hidden
+smoke. The price vector in `classify-archaeology.ts` reproduces every cell's
+reported cost, so Sonnet 5.5 costs the same per token as Sonnet 5.
+
+| arm | model | turns (median, range) | cost USD (median, range) | cost mean | × hono (median) |
+|---|---|---|---|---|---|
+| guren shipped (cli 2.27) | sonnet-5-5 | 38 (30–41) | 0.573 (0.56–0.61) | 0.583 | 1.40 |
+| guren bare (cli 2.27) | sonnet-5-5 | 51 (47–52) | 0.632 (0.58–0.69) | 0.636 | 1.54 |
+| hono | sonnet-5-5 | 40 (29–42) | 0.410 (0.38–0.46) | 0.416 | 1.00 |
+| guren-july (716117a, cli 2.0) | sonnet-5-5 | 33 (32–37) | 0.568 (0.49–0.64) | 0.567 | 1.38 |
+| guren shipped, rules with `paths:` (1e756eb) | sonnet-5-5 | 33 (29–41) | 0.570 (0.47–0.70) | 0.580 | 1.39 |
+| guren shipped (cli 2.28, 306824b) | sonnet-5-5 | 38 (37–43) | 0.518 (0.50–0.63) | 0.551 | 1.26 |
+
+**Reading.**
+
+- The ratios move little between the two models: shipped 1.44 → 1.40, bare
+  1.68 → 1.54, the released harness 1.28 → 1.26.
+- The `paths:` arm, the cheapest Guren arm on Sonnet 5, is level with the
+  shipped arm here. Its guidance at session start still drops from 25.5k to
+  9.2k tokens; the rest of the cost did not follow. Round 7's 40% estimate
+  for the fix is a Sonnet 5 sample estimate that did not reproduce.
+- The July app is still no dearer than the current one (33 turns / $0.57
+  against 38 / $0.57).
+- Token accounting: [ARCHAEOLOGY-2026-09.md, Sonnet 5.5](./ARCHAEOLOGY-2026-09.md#sonnet-55-round-8-2026-09-30).
+  The whole shipped gap is guidance loaded at start; name confusion appears
+  only in the bare arm, as in round 7.
+- Sonnet 5.5's reliable knowledge cutoff is June 2026 (Anthropic's model
+  overview). Guren's v2 APIs (2026-08-01) came after it, but its earlier
+  releases (from November 2025) did not, so this model may have seen the
+  pre-v2 framework. Its training data cutoff is not published and can be
+  later than the reliable knowledge cutoff.
+
+Lifetime acceptance is now **82/84**. Runner: `agent-eval/run-arms.sh`.
+
 ## Operational notes
 
 - Trials are disk-hungry (a worktree + node_modules each); run sequentially

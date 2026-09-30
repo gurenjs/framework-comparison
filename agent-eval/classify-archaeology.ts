@@ -63,7 +63,10 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const RESULTS = join(import.meta.dirname, 'results')
-const ARMS = ['guren-shipped', 'guren-shipped-paths', 'guren-bare', 'hono-sep', 'guren-july'] as const
+// ARM_SUFFIX selects a re-run of the same arms under another model (e.g. -s55 for Sonnet 5.5).
+const ARM_SUFFIX = process.env.ARM_SUFFIX ?? ''
+const ARMS = ['guren-shipped', 'guren-shipped-paths', 'guren-bare', 'hono-sep', 'guren-july', 'guren-cli228'].map((a) => a + ARM_SUFFIX)
+const HONO = `hono-sep${ARM_SUFFIX}`
 const TRIALS = [1, 2, 3]
 // USD per million tokens for claude-sonnet-5; 1h cache writes (all writes here are 1h).
 const PRICE = { input: 2, cacheWrite: 4, cacheRead: 0.2, output: 10 }
@@ -638,7 +641,7 @@ function callOnePrefix(label: string): number | null {
   return null
 }
 // The hono app ships no agent guidance, so its call-1 prefix is the shared base.
-const sharedPrefix = median(TRIALS.map((t) => callOnePrefix(`hono-sep-${t}`) ?? Number.NaN))
+const sharedPrefix = median(TRIALS.map((t) => callOnePrefix(`${HONO}-${t}`) ?? Number.NaN))
 const cells: CellReport[] = []
 for (const arm of ARMS)
   for (const t of TRIALS) {
@@ -695,9 +698,9 @@ const armMean = (arm: string): Bucket => {
   const keys = Object.keys(bs[0]) as (keyof Bucket)[]
   return Object.fromEntries(keys.map((k) => [k, mean(bs.map((b) => b[k]))])) as Bucket
 }
-const others = ARMS.filter((a) => a !== 'hono-sep')
+const others = ARMS.filter((a) => a !== HONO)
 const means = Object.fromEntries(ARMS.map((a) => [a, armMean(a)])) as Record<string, Bucket>
-const honoMean = means['hono-sep']
+const honoMean = means[HONO]
 out.push(`| bucket | ${ARMS.join(' | ')} | ${others.map((a) => `${a} − hono`).join(' | ')} |`)
 out.push(`|---|${ARMS.map(() => '---').join('|')}|${others.map(() => '---').join('|')}|`)
 for (const k of Object.keys(honoMean) as (keyof Bucket)[])
@@ -706,10 +709,10 @@ for (const k of Object.keys(honoMean) as (keyof Bucket)[])
   )
 const totals = Object.fromEntries(ARMS.map((a) => [a, mean(rows.filter((r) => r.arm === a).map((r) => r.cost))]))
 out.push(
-  `| total (mean cost) | ${ARMS.map((a) => usdf(totals[a])).join(' | ')} | ${others.map((a) => usdf(totals[a] - totals['hono-sep'])).join(' | ')} |`,
+  `| total (mean cost) | ${ARMS.map((a) => usdf(totals[a])).join(' | ')} | ${others.map((a) => usdf(totals[a] - totals[HONO])).join(' | ')} |`,
 )
 for (const a of others) {
-  const gap = totals[a] - totals['hono-sep']
+  const gap = totals[a] - totals[HONO]
   const d = (k: keyof Bucket) => means[a][k] - honoMean[k]
   const marginalA = mean(rows.filter((r) => r.arm === a).map((r) => r.marginal.a))
   const marginalB = mean(rows.filter((r) => r.arm === a).map((r) => r.marginal.b))
