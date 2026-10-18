@@ -1,0 +1,40 @@
+diff --git a/routes/api/posts.ts b/routes/api/posts.ts
+new file mode 100644
+index 0000000..fcb2c5a
+--- /dev/null
++++ b/routes/api/posts.ts
+@@ -0,0 +1,34 @@
++import { z } from "zod";
++import { defineHandler } from "void";
++import { count, db, desc, eq } from "void/db";
++import { posts } from "@schema";
++import { selectPosts } from "../../lib/posts";
++
++const PER_PAGE = 10;
++
++const querySchema = z.object({
++  page: z.coerce.number().int().min(1).default(1),
++  author: z.string().min(1).optional(),
++});
++
++export const GET = defineHandler.withValidator({
++  query: querySchema,
++})(async (_c, { query }) => {
++  const filter = query.author ? eq(posts.authorId, query.author) : undefined;
++  const [{ total }] = await db.select({ total: count() }).from(posts).where(filter);
++  const rows = await selectPosts()
++    .where(filter)
++    .orderBy(desc(posts.id))
++    .limit(PER_PAGE)
++    .offset((query.page - 1) * PER_PAGE);
++
++  return {
++    data: rows.map(({ id, title, excerpt, body, createdAt, author }) => ({ id, title, excerpt, body, createdAt, author })),
++    meta: {
++      currentPage: query.page,
++      lastPage: Math.max(1, Math.ceil(total / PER_PAGE)),
++      perPage: PER_PAGE,
++      total,
++    },
++  };
++});
