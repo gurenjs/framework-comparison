@@ -1,30 +1,26 @@
 diff --git a/pages/profile.server.ts b/pages/profile.server.ts
-index e9205f9..a2c3bd8 100644
+index e9205f9..c6d2914 100644
 --- a/pages/profile.server.ts
 +++ b/pages/profile.server.ts
-@@ -4,7 +4,6 @@ import { requireAuth } from "void/auth";
+@@ -4,7 +4,7 @@ import { requireAuth } from "void/auth";
  import { and, db, eq, ne } from "void/db";
  import { users } from "../lib/users";
  import { userOrRedirect } from "../lib/guards";
 -import { profileUpdateSchema } from "../lib/validators";
++import { z } from "zod";
  
  export type Props = InferProps<typeof loader>;
  
-@@ -15,15 +14,16 @@ export const loader = defineHandler(async (c) => {
-   return { profile };
+@@ -16,7 +16,7 @@ export const loader = defineHandler(async (c) => {
  });
  
--export const action = defineHandler.withValidator({
+ export const action = defineHandler.withValidator({
 -  body: profileUpdateSchema,
--})(async (c, { body }) => {
-+type ProfileInput = { name: string; email: string };
-+
-+export const action = defineHandler(async (c) => {
++  body: z.looseObject({ name: z.string(), email: z.string() }),
+ })(async (c, { body }) => {
    const user = requireAuth(c);
-+  const body = await c.req.json<ProfileInput>();
    const [conflict] = await db
-     .select({ id: users.id })
-     .from(users)
+@@ -25,5 +25,5 @@ export const action = defineHandler.withValidator({
      .where(and(eq(users.email, body.email), ne(users.id, user.id)));
    if (conflict) throw new ValidationError({ email: "Email is already in use." });
  
