@@ -1,0 +1,8 @@
+{
+  "name": "void-eval-acceptance-suite",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "bun test --timeout 30000"
+  }
+}
