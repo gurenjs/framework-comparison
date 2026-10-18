@@ -1,39 +1,53 @@
 {
-  "generatedAt": "2026-10-18T02:20:45.725Z",
+  "generatedAt": "2026-10-18T02:45:40.775Z",
   "n": 500,
-  "runs": 3,
+  "runs": 5,
   "experiments": [
     {
       "group": "routes",
       "experiment": "as generated: { name, params|body, output }",
       "n": 500,
-      "routesFileMs": 351,
+      "routesFileMs": 418,
       "instantiations": 403816,
       "types": 119478,
-      "checkTime": 0.309,
-      "totalTime": 0.415,
-      "memoryKB": 328347,
+      "checkTime": 0.308,
+      "totalTime": 0.406,
+      "memoryKB": 328296,
       "runs": [
         {
           "instantiations": 403816,
           "types": 119478,
-          "checkTime": 0.309,
-          "totalTime": 0.449,
-          "memoryKB": 328459
+          "checkTime": 0.308,
+          "totalTime": 0.452,
+          "memoryKB": 328251
         },
         {
           "instantiations": 403816,
           "types": 119478,
-          "checkTime": 0.316,
-          "totalTime": 0.415,
-          "memoryKB": 328309
+          "checkTime": 0.289,
+          "totalTime": 0.395,
+          "memoryKB": 328249
         },
         {
           "instantiations": 403816,
           "types": 119478,
-          "checkTime": 0.295,
-          "totalTime": 0.407,
-          "memoryKB": 328347
+          "checkTime": 0.321,
+          "totalTime": 0.427,
+          "memoryKB": 328513
+        },
+        {
+          "instantiations": 403816,
+          "types": 119478,
+          "checkTime": 0.301,
+          "totalTime": 0.403,
+          "memoryKB": 328318
+        },
+        {
+          "instantiations": 403816,
+          "types": 119478,
+          "checkTime": 0.308,
+          "totalTime": 0.406,
+          "memoryKB": 328296
         }
       ]
     },
@@ -41,33 +55,47 @@
       "group": "routes",
       "experiment": "no output schema",
       "n": 500,
-      "routesFileMs": 227,
+      "routesFileMs": 247,
       "instantiations": 342058,
       "types": 104346,
-      "checkTime": 0.247,
-      "totalTime": 0.354,
-      "memoryKB": 307775,
+      "checkTime": 0.228,
+      "totalTime": 0.335,
+      "memoryKB": 307725,
       "runs": [
         {
           "instantiations": 342058,
           "types": 104346,
-          "checkTime": 0.248,
-          "totalTime": 0.375,
-          "memoryKB": 307776
-        },
-        {
-          "instantiations": 342058,
-          "types": 104346,
-          "checkTime": 0.237,
-          "totalTime": 0.333,
-          "memoryKB": 307695
-        },
-        {
-          "instantiations": 342058,
-          "types": 104346,
-          "checkTime": 0.247,
+          "checkTime": 0.228,
           "totalTime": 0.354,
-          "memoryKB": 307775
+          "memoryKB": 307443
+        },
+        {
+          "instantiations": 342058,
+          "types": 104346,
+          "checkTime": 0.221,
+          "totalTime": 0.328,
+          "memoryKB": 307725
+        },
+        {
+          "instantiations": 342058,
+          "types": 104346,
+          "checkTime": 0.225,
+          "totalTime": 0.335,
+          "memoryKB": 307718
+        },
+        {
+          "instantiations": 342058,
+          "types": 104346,
+          "checkTime": 0.232,
+          "totalTime": 0.332,
+          "memoryKB": 307729
+        },
+        {
+          "instantiations": 342058,
+          "types": 104346,
+          "checkTime": 0.236,
+          "totalTime": 0.336,
+          "memoryKB": 307792
         }
       ]
     },
@@ -75,33 +103,47 @@
       "group": "routes",
       "experiment": "name only in options",
       "n": 500,
-      "routesFileMs": 126,
+      "routesFileMs": 139,
       "instantiations": 276549,
       "types": 87050,
-      "checkTime": 0.191,
-      "totalTime": 0.296,
-      "memoryKB": 282959,
+      "checkTime": 0.206,
+      "totalTime": 0.306,
+      "memoryKB": 282966,
       "runs": [
         {
           "instantiations": 276549,
           "types": 87050,
-          "checkTime": 0.209,
-          "totalTime": 0.309,
-          "memoryKB": 282949
+          "checkTime": 0.206,
+          "totalTime": 0.306,
+          "memoryKB": 282915
         },
         {
           "instantiations": 276549,
           "types": 87050,
-          "checkTime": 0.188,
-          "totalTime": 0.294,
-          "memoryKB": 282989
+          "checkTime": 0.194,
+          "totalTime": 0.303,
+          "memoryKB": 283090
+        },
+        {
+          "instantiations": 276549,
+          "types": 87050,
+          "checkTime": 0.224,
+          "totalTime": 0.325,
+          "memoryKB": 282966
+        },
+        {
+          "instantiations": 276549,
+          "types": 87050,
+          "checkTime": 0.223,
+          "totalTime": 0.333,
+          "memoryKB": 282980
         },
         {
           "instantiations": 276549,
           "types": 87050,
           "checkTime": 0.191,
-          "totalTime": 0.296,
-          "memoryKB": 282959
+          "totalTime": 0.294,
+          "memoryKB": 282906
         }
       ]
     },
@@ -109,33 +151,47 @@
       "group": "routes",
       "experiment": "bare [C, action] + .name()",
       "n": 500,
-      "routesFileMs": 98,
+      "routesFileMs": 78,
       "instantiations": 266655,
       "types": 82362,
-      "checkTime": 0.199,
-      "totalTime": 0.297,
-      "memoryKB": 277688,
+      "checkTime": 0.214,
+      "totalTime": 0.325,
+      "memoryKB": 277557,
       "runs": [
         {
           "instantiations": 266655,
           "types": 82362,
-          "checkTime": 0.189,
-          "totalTime": 0.291,
-          "memoryKB": 277688
+          "checkTime": 0.188,
+          "totalTime": 0.29,
+          "memoryKB": 277557
         },
         {
           "instantiations": 266655,
           "types": 82362,
-          "checkTime": 0.206,
-          "totalTime": 0.31,
-          "memoryKB": 277734
+          "checkTime": 0.191,
+          "totalTime": 0.288,
+          "memoryKB": 277535
         },
         {
           "instantiations": 266655,
           "types": 82362,
-          "checkTime": 0.199,
-          "totalTime": 0.297,
-          "memoryKB": 277625
+          "checkTime": 0.231,
+          "totalTime": 0.336,
+          "memoryKB": 277500
+        },
+        {
+          "instantiations": 266655,
+          "types": 82362,
+          "checkTime": 0.214,
+          "totalTime": 0.325,
+          "memoryKB": 277608
+        },
+        {
+          "instantiations": 266655,
+          "types": 82362,
+          "checkTime": 0.228,
+          "totalTime": 0.331,
+          "memoryKB": 277711
         }
       ]
     },
@@ -143,33 +199,95 @@
       "group": "routes",
       "experiment": "split into 10 route files",
       "n": 500,
-      "routesFileMs": 0,
+      "routesFileMs": 70,
       "instantiations": 405870,
       "types": 120608,
-      "checkTime": 0.262,
-      "totalTime": 0.358,
-      "memoryKB": 330112,
+      "checkTime": 0.263,
+      "totalTime": 0.363,
+      "memoryKB": 330083,
       "runs": [
         {
           "instantiations": 405870,
           "types": 120608,
-          "checkTime": 0.255,
-          "totalTime": 0.352,
-          "memoryKB": 330163
-        },
-        {
-          "instantiations": 405870,
-          "types": 120608,
           "checkTime": 0.262,
-          "totalTime": 0.358,
-          "memoryKB": 330091
+          "totalTime": 0.371,
+          "memoryKB": 330109
         },
         {
           "instantiations": 405870,
           "types": 120608,
           "checkTime": 0.264,
-          "totalTime": 0.395,
-          "memoryKB": 330112
+          "totalTime": 0.363,
+          "memoryKB": 330155
+        },
+        {
+          "instantiations": 405870,
+          "types": 120608,
+          "checkTime": 0.263,
+          "totalTime": 0.36,
+          "memoryKB": 330042
+        },
+        {
+          "instantiations": 405870,
+          "types": 120608,
+          "checkTime": 0.246,
+          "totalTime": 0.354,
+          "memoryKB": 330046
+        },
+        {
+          "instantiations": 405870,
+          "types": 120608,
+          "checkTime": 0.277,
+          "totalTime": 0.393,
+          "memoryKB": 330083
+        }
+      ]
+    },
+    {
+      "group": "routes",
+      "experiment": "GET without params schema (id read from the path, as Void and Hono do)",
+      "n": 500,
+      "routesFileMs": 343,
+      "instantiations": 372737,
+      "types": 108400,
+      "checkTime": 0.275,
+      "totalTime": 0.397,
+      "memoryKB": 314772,
+      "runs": [
+        {
+          "instantiations": 372737,
+          "types": 108400,
+          "checkTime": 0.275,
+          "totalTime": 0.371,
+          "memoryKB": 314772
+        },
+        {
+          "instantiations": 372737,
+          "types": 108400,
+          "checkTime": 0.316,
+          "totalTime": 0.423,
+          "memoryKB": 314740
+        },
+        {
+          "instantiations": 372737,
+          "types": 108400,
+          "checkTime": 0.274,
+          "totalTime": 0.397,
+          "memoryKB": 314827
+        },
+        {
+          "instantiations": 372737,
+          "types": 108400,
+          "checkTime": 0.265,
+          "totalTime": 0.382,
+          "memoryKB": 314695
+        },
+        {
+          "instantiations": 372737,
+          "types": 108400,
+          "checkTime": 0.295,
+          "totalTime": 0.408,
+          "memoryKB": 314816
         }
       ]
     },
@@ -177,33 +295,47 @@
       "group": "router-types",
       "experiment": "Router.d.ts: controller overload before inline-handler overload",
       "n": 500,
-      "routesFileMs": 297,
+      "routesFileMs": 318,
       "instantiations": 388262,
       "types": 116461,
-      "checkTime": 0.288,
-      "totalTime": 0.387,
-      "memoryKB": 322740,
+      "checkTime": 0.302,
+      "totalTime": 0.411,
+      "memoryKB": 322752,
       "runs": [
         {
           "instantiations": 388262,
           "types": 116461,
-          "checkTime": 0.288,
-          "totalTime": 0.387,
-          "memoryKB": 322740
+          "checkTime": 0.303,
+          "totalTime": 0.411,
+          "memoryKB": 322728
         },
         {
           "instantiations": 388262,
           "types": 116461,
-          "checkTime": 0.263,
-          "totalTime": 0.373,
-          "memoryKB": 322789
+          "checkTime": 0.303,
+          "totalTime": 0.412,
+          "memoryKB": 322635
         },
         {
           "instantiations": 388262,
           "types": 116461,
-          "checkTime": 0.308,
-          "totalTime": 0.417,
-          "memoryKB": 322727
+          "checkTime": 0.302,
+          "totalTime": 0.412,
+          "memoryKB": 322876
+        },
+        {
+          "instantiations": 388262,
+          "types": 116461,
+          "checkTime": 0.282,
+          "totalTime": 0.4,
+          "memoryKB": 322889
+        },
+        {
+          "instantiations": 388262,
+          "types": 116461,
+          "checkTime": 0.278,
+          "totalTime": 0.394,
+          "memoryKB": 322752
         }
       ]
     },
@@ -211,33 +343,47 @@
       "group": "router-types",
       "experiment": "Router.d.ts: controller overload without schema generics",
       "n": 500,
-      "routesFileMs": 351,
+      "routesFileMs": 347,
       "instantiations": 395296,
       "types": 118947,
-      "checkTime": 0.311,
-      "totalTime": 0.409,
-      "memoryKB": 328529,
+      "checkTime": 0.33,
+      "totalTime": 0.438,
+      "memoryKB": 328498,
       "runs": [
         {
           "instantiations": 395296,
           "types": 118947,
-          "checkTime": 0.3,
-          "totalTime": 0.408,
-          "memoryKB": 328569
+          "checkTime": 0.391,
+          "totalTime": 0.517,
+          "memoryKB": 328519
         },
         {
           "instantiations": 395296,
           "types": 118947,
-          "checkTime": 0.314,
-          "totalTime": 0.412,
-          "memoryKB": 328529
+          "checkTime": 0.33,
+          "totalTime": 0.438,
+          "memoryKB": 328498
         },
         {
           "instantiations": 395296,
           "types": 118947,
-          "checkTime": 0.311,
-          "totalTime": 0.409,
-          "memoryKB": 328484
+          "checkTime": 0.431,
+          "totalTime": 0.551,
+          "memoryKB": 328325
+        },
+        {
+          "instantiations": 395296,
+          "types": 118947,
+          "checkTime": 0.324,
+          "totalTime": 0.429,
+          "memoryKB": 328455
+        },
+        {
+          "instantiations": 395296,
+          "types": 118947,
+          "checkTime": 0.316,
+          "totalTime": 0.414,
+          "memoryKB": 328578
         }
       ]
     },
@@ -245,33 +391,47 @@
       "group": "router-types",
       "experiment": "Router.d.ts: both",
       "n": 500,
-      "routesFileMs": 292,
+      "routesFileMs": 275,
       "instantiations": 377742,
       "types": 114430,
-      "checkTime": 0.277,
-      "totalTime": 0.376,
-      "memoryKB": 321153,
+      "checkTime": 0.281,
+      "totalTime": 0.38,
+      "memoryKB": 321102,
       "runs": [
         {
           "instantiations": 377742,
           "types": 114430,
-          "checkTime": 0.278,
-          "totalTime": 0.376,
-          "memoryKB": 321085
+          "checkTime": 0.327,
+          "totalTime": 0.441,
+          "memoryKB": 321133
         },
         {
           "instantiations": 377742,
           "types": 114430,
-          "checkTime": 0.265,
-          "totalTime": 0.365,
-          "memoryKB": 321220
+          "checkTime": 0.281,
+          "totalTime": 0.38,
+          "memoryKB": 321122
         },
         {
           "instantiations": 377742,
           "types": 114430,
-          "checkTime": 0.277,
-          "totalTime": 0.379,
-          "memoryKB": 321153
+          "checkTime": 0.252,
+          "totalTime": 0.362,
+          "memoryKB": 321063
+        },
+        {
+          "instantiations": 377742,
+          "types": 114430,
+          "checkTime": 0.251,
+          "totalTime": 0.359,
+          "memoryKB": 321102
+        },
+        {
+          "instantiations": 377742,
+          "types": 114430,
+          "checkTime": 0.295,
+          "totalTime": 0.403,
+          "memoryKB": 321072
         }
       ]
     },
@@ -279,33 +439,95 @@
       "group": "client",
       "experiment": "Links.tsx: <Link> only (route() calls removed)",
       "n": 500,
-      "routesFileMs": 334,
+      "routesFileMs": 360,
       "instantiations": 367518,
       "types": 116639,
-      "checkTime": 0.301,
-      "totalTime": 0.413,
-      "memoryKB": 323305,
+      "checkTime": 0.308,
+      "totalTime": 0.42,
+      "memoryKB": 323324,
       "runs": [
         {
           "instantiations": 367518,
           "types": 116639,
-          "checkTime": 0.301,
-          "totalTime": 0.413,
-          "memoryKB": 323397
+          "checkTime": 0.297,
+          "totalTime": 0.405,
+          "memoryKB": 323331
         },
         {
           "instantiations": 367518,
           "types": 116639,
-          "checkTime": 0.338,
-          "totalTime": 0.437,
-          "memoryKB": 323305
+          "checkTime": 0.318,
+          "totalTime": 0.42,
+          "memoryKB": 323324
         },
         {
           "instantiations": 367518,
           "types": 116639,
-          "checkTime": 0.301,
-          "totalTime": 0.407,
-          "memoryKB": 323269
+          "checkTime": 0.308,
+          "totalTime": 0.434,
+          "memoryKB": 323109
+        },
+        {
+          "instantiations": 367518,
+          "types": 116639,
+          "checkTime": 0.292,
+          "totalTime": 0.395,
+          "memoryKB": 322980
+        },
+        {
+          "instantiations": 367518,
+          "types": 116639,
+          "checkTime": 0.319,
+          "totalTime": 0.428,
+          "memoryKB": 323342
+        }
+      ]
+    },
+    {
+      "group": "client",
+      "experiment": "+500 Inertia <Link href={route(...)}>",
+      "n": 500,
+      "routesFileMs": 399,
+      "instantiations": 410357,
+      "types": 125087,
+      "checkTime": 0.441,
+      "totalTime": 0.557,
+      "memoryKB": 331851,
+      "runs": [
+        {
+          "instantiations": 410357,
+          "types": 125087,
+          "checkTime": 0.398,
+          "totalTime": 0.526,
+          "memoryKB": 331851
+        },
+        {
+          "instantiations": 410357,
+          "types": 125087,
+          "checkTime": 0.487,
+          "totalTime": 0.607,
+          "memoryKB": 331557
+        },
+        {
+          "instantiations": 410357,
+          "types": 125087,
+          "checkTime": 0.423,
+          "totalTime": 0.557,
+          "memoryKB": 331825
+        },
+        {
+          "instantiations": 410357,
+          "types": 125087,
+          "checkTime": 0.441,
+          "totalTime": 0.553,
+          "memoryKB": 331854
+        },
+        {
+          "instantiations": 410357,
+          "types": 125087,
+          "checkTime": 0.456,
+          "totalTime": 0.605,
+          "memoryKB": 331924
         }
       ]
     },
@@ -313,33 +535,47 @@
       "group": "client",
       "experiment": "Links.tsx removed",
       "n": 500,
-      "routesFileMs": 305,
+      "routesFileMs": 339,
       "instantiations": 302847,
       "types": 106627,
-      "checkTime": 0.296,
-      "totalTime": 0.397,
-      "memoryKB": 300583,
+      "checkTime": 0.31,
+      "totalTime": 0.416,
+      "memoryKB": 300598,
       "runs": [
         {
           "instantiations": 302847,
           "types": 106627,
-          "checkTime": 0.296,
+          "checkTime": 0.31,
+          "totalTime": 0.416,
+          "memoryKB": 300589
+        },
+        {
+          "instantiations": 302847,
+          "types": 106627,
+          "checkTime": 0.289,
           "totalTime": 0.397,
-          "memoryKB": 300574
+          "memoryKB": 300598
         },
         {
           "instantiations": 302847,
           "types": 106627,
-          "checkTime": 0.283,
-          "totalTime": 0.386,
-          "memoryKB": 300583
+          "checkTime": 0.729,
+          "totalTime": 0.826,
+          "memoryKB": 300601
         },
         {
           "instantiations": 302847,
           "types": 106627,
-          "checkTime": 0.318,
-          "totalTime": 0.421,
+          "checkTime": 0.301,
+          "totalTime": 0.413,
           "memoryKB": 300599
+        },
+        {
+          "instantiations": 302847,
+          "types": 106627,
+          "checkTime": 0.484,
+          "totalTime": 0.605,
+          "memoryKB": 300574
         }
       ]
     }

@@ -85,7 +85,7 @@ function experimentsTable(): string {
     `| ${cell(e.experiment)} | ${fmtInt(e.instantiations)} (${fmtK(e.instantiations - ref.instantiations)}) | ${e.checkTime.toFixed(3)}s (${fmtS(e.checkTime - ref.checkTime)}) | ${e.routesFileMs} ms |`,
   )
   return [
-    `Guren, N = ${x.n}, full app (server + client), median of ${x.runs} runs. Deltas are against the first row. The last column is \`routes/bench.ts\`'s own check time from \`--generateTrace\`.`,
+    `Guren, N = ${x.n}, full app (server + client), median of ${x.runs} runs. Deltas are against the first row. The last column is the slowest routes file's own check time under \`--generateTrace\` (traced runs are slower than untraced ones).`,
     '',
     '| Variant | Instantiations | Check time | routes file |',
     '|---|---|---|---|',

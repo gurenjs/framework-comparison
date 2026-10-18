@@ -1,7 +1,7 @@
 // Guren-only follow-ups to ablate.ts: what the server-side cost is made of and
 // what would reduce it. N=500, each variant applied after codegen. Writes
-// typecheck/experiments.json; `routesFileMs` is the routes file's own check
-// time from `tsc --generateTrace` (one file is checked by one checker).
+// typecheck/experiments.json; `routesFileMs` is the slowest routes file's own
+// check time from `tsc --generateTrace` (one file is checked by one checker).
 //
 //   bun typecheck/experiments.ts
 //
@@ -29,21 +29,22 @@ function edit(path: string, fn: (s: string) => string): void {
   writeFileSync(path, after)
 }
 
-function fileCheckMs(suffix: string): number {
+function fileCheckMs(match: RegExp): number {
   const trace = mkdtempSync(join(tmpdir(), 'tc-trace-'))
   try {
     spawnSync('./node_modules/.bin/tsc', ['--noEmit', '--generateTrace', trace], { cwd: DIR })
     const events = JSON.parse(readFileSync(join(trace, 'trace.json'), 'utf8')) as Array<Record<string, any>>
     const open = new Map<unknown, Array<Record<string, any>>>()
-    let ms = 0
+    const perFile = new Map<string, number>()
     for (const e of events) {
       if (e.ph === 'B') open.set(e.tid, [...(open.get(e.tid) ?? []), e])
       else if (e.ph === 'E') {
         const b = open.get(e.tid)!.pop()!
-        if (b.name === 'checkSourceFile' && String(b.args.path).endsWith(suffix)) ms += (e.ts - b.ts) / 1000
+        const path = String(b.args?.path ?? '')
+        if (b.name === 'checkSourceFile' && match.test(path)) perFile.set(path, (perFile.get(path) ?? 0) + (e.ts - b.ts) / 1000)
       }
     }
-    return Math.round(ms)
+    return Math.round(Math.max(0, ...perFile.values()))
   } finally {
     rmSync(trace, { recursive: true, force: true })
   }
@@ -105,6 +106,17 @@ const EXPERIMENTS: Experiment[] = [
       )
     },
   },
+  {
+    group: 'routes',
+    name: 'GET without params schema (id read from the path, as Void and Hono do)',
+    apply: () => {
+      edit(BENCH, (s) => s.replace(/, params: r\d+\.Params/g, ''))
+      for (let i = 0; i < N; i += 2) {
+        edit(join(DIR, `app/Http/Controllers/Bench/R${i}Controller.ts`), (s) =>
+          s.replace(/export const Params = .*\n/, '').replace(/const \{ params \} = this\.validated\('[^']+'\)\n\s*/, '').replace('id: params.id', "id: this.ctx.req.param('id') as string"))
+      }
+    },
+  },
   { group: 'router-types', name: 'Router.d.ts: controller overload before inline-handler overload', apply: () => edit(ROUTER_DTS, swapOverloads) },
   { group: 'router-types', name: 'Router.d.ts: controller overload without schema generics', apply: () => edit(ROUTER_DTS, dropControllerSchemaGenerics) },
   { group: 'router-types', name: 'Router.d.ts: both', apply: () => edit(ROUTER_DTS, (s) => swapOverloads(dropControllerSchemaGenerics(s))) },
@@ -112,6 +124,15 @@ const EXPERIMENTS: Experiment[] = [
     group: 'client',
     name: 'Links.tsx: <Link> only (route() calls removed)',
     apply: () => edit(join(DIR, 'resources/js/bench/Links.tsx'), (s) => s.replace(/>\{route\(.*?\)\}<\/Link>/g, '>x</Link>')),
+  },
+  {
+    group: 'client',
+    name: "+500 Inertia <Link href={route(...)}>",
+    apply: () =>
+      writeFileSync(
+        join(DIR, 'resources/js/bench/Hrefs.tsx'),
+        `import { Link } from '@inertiajs/react'\nimport { route } from '../../../.guren/routes.gen'\n\nexport function BenchHrefs() {\n  return (\n    <nav>\n${Array.from({ length: N }, (_, i) => (i % 2 === 0 ? `      <Link href={route('r${i}.show', { id: 1 })}>r${i}</Link>` : `      <Link href={route('r${i}.store')}>r${i}</Link>`)).join('\n')}\n    </nav>\n  )\n}\n`,
+      ),
   },
   { group: 'client', name: 'Links.tsx removed', apply: () => rmSync(join(DIR, 'resources/js/bench/Links.tsx')) },
 ]
@@ -125,7 +146,7 @@ if (import.meta.main) {
       codegen('guren', DIR)
       x.apply()
       const d = measure(DIR, RUNS)
-      const routesFileMs = fileCheckMs('routes/bench.ts')
+      const routesFileMs = fileCheckMs(/routes\/bench(-\d+)?\.ts$/)
       out.push({ group: x.group, experiment: x.name, n: N, routesFileMs, ...d })
       console.log(`${x.name.padEnd(64)} inst=${d.instantiations} check=${d.checkTime}s routes/bench.ts=${routesFileMs}ms`)
       writeFileSync(ROUTER_DTS, routerOrig)

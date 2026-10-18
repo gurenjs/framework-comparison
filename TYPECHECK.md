@@ -75,10 +75,18 @@ The two codegen stacks put their cost on opposite sides:
   validator.
 - **With the same consumer on both sides** (API calls only, the `no-links`
   row), Guren adds 295k instantiations to Void's 351k, 16% fewer.
-- **The generated declarations themselves are cheap.** Turning the Inertia
-  `href` union (`types/generated/routes.d.ts`) into `string` changes nothing,
-  and removing the `GurenRouteContracts` augmentation that types
-  `this.validated()` saves 12k.
+- **The generated `.guren/*.gen.ts` declarations are cheap.** Removing the
+  `GurenRouteContracts` augmentation that types `this.validated()` saves 12k.
+- **The generated Inertia `href` union has no effect at all.**
+  `types/generated/routes.d.ts` augments `BaseInertiaLinkProps` in
+  `@inertiajs/react`, but in `@inertiajs/react` 3.9.1 that interface is not
+  exported (it is local to `types/Link.d.ts`), so the augmentation declares a
+  new, unrelated interface. `<Link href="/nope">` typechecks in the scaffold,
+  and 500 extra `<Link href={route(...)}>` elements add only 6.5k
+  instantiations because `href` is still `string`. Replacing the union with
+  `string` (`no-href-union`) therefore changes nothing. The `Router`
+  augmentation in the same file only adds overloads beside Inertia's own
+  `string` ones, so it does not narrow `router.visit()` either.
 
 ### Why Guren's check time is higher
 
@@ -100,30 +108,42 @@ app drops from 404k to 360k instantiations). Void needs a schema only for the
 250 POST bodies and infers responses from the handler's return type.
 
 <!-- typecheck:experiments:begin -->
-Guren, N = 500, full app (server + client), median of 3 runs. Deltas are against the first row. The last column is `routes/bench.ts`'s own check time from `--generateTrace`.
+Guren, N = 500, full app (server + client), median of 5 runs. Deltas are against the first row. The last column is the slowest routes file's own check time under `--generateTrace` (traced runs are slower than untraced ones).
 
 | Variant | Instantiations | Check time | routes file |
 |---|---|---|---|
-| as generated: { name, params\|body, output } | 403,816 (+0k) | 0.309s (+0.000s) | 351 ms |
-| no output schema | 342,058 (-62k) | 0.247s (-0.062s) | 227 ms |
-| name only in options | 276,549 (-127k) | 0.191s (-0.118s) | 126 ms |
-| bare [C, action] + .name() | 266,655 (-137k) | 0.199s (-0.110s) | 98 ms |
-| split into 10 route files | 405,870 (+2k) | 0.262s (-0.047s) | 0 ms |
-| Router.d.ts: controller overload before inline-handler overload | 388,262 (-16k) | 0.288s (-0.021s) | 297 ms |
-| Router.d.ts: controller overload without schema generics | 395,296 (-9k) | 0.311s (+0.002s) | 351 ms |
-| Router.d.ts: both | 377,742 (-26k) | 0.277s (-0.032s) | 292 ms |
-| Links.tsx: &lt;Link> only (route() calls removed) | 367,518 (-36k) | 0.301s (-0.008s) | 334 ms |
-| Links.tsx removed | 302,847 (-101k) | 0.296s (-0.013s) | 305 ms |
+| as generated: { name, params\|body, output } | 403,816 (+0k) | 0.308s (+0.000s) | 418 ms |
+| no output schema | 342,058 (-62k) | 0.228s (-0.080s) | 247 ms |
+| name only in options | 276,549 (-127k) | 0.206s (-0.102s) | 139 ms |
+| bare [C, action] + .name() | 266,655 (-137k) | 0.214s (-0.094s) | 78 ms |
+| split into 10 route files | 405,870 (+2k) | 0.263s (-0.045s) | 70 ms |
+| GET without params schema (id read from the path, as Void and Hono do) | 372,737 (-31k) | 0.275s (-0.033s) | 343 ms |
+| Router.d.ts: controller overload before inline-handler overload | 388,262 (-16k) | 0.302s (-0.006s) | 318 ms |
+| Router.d.ts: controller overload without schema generics | 395,296 (-9k) | 0.330s (+0.022s) | 347 ms |
+| Router.d.ts: both | 377,742 (-26k) | 0.281s (-0.027s) | 275 ms |
+| Links.tsx: &lt;Link> only (route() calls removed) | 367,518 (-36k) | 0.308s (+0.000s) | 360 ms |
+| +500 Inertia &lt;Link href={route(...)}> | 410,357 (+7k) | 0.441s (+0.133s) | 399 ms |
+| Links.tsx removed | 302,847 (-101k) | 0.310s (+0.002s) | 339 ms |
 <!-- typecheck:experiments:end -->
 
 Reading the experiments:
 
+Instantiations are exact; the check-time column was measured while other
+work shared the machine, so treat differences under ~0.03 s (and the
+`<Link href>` row's check time) as noise.
+
 - **Contract schemas in the registrar are the largest single item**: removing
   all of them from the route options (`bare [C, action]`) saves 137k
-  instantiations and 0.11 s; the output schemas alone are 62k and 0.06 s.
+  instantiations and ~0.1 s; the output schemas alone are 62k and ~0.08 s.
   Keeping them is what makes the API client typed, so this row bounds what a
   different placement of the schemas could save, not something to switch off.
-- **Splitting the registrar into 10 files** leaves instantiations unchanged and
+- **Guren carries 250 schemas the other stacks do not.** The GET endpoints
+  declare `params: z.object({ id: z.string() })` so the controller can read
+  `this.validated().params`; Void and Hono type `:id` from the path. Dropping
+  it (and reading the id with `this.ctx.req.param('id')`) saves 31k
+  instantiations, which narrows Guren's total to 365k against Void's 351k.
+- **Splitting the registrar into 10 files** leaves instantiations unchanged (the
+  routes-file column then shows the slowest of the ten) and
   cuts check time by 0.05 s (15%), because the work spreads over the checkers.
 - **The Router overloads cost a little on top.** A controller route with a
   contract first tries the inline-handler overload (inferring four schema type
@@ -142,7 +162,7 @@ In order of measured effect at 500 endpoints:
    them on one checker. Declaring the contract beside the controller action
    (for example a static contract map on the controller, read by both the
    router and codegen) would leave the registrar referencing classes only. The
-   `bare [C, action]` row (−137k, −0.11 s) is the upper bound. This changes the
+   `bare [C, action]` row (−137k, ~−0.1 s) is the upper bound. This changes the
    routing API, so it needs an RFC.
 2. **Have `make:feature` write `routes/<collection>.ts`** and register it from
    `routes/web.ts`, the shape `plan:scaffold` already uses, instead of
@@ -153,12 +173,17 @@ In order of measured effect at 500 endpoints:
    `TypedRouteHandler` one, and drop the schema type parameters it never reads.
    −26k (−6%), −0.03 s. Needs the router's type tests to confirm inline
    handlers still infer their input.
-4. **Prefer `resource` hints over `output` schemas** where a Resource exists:
+4. **Fix or drop the Inertia `href` augmentation** in
+   `types/generated/routes.d.ts`. It is generated on every codegen and has no
+   effect with `@inertiajs/react` 3.x (see above). Making it work means
+   augmenting an exported type, or shipping a typed `Link` wrapper; either
+   way it will add instantiations that this benchmark does not count today.
+5. **Prefer `resource` hints over `output` schemas** where a Resource exists:
    codegen reads the hint as a type, so no zod output schema is inferred. The
-   `no output schema` row (−62k, −0.06 s) is the ceiling for this app's shape.
+   `no output schema` row (−62k, ~−0.08 s) is the ceiling for this app's shape.
 
-Not worth changing on this evidence: the generated `.guren/*.gen.ts` types,
-the `href` union, and the contract augmentation.
+Not worth changing on this evidence: the generated `.guren/*.gen.ts` types
+and the contract augmentation.
 
 ## Conditions
 
@@ -184,6 +209,15 @@ the `href` union, and the contract augmentation.
   `new Hono().get(...).post(...)` chain. *Sub-routers*: one `new Hono()` chain
   per 10 endpoints, mounted with chained `app.route('/', gN)`. The client calls
   every endpoint through `hc<AppType>` and reads `res.json()` under `res.ok`.
+- **Schemas per endpoint differ.** Guren: `params` (GET) or `body` (POST),
+  plus `output`, so 1,000 zod schemas at 500 endpoints. Void and Hono: the
+  250 POST bodies only, with path params typed from the path and responses
+  inferred from the handler. The `output` schema is what types Guren's
+  client response; the `params` schema is not needed for that, and the
+  experiments include a row without it.
+- **`pages.gen.ts` does not grow.** API endpoints add no pages, so
+  `.guren/pages.gen.ts` stays the scaffold's and sits in the 0-route
+  baseline; page-count scaling is not measured here.
 - **Everything consumes the types.** Each client call reads a property off the
   typed response (`data.n` / `data.count`), and a wrong body or a missing
   property was confirmed to be a type error on Guren and Void before measuring.
