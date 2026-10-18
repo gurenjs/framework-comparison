@@ -90,6 +90,15 @@ export interface MutationResult {
   bodyText: string
 }
 
+/** A page read through the framework's page-data protocol (Inertia JSON / Void page JSON). */
+export interface PageResult {
+  status: number
+  component: string | null
+  props: Record<string, any> | null
+  /** Validation errors carried by the page object (Void); `{}` otherwise. */
+  errors: Record<string, unknown>
+}
+
 export interface DriverCapabilities {
   /**
    * The profile form has an optional `password` field (Guren: yes, Void: no).
@@ -172,4 +181,21 @@ export interface Driver {
    * `redirect: 'manual'`, and adds nothing else.
    */
   raw(client: Client, method: string, path: string, init?: RequestInit): Promise<Response>
+
+  /**
+   * Run SQL directly on the app's SQLite database (lib/db.ts). Only for
+   * contracts the task pins at the table level; prefer HTTP everywhere else.
+   */
+  sql<T = Record<string, unknown>>(query: string, params?: unknown[]): T[]
+
+  /**
+   * Generic building blocks for task-specific helpers (drivers/ext/*.ts):
+   * `mutate` submits a form the way the framework's client does (Guren:
+   * CSRF header, JSON, no Inertia header -> 422 JSON on validation failure;
+   * Void: Origin + X-VoidPages, validation failure -> 200 page JSON with
+   * errors). `ok` is always false here; callers decide success. `location`
+   * is the redirect pathname (query dropped). `page` reads page data.
+   */
+  mutate(client: Client, method: string, path: string, body?: unknown): Promise<MutationResult & { location: string | null }>
+  page(client: Client, path: string): Promise<PageResult>
 }

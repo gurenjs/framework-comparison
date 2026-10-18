@@ -237,11 +237,10 @@ What this shows:
   affected. Earlier rounds ran with those entries active.
 - Built-in Claude Code skills (deep-research, design, …) are listed in both
   arms alike.
-- The Guren side of the suite gate was validated on 0fd1654's locked
-  dependencies. The Guren cells run after `bun update`. All four of them
-  passed the suite, but the gate itself was not rerun on the updated
-  dependencies. Rerun `suite/validate-guren.sh` with the update before a
-  full run.
+- The Guren side of the suite gate was re-validated on the start state the
+  cells use (0fd1654 after `bun update`, @guren/cli 2.31.1): every task fails
+  on the start state and passes with the reference, 2× each
+  (`void-eval/logs/validate-guren-updated-2026-10-18.log`).
 - `run-matrix.sh` runs the arms in a fixed order per task (Guren first), so
   whichever cell writes the shared prompt cache first pays for it. For a
   full run, alternate the order and compare token totals, not dollars.

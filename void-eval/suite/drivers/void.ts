@@ -18,6 +18,7 @@
 // - User ids are Better Auth's opaque strings.
 
 import { CookieJar } from '../lib/cookies.ts'
+import { sqlAll } from '../lib/db.ts'
 import type {
   Client,
   Credentials,
@@ -28,6 +29,7 @@ import type {
   NewPost,
   NewUser,
   PostView,
+  PageResult,
   ProfileView,
 } from './types.ts'
 
@@ -77,7 +79,7 @@ export class VoidDriver implements Driver {
   }
 
   /** A page action. `errors` is filled only from a page object's validation errors. */
-  private async mutate(client: Client, method: string, path: string, body?: unknown): Promise<MutationResult & { location: string | null }> {
+  async mutate(client: Client, method: string, path: string, body?: unknown): Promise<MutationResult & { location: string | null }> {
     const res = await this.send(client, method, path, body)
     if (res.status === 403 && /origin/i.test(res.bodyText)) {
       throw new Error(`void driver: ${method} ${path} was rejected by the origin check (harness bug, not app behaviour)`)
@@ -92,7 +94,7 @@ export class VoidDriver implements Driver {
     return { status: res.status, ok: false, errors, bodyText: res.bodyText, location: res.location }
   }
 
-  private async visit(client: Client, path: string): Promise<{ status: number; page: VoidPage | null }> {
+  private async visitRaw(client: Client, path: string): Promise<{ status: number; page: VoidPage | null }> {
     const res = await this.raw(client, 'GET', path, { headers: { 'X-VoidPages': 'true', Accept: 'application/json' } })
     const type = res.headers.get('content-type') ?? ''
     if (res.status === 200 && type.includes('application/json')) {
@@ -138,11 +140,11 @@ export class VoidDriver implements Driver {
   }
 
   async getPostStatus(client: Client, id: Id): Promise<number> {
-    return (await this.visit(client, `/posts/${id}`)).status
+    return (await this.visitRaw(client, `/posts/${id}`)).status
   }
 
   async getPost(client: Client, id: Id): Promise<PostView | null> {
-    const { page } = await this.visit(client, `/posts/${id}`)
+    const { page } = await this.visitRaw(client, `/posts/${id}`)
     const post = page?.props.post
     if (!post) return null
     return { id: post.id, title: post.title, author: post.author ?? null }
@@ -150,7 +152,7 @@ export class VoidDriver implements Driver {
 
   async listPosts(client: Client, opts: { page?: number } = {}): Promise<ListResult> {
     const path = opts.page === undefined ? '/posts' : `/posts?page=${opts.page}`
-    const { status, page } = await this.visit(client, path)
+    const { status, page } = await this.visitRaw(client, path)
     if (status !== 200 || !page || page.component !== 'posts') {
       throw new Error(`void driver: GET ${path} did not return the posts page (status ${status}, component ${page?.component})`)
     }
@@ -170,7 +172,7 @@ export class VoidDriver implements Driver {
   }
 
   async getProfile(client: Client): Promise<ProfileView | null> {
-    const { page } = await this.visit(client, '/profile')
+    const { page } = await this.visitRaw(client, '/profile')
     const profile = page?.component === 'profile' ? page.props.profile : null
     return profile ? { name: profile.name, email: profile.email } : null
   }
@@ -185,5 +187,17 @@ export class VoidDriver implements Driver {
 
   absentUserId(): Id {
     return `absent${crypto.randomUUID().replaceAll('-', '')}`
+  }
+
+  sql<T = Record<string, unknown>>(query: string, params: unknown[] = []): T[] {
+    const appDir = process.env.SUITE_APP_DIR
+    if (!appDir) throw new Error('SUITE_APP_DIR is not set (run.sh sets it)')
+    return sqlAll<T>('void', appDir, query, params)
+  }
+
+  /** Any page as `{ status, component, props, errors }`; component/props are null when the response is not a 200 page object. */
+  async page(client: Client, path: string): Promise<PageResult> {
+    const { status, page } = await this.visitRaw(client, path)
+    return { status, component: page?.component ?? null, props: page?.props ?? null, errors: ((page as any)?.errors ?? {}) as Record<string, unknown> }
   }
 }

@@ -11,7 +11,11 @@ while [ $# -gt 0 ]; do case "$1" in
   --models) MODELS="$2"; shift 2;; --trials) TRIALS="$2"; shift 2;;
   *) echo "unknown arg $1"; exit 2;; esac; done
 IFS=, read -ra T <<<"$TASKS"; IFS=, read -ra A <<<"$ARMS"; IFS=, read -ra M <<<"$MODELS"
-for trial in $(seq 1 "$TRIALS"); do for task in "${T[@]}"; do for model in "${M[@]}"; do for arm in "${A[@]}"; do
+for trial in $(seq 1 "$TRIALS"); do for task in "${T[@]}"; do for model in "${M[@]}"; do
+# Alternate the arm order by trial, so neither arm always writes the shared
+# prompt cache for the other.
+ORDER=("${A[@]}"); if [ $((trial % 2)) -eq 0 ]; then ORDER=(); for ((k=${#A[@]}-1; k>=0; k--)); do ORDER+=("${A[k]}"); done; fi
+for arm in "${ORDER[@]}"; do
   out="$RESULTS/$(cell_id "$task" "$arm" "$model" "$trial")"
   if [ -f "$out.verdict.json" ] && ! grep -q BOOT-ERROR "$out.verdict.json"; then echo "skip $task $arm $model $trial"; continue; fi
   if [ ! -f "$out.patch" ]; then

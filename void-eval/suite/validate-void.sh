@@ -37,7 +37,7 @@ for task in "${TASKS[@]}"; do
   wt="$WT_ROOT/suite-void-$task"
   make_start_state void "$task" "$wt" >/dev/null || { echo "$task: start state failed"; BAD=1; continue; }
   setup_app void "$wt"
-  run_phase "$task" seeded "$wt" fail
+  run_phase "$task" start "$wt" fail
   git -C "$wt" apply --whitespace=nowarn "$VE/tasks/$task/reference.void.patch" || { echo "$task: reference apply failed"; BAD=1; continue; }
   run_phase "$task" reference "$wt" pass
   drop_start_state void "$wt"

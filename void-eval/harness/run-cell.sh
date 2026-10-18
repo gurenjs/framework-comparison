@@ -9,7 +9,9 @@ set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 
 TASK="$1"; ARM="$2"; MODEL="$3"; TRIAL="$4"
-MAX_TURNS="${MAX_TURNS:-120}"
+# Stage 2 tickets carry "max_turns": 200 in tasks/<id>/task.json (as in agents-on-guren).
+TASK_MAX_TURNS="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("max_turns", 120))' "$VE_ROOT/tasks/$TASK/task.json" 2>/dev/null || echo 120)"
+MAX_TURNS="${MAX_TURNS:-$TASK_MAX_TURNS}"
 CELL="$(cell_id "$TASK" "$ARM" "$MODEL" "$TRIAL")"
 OUT="$RESULTS/$CELL"
 WT="$WT_ROOT/run-$TASK-$ARM-$MODEL-$TRIAL"
