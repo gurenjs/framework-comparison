@@ -27,6 +27,21 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(ROOT, 'results')
 TICKETS = sys.argv[1:] or ['post-tags', 'comments-moderation', 'post-revisions', 'json-api-tokens', 'scheduled-publish']
 TEST_PATH = re.compile(r'/tests?/|\.test\.')
+# Files a patch adds that no one wrote by hand: migration SQL and Drizzle
+# snapshots, Guren codegen output, lockfiles. Excluded from "added lines".
+GENERATED = re.compile(r'(^|/)(db/migrations/|docs/spec/|\.guren/|bun\.lock$|pnpm-lock\.yaml$)|\.gen\.ts$')
+
+
+def added_lines(patch):
+    """Hand-written lines a patch adds (generated files excluded)."""
+    n, skip = 0, False
+    for line in patch.splitlines():
+        if line.startswith('diff --git'):
+            path = line.split(' b/', 1)[-1]
+            skip = bool(GENERATED.search(path))
+        elif line.startswith('+') and not line.startswith('+++') and not skip:
+            n += 1
+    return n
 
 
 def cells():
@@ -81,6 +96,9 @@ def section_table():
     rows = collections.defaultdict(list)
     for t, arm, base in cells():
         d = json.load(open(base + '.result.json'))
+        if d.get('num_turns') is None:  # the session died before its result event
+            print(f'(skipped, no result event: {base})', file=sys.stderr)
+            continue
         u = d.get('usage', {})
         v = json.load(open(base + '.verdict.json')) if os.path.exists(base + '.verdict.json') else {}
         patch = open(base + '.patch').read() if os.path.exists(base + '.patch') else ''
@@ -89,9 +107,9 @@ def section_table():
             turns=d.get('num_turns'), cost=d.get('total_cost_usd', 0), ok=v.get('status') == 'PASS',
             inp=u.get('input_tokens', 0) + u.get('cache_creation_input_tokens', 0) + u.get('cache_read_input_tokens', 0),
             out=u.get('output_tokens', 0), wall=d.get('duration_ms', 0) / 1000, tests=tests,
-            added=sum(1 for l in patch.splitlines() if l.startswith('+') and not l.startswith('+++'))))
+            added=added_lines(patch)))
     print('## 1. Per ticket\n')
-    print('| ticket | arm | pass | turns | input tokens (med) | output tokens (med) | cost (med) | wall s (med) | cells with tests | added lines (med) |')
+    print('| ticket | arm | pass | turns | input tokens (med) | output tokens (med) | cost (med) | wall s (med) | cells with tests | hand-written added lines (med) |')
     print('|---|---|---|---|---|---|---|---|---|---|')
     for t in TICKETS:
         for arm in ('guren', 'void'):
@@ -107,7 +125,7 @@ def section_table():
             print(f"\n{arm}: {sum(x['ok'] for x in c)}/{len(c)} pass, turns median {st.median(x['turns'] for x in c)} "
                   f"(mean {st.mean(x['turns'] for x in c):.1f}), input median {st.median(x['inp'] for x in c) / 1000:.0f}k, "
                   f"cost median ${st.median(x['cost'] for x in c):.3f} (mean ${st.mean(x['cost'] for x in c):.3f}), "
-                  f"total ${sum(x['cost'] for x in c):.2f}")
+                  f"total ${sum(x['cost'] for x in c):.2f}, hand-written added lines median {st.median(x['added'] for x in c):.0f}")
     print()
 
 
@@ -118,6 +136,7 @@ def section_streams():
     dist = collections.defaultdict(collections.Counter)
     test_caught = collections.Counter()
     test_cells = collections.Counter()
+    per_cell = []
     for t, arm, base in cells():
         ids, s, n = {}, collections.Counter(), collections.Counter()
         failed_test = fixed_after = ran_tests = False
@@ -146,12 +165,16 @@ def section_streams():
                     m = re.search(r'(\d+) fail', body)
                     if m and int(m.group(1)) > 0:
                         failed_test = True
-        for k in set(s) | set(n):
-            size[arm][k].append(s.get(k, 0))
-            calls[arm][k].append(n.get(k, 0))
+        per_cell.append((arm, s, n))
         if ran_tests:
             test_cells[arm] += 1
             test_caught[arm] += failed_test and fixed_after
+    # Average over every cell of the arm, counting a category a cell never used as 0.
+    cats = {k for _, s, n in per_cell for k in set(s) | set(n)}
+    for arm, s, n in per_cell:
+        for k in cats:
+            size[arm][k].append(s.get(k, 0))
+            calls[arm][k].append(n.get(k, 0))
     print('## 2. Tool output read back into context (mean per cell)\n')
     for arm in size:
         print(f'{arm}:')

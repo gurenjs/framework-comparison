@@ -158,12 +158,20 @@ harness bug: the suite's retry for a known `vp dev` error page missed a
 leading newline. The same patch was regraded after the fix and passed
 10/10. The original verdict is kept as `*.verdict.harness-bug.json`.
 
-### The work done was equal
+### Same features, more code on Guren
 
 - **UI:** both arms changed the same number of UI files on every ticket, so
-  neither arm skipped the forms.
-- **Size of the change:** the median patch adds 538 lines on Guren and 620 on
-  Void. The Void cells did the same work for half the tokens.
+  neither skipped the forms.
+- **Hand-written added lines (median per cell):** Guren 214, Void 121. Counted
+  by `analyze.py` with generated files excluded: migrations and Drizzle
+  snapshots, `.guren/*.gen.ts`, `docs/spec/`, lockfiles.
+- **Where the difference comes from:**
+  - tests: 690 lines over 15 Guren cells, none on Void;
+  - more layers per feature (controllers 739 lines, validators 138,
+    middleware 107);
+  - longer page markup (UI lines: Guren 54, Void 31 median).
+- **What the black-box suite sees:** the same behaviour from both. Guren's
+  extra code is structure and tests, not extra features.
 
 ### Where Guren's extra tokens go
 
@@ -193,8 +201,9 @@ tool-output sizes.
    them on every later turn. In the `post-tags` trace, one `cat` of four
    Guren files added 15.5k tokens; on Void the largest single jump was 6k.
 3. **A bigger app to read.** Guren cells' file reads and `cat`s returned
-   about 13k characters per cell; Void cells' returned 2k. This is mostly
-   the confound above.
+   about 9k characters per cell; Void cells' returned 1k. This is mostly the
+   confound above. Guren's codegen and migration commands also print more
+   (20k vs 7k characters per cell).
 4. **Tests the agents wrote.** Guren agents added tests in 11/15 cells and
    ran `bun test` in 15/15. Void agents wrote none: the app has no test
    runner, and the Void docs describe no testing story for apps. Part of
@@ -296,8 +305,10 @@ pagination-skips-page, raw-body-no-validation, api-posts-contract): 8/8 pass.
   The suite works around all three. It retries the boot, runs Void servers
   one at a time, and retries that exact page once.
 - Claude Code loads `AGENTS.md`, so Void's pointer to its docs is in context.
-  Agents used the docs sparingly: 2 reads per cell (median), plus about 4
-  framework-file reads. No agent invoked the `void` skill.
+  Void agents named `node_modules/void/docs` paths 84 times in 15 cells,
+  about 5–6 per cell, and `void/dist` 20 times. Guren agents named
+  `@guren/*` dist paths 47 times, 30 of them on json-api-tokens. No agent
+  invoked the `void` skill.
 
 ## Where Guren could do better (proposals for gurenjs)
 

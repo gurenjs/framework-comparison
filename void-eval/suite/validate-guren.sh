@@ -43,7 +43,9 @@ for task in "${TASKS[@]}"; do
   # that touches generated files applies cleanly.
   git -C "$wt" checkout -- .guren 2>/dev/null || true
   git -C "$wt" apply --whitespace=nowarn "$AOG_ROOT/tasks/$task/reference.patch" || { echo "$task: reference apply failed"; BAD=1; drop_start_state guren "$wt"; continue; }
-  run_phase "$task" reference "$wt" pass
+  # boot-guren.sh reuses an existing vite build; the reference may add or
+  # change pages, so force a rebuild for this phase.
+  SUITE_REBUILD=1 run_phase "$task" reference "$wt" pass
   drop_start_state guren "$wt"
 done
 

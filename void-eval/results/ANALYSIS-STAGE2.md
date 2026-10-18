@@ -1,41 +1,44 @@
 ## 1. Per ticket
 
-| ticket | arm | pass | turns | input tokens (med) | output tokens (med) | cost (med) | wall s (med) | cells with tests | added lines (med) |
+| ticket | arm | pass | turns | input tokens (med) | output tokens (med) | cost (med) | wall s (med) | cells with tests | hand-written added lines (med) |
 |---|---|---|---|---|---|---|---|---|---|
-| post-tags | guren | 3/3 | 24, 23, 24 | 1159k | 11.1k | $0.56 | 167 | 3/3 | 538 |
-| post-tags | void | 3/3 | 15, 10, 13 | 422k | 5.9k | $0.22 | 67 | 0/3 | 620 |
-| comments-moderation | guren | 3/3 | 33, 21, 23 | 1131k | 10.9k | $0.55 | 141 | 3/3 | 734 |
-| comments-moderation | void | 3/3 | 24, 24, 19 | 582k | 8.2k | $0.30 | 91 | 0/3 | 740 |
-| post-revisions | guren | 3/3 | 19, 18, 15 | 450k | 5.7k | $0.30 | 171 | 0/3 | 437 |
-| post-revisions | void | 3/3 | 20, 24, 15 | 385k | 6.6k | $0.21 | 74 | 0/3 | 588 |
-| json-api-tokens | guren | 3/3 | 42, 39, 46 | 1959k | 14.4k | $0.86 | 375 | 3/3 | 655 |
-| json-api-tokens | void | 3/3 | 17, 23, 15 | 431k | 8.1k | $0.27 | 124 | 0/3 | 717 |
-| scheduled-publish | guren | 3/3 | 17, 16, 22 | 802k | 7.8k | $0.38 | 154 | 2/3 | 348 |
-| scheduled-publish | void | 3/3 | 24, 14, 19 | 518k | 6.6k | $0.25 | 82 | 0/3 | 495 |
+| post-tags | guren | 3/3 | 24, 23, 24 | 1159k | 11.1k | $0.56 | 167 | 3/3 | 214 |
+| post-tags | void | 3/3 | 15, 10, 13 | 422k | 5.9k | $0.22 | 67 | 0/3 | 121 |
+| comments-moderation | guren | 3/3 | 33, 21, 23 | 1131k | 10.9k | $0.55 | 141 | 3/3 | 296 |
+| comments-moderation | void | 3/3 | 24, 24, 19 | 582k | 8.2k | $0.30 | 91 | 0/3 | 178 |
+| post-revisions | guren | 3/3 | 19, 18, 15 | 450k | 5.7k | $0.30 | 171 | 0/3 | 125 |
+| post-revisions | void | 3/3 | 20, 24, 15 | 385k | 6.6k | $0.21 | 74 | 0/3 | 104 |
+| json-api-tokens | guren | 3/3 | 42, 39, 46 | 1959k | 14.4k | $0.86 | 375 | 3/3 | 320 |
+| json-api-tokens | void | 3/3 | 17, 23, 15 | 431k | 8.1k | $0.27 | 124 | 0/3 | 205 |
+| scheduled-publish | guren | 3/3 | 17, 16, 22 | 802k | 7.8k | $0.38 | 154 | 2/3 | 103 |
+| scheduled-publish | void | 3/3 | 24, 14, 19 | 518k | 6.6k | $0.25 | 82 | 0/3 | 67 |
 
-guren: 15/15 pass, turns median 23 (mean 25.5), input median 1125k, cost median $0.550 (mean $0.534), total $8.02
+guren: 15/15 pass, turns median 23 (mean 25.5), input median 1125k, cost median $0.550 (mean $0.534), total $8.02, hand-written added lines median 214
 
-void: 15/15 pass, turns median 19 (mean 18.4), input median 467k, cost median $0.254 (mean $0.256), total $3.85
+void: 15/15 pass, turns median 19 (mean 18.4), input median 467k, cost median $0.254 (mean $0.256), total $3.85, hand-written added lines median 121
 
 ## 2. Tool output read back into context (mean per cell)
 
 guren:
    codegen/migrate       19663 chars   2.5 calls
-   read-framework        16702 chars   4.5 calls
-   bash-read/other        8678 chars   4.1 calls
-   read-src               4314 chars   1.6 calls
+   read-framework         8908 chars   2.4 calls
+   bash-read/other        6942 chars   3.3 calls
+   read-src               2301 chars   0.9 calls
    run-tests              2117 chars   2.3 calls
-   typecheck              1853 chars   2.1 calls
-   edit-src               1620 chars   9.5 calls
+   edit-src               1404 chars   8.2 calls
+   typecheck              1359 chars   1.5 calls
    guren-cli               900 chars   2.1 calls
-   edit-test               324 chars   1.6 calls
+   edit-test               238 chars   1.2 calls
 void:
    read-framework        14161 chars   4.3 calls
-   codegen/migrate        7297 chars   2.3 calls
-   bash-read/other        1225 chars   1.8 calls
+   codegen/migrate        6811 chars   2.1 calls
    edit-src               1195 chars   7.3 calls
    typecheck              1100 chars   2.2 calls
-   read-src                927 chars   1.0 calls
+   bash-read/other         898 chars   1.3 calls
+   read-src                124 chars   0.1 calls
+   guren-cli                 0 chars   0.0 calls
+   run-tests                 0 chars   0.0 calls
+   edit-test                 0 chars   0.0 calls
 
 ## 3. PostToolUse blocks (exit 2), by message
 

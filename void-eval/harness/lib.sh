@@ -36,13 +36,18 @@ make_start_state() {
       git -C "$GUREN_APP_REPO" worktree remove --force "$dest" 2>/dev/null || true
       git -C "$GUREN_APP_REPO" worktree prune
       git -C "$GUREN_APP_REPO" worktree add --detach "$dest" "$GUREN_BASE" >/dev/null || return 1
-      # GUREN_UPDATE=1 (default): move the app to the current @guren/*
-      # releases within its semver ranges (RUNBOOK: `bun update` before an
-      # app arm), so the arm measures today's Guren, not 0fd1654's 2.27 CLI.
-      if [ "${GUREN_UPDATE:-1}" = 1 ]; then
+      # Move the app from 0fd1654's locked @guren/cli 2.27 to the releases this
+      # round measured (RUNBOOK: `bun update` before an app arm). The result of
+      # that update is pinned in harness/guren-pinned/ (package.json + bun.lock,
+      # @guren/cli 2.31.1), so a cell and its later grading install the same
+      # versions. GUREN_UPDATE=live runs a fresh `bun update` instead (and
+      # refreshes the pin by hand: copy the two files back).
+      if [ "${GUREN_UPDATE:-pinned}" = live ]; then
         (cd "$dest" && bun install --frozen-lockfile >/dev/null 2>&1 && bun update >/dev/null 2>&1) || { echo "BUN-UPDATE-FAILED"; return 1; }
-        git -C "$dest" add -A && git -C "$dest" "${GIT_ID[@]}" commit -q -m "harness: bun update (@guren/cli $(cd "$dest" && bunx guren --version 2>/dev/null | head -1))" --no-verify
+      else
+        cp "$VE_ROOT/harness/guren-pinned/package.json" "$VE_ROOT/harness/guren-pinned/bun.lock" "$dest/"
       fi
+      git -C "$dest" add -A && git -C "$dest" "${GIT_ID[@]}" commit -q -m "harness: current @guren/* releases" --no-verify
       if [ -f "$AOG_ROOT/tasks/$task/seed.patch" ]; then
         git -C "$dest" apply --whitespace=nowarn "$AOG_ROOT/tasks/$task/seed.patch" || { echo "SEED-APPLY-FAILED"; return 1; }
         git -C "$dest" add -A && git -C "$dest" "${GIT_ID[@]}" commit -q -m "seed: $task" --no-verify

@@ -30,10 +30,14 @@ setup_app "$ARM" "$WT"
 TC=fail; SU=fail
 typecheck "$ARM" "$WT" "$OUT.typecheck.log" && TC=pass
 "$VE_ROOT/suite/run.sh" "$ARM" "$WT" "$TASK" "$PORT" > "$OUT.suite.log" 2>&1
-case $? in 0) SU=pass ;; 3) SU=boot-error ;; esac
+# run.sh: 0 = all tests passed, 1 = a test failed. Anything else (boot
+# failure 3, usage error 2, interrupted 130, ...) says nothing about the
+# agent's patch, so it is recorded as a harness error and run-matrix.sh
+# grades the cell again on its next pass.
+case $? in 0) SU=pass ;; 1) SU=fail ;; *) SU=harness-error ;; esac
 CNT="$(grep -oE '^ *[0-9]+ (pass|fail)$' "$OUT.suite.log" | tr -s ' ' | tr '\n' ' ' | sed 's/^ //; s/ $//')"
 
-if [ "$SU" = boot-error ]; then STATUS=BOOT-ERROR
+if [ "$SU" = harness-error ]; then STATUS=HARNESS-ERROR
 elif [ "$TC" = pass ] && [ "$SU" = pass ]; then STATUS=PASS; else STATUS=FAIL; fi
 verdict "$STATUS" "$TC" "$SU" "$CNT"
 drop_start_state "$ARM" "$WT"

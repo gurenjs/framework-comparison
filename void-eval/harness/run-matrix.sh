@@ -17,7 +17,7 @@ for trial in $(seq 1 "$TRIALS"); do for task in "${T[@]}"; do for model in "${M[
 ORDER=("${A[@]}"); if [ $((trial % 2)) -eq 0 ]; then ORDER=(); for ((k=${#A[@]}-1; k>=0; k--)); do ORDER+=("${A[k]}"); done; fi
 for arm in "${ORDER[@]}"; do
   out="$RESULTS/$(cell_id "$task" "$arm" "$model" "$trial")"
-  if [ -f "$out.verdict.json" ] && ! grep -q BOOT-ERROR "$out.verdict.json"; then echo "skip $task $arm $model $trial"; continue; fi
+  if [ -f "$out.verdict.json" ] && ! grep -q HARNESS-ERROR "$out.verdict.json"; then echo "skip $task $arm $model $trial"; continue; fi
   if [ ! -f "$out.patch" ]; then
     FORCE=1 bash "$HERE/run-cell.sh" "$task" "$arm" "$model" "$trial" || { echo "RUN FAILED $task $arm $model $trial"; continue; }
   fi
