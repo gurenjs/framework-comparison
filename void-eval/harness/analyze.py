@@ -23,6 +23,9 @@ import re
 import statistics as st
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from streams import TESTS, TYPECHECK, events as stream_events, tool_uses, total_input  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(ROOT, 'results')
 TICKETS = sys.argv[1:] or ['post-tags', 'comments-moderation', 'post-revisions', 'json-api-tokens', 'scheduled-publish']
@@ -54,19 +57,7 @@ def cells():
 
 def events(base):
     path = base + '.stream.jsonl'
-    if not os.path.exists(path):
-        return
-    for line in open(path):
-        try:
-            yield json.loads(line)
-        except json.JSONDecodeError:
-            continue
-
-
-def tool_uses(e):
-    if e.get('type') != 'assistant':
-        return []
-    return [c for c in e['message'].get('content', []) if isinstance(c, dict) and c.get('type') == 'tool_use']
+    return stream_events(path) if os.path.exists(path) else iter(())
 
 
 def tool_results(e):
@@ -79,8 +70,8 @@ def category(name, inp):
         return 'edit-test' if TEST_PATH.search(inp.get('file_path', '')) else 'edit-src'
     if name == 'Bash':
         cmd = inp.get('command', '')
-        if re.search(r'\bbun test\b', cmd): return 'run-tests'
-        if re.search(r'tsc|typecheck|void prepare', cmd): return 'typecheck'
+        if TESTS.search(cmd): return 'run-tests'
+        if TYPECHECK.search(cmd): return 'typecheck'
         if re.search(r'guren (check|gate|audit|doctor|context|routes|make|db)', cmd): return 'guren-cli'
         if 'node_modules' in cmd: return 'read-framework'
         if re.search(r'codegen|db:|migrat|void db', cmd): return 'codegen/migrate'
@@ -105,7 +96,7 @@ def section_table():
         tests = any(l.startswith('diff --git') and TEST_PATH.search(l) for l in patch.splitlines())
         rows[(t, arm)].append(dict(
             turns=d.get('num_turns'), cost=d.get('total_cost_usd', 0), ok=v.get('status') == 'PASS',
-            inp=u.get('input_tokens', 0) + u.get('cache_creation_input_tokens', 0) + u.get('cache_read_input_tokens', 0),
+            inp=total_input(u),
             out=u.get('output_tokens', 0), wall=d.get('duration_ms', 0) / 1000, tests=tests,
             added=added_lines(patch)))
     print('## 1. Per ticket\n')
@@ -208,7 +199,7 @@ def section_growth(per_arm=1, threshold=2500):
                 continue
             m = e['message']
             u = m.get('usage', {})
-            tot = u.get('input_tokens', 0) + u.get('cache_creation_input_tokens', 0) + u.get('cache_read_input_tokens', 0)
+            tot = total_input(u)
             if m.get('id') not in seen:
                 seen.add(m.get('id'))
                 if prev is None:

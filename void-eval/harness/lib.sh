@@ -22,7 +22,7 @@ GIT_ID=(-c user.name=ve -c user.email=ve@example.invalid)
 
 # Void needs Node >= 24.21; both arms get the same PATH so the only
 # difference between them is the app.
-NODE24_BIN="${NODE24_BIN:-$(mise where node@24.22.0 2>/dev/null)/bin}"
+export NODE24_BIN="${NODE24_BIN:-$(mise where node@24.22.0 2>/dev/null)/bin}"
 export PATH="$NODE24_BIN:$PATH"
 
 cell_id() { echo "$1/$2-$3-$4"; }   # <task> <arm> <model> <trial>
@@ -43,7 +43,7 @@ make_start_state() {
       # versions. GUREN_UPDATE=live runs a fresh `bun update` instead (and
       # refreshes the pin by hand: copy the two files back).
       if [ "${GUREN_UPDATE:-pinned}" = live ]; then
-        (cd "$dest" && bun install --frozen-lockfile >/dev/null 2>&1 && bun update >/dev/null 2>&1) || { echo "BUN-UPDATE-FAILED"; return 1; }
+        (cd "$dest" && bun update >/dev/null 2>&1) || { echo "BUN-UPDATE-FAILED"; return 1; }
       else
         cp "$VE_ROOT/harness/guren-pinned/package.json" "$VE_ROOT/harness/guren-pinned/bun.lock" "$dest/"
       fi

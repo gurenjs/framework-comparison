@@ -29,8 +29,10 @@ import type {
   NewPost,
   NewUser,
   PostView,
+  MutateOptions,
   PageResult,
   ProfileView,
+  Submit,
 } from './types.ts'
 
 interface VoidPage {
@@ -42,11 +44,13 @@ interface VoidPage {
 export class VoidDriver implements Driver {
   readonly name = 'void'
   readonly capabilities = { profilePassword: false, integerUserIds: false }
+  readonly components = { postIndex: 'posts', postShow: 'posts/[id]' }
+  readonly formValidationStatus = 200
 
   constructor(readonly baseUrl: string) {}
 
   newClient(): Client {
-    return { jar: new CookieJar(), state: {} }
+    return { jar: new CookieJar() }
   }
 
   async raw(client: Client, method: string, path: string, init: RequestInit = {}): Promise<Response> {
@@ -62,7 +66,10 @@ export class VoidDriver implements Driver {
     // the dev server, not the app under test, so retry exactly that once.
     if (res.status === 500 && !res.headers.get('content-type')) {
       const text = await res.clone().text()
-      if (/^\s*<!DOCTYPE html>/i.test(text) && text.includes('"message":"fetch failed"')) res = await send()
+      if (/^\s*<!DOCTYPE html>/i.test(text) && text.includes('"message":"fetch failed"')) {
+        console.warn(`suite: ${method} ${path} re-sent after the vp dev "fetch failed" page`)
+        res = await send()
+      }
     }
     client.jar.store(res)
     return res
@@ -74,8 +81,15 @@ export class VoidDriver implements Driver {
     return new URL(this.baseUrl).origin
   }
 
-  private async send(client: Client, method: string, path: string, body?: unknown, pages = true) {
-    const headers: Record<string, string> = { Origin: this.origin, Accept: 'application/json' }
+  /**
+   * A mutation as the Void client sends it: `Origin` always, `X-VoidPages`
+   * unless `opts.pages === false` (a plain JSON client, e.g. Better Auth or a
+   * JSON route). `errors` is filled only from a page object's validation
+   * errors. Requests refused by Void's own origin check throw.
+   */
+  async mutate(client: Client, method: string, path: string, body?: unknown, opts: MutateOptions = {}): Promise<Submit> {
+    const pages = opts.pages ?? true
+    const headers: Record<string, string> = { ...opts.headers, Origin: this.origin, Accept: 'application/json' }
     if (pages) headers['X-VoidPages'] = 'true'
     const init: RequestInit = { headers }
     if (body !== undefined) {
@@ -84,24 +98,17 @@ export class VoidDriver implements Driver {
     }
     const res = await this.raw(client, method, path, init)
     const bodyText = await res.text()
-    const location = res.headers.get('location')
-    return { status: res.status, bodyText, location: location ? new URL(location, this.baseUrl).pathname : null }
-  }
-
-  /** A page action. `errors` is filled only from a page object's validation errors. */
-  async mutate(client: Client, method: string, path: string, body?: unknown): Promise<MutationResult & { location: string | null }> {
-    const res = await this.send(client, method, path, body)
-    if (res.status === 403 && /origin/i.test(res.bodyText)) {
+    if (isOriginRejection(res.status, bodyText)) {
       throw new Error(`void driver: ${method} ${path} was rejected by the origin check (harness bug, not app behaviour)`)
     }
     let errors: Record<string, unknown> = {}
-    if (res.status === 200 || res.status === 422) {
+    if (pages && (res.status === 200 || res.status === 422)) {
       try {
-        const page = JSON.parse(res.bodyText) as Partial<VoidPage> & { errors?: Record<string, unknown> }
-        errors = page.errors ?? {}
+        errors = (JSON.parse(bodyText) as Partial<VoidPage>).errors ?? {}
       } catch {}
     }
-    return { status: res.status, ok: false, errors, bodyText: res.bodyText, location: res.location }
+    const location = res.headers.get('location')
+    return { status: res.status, ok: false, errors, bodyText, location: location ? new URL(location, this.baseUrl).pathname : null, headers: res.headers }
   }
 
   private async visitRaw(client: Client, path: string): Promise<{ status: number; page: VoidPage | null }> {
@@ -117,18 +124,18 @@ export class VoidDriver implements Driver {
   // --- Driver --------------------------------------------------------------
 
   async register(client: Client, user: NewUser): Promise<void> {
-    const res = await this.send(client, 'POST', '/api/auth/sign-up/email', {
+    const res = await this.mutate(client, 'POST', '/api/auth/sign-up/email', {
       name: user.name,
       email: user.email,
       password: user.password,
-    }, false)
+    }, { pages: false })
     if (res.status !== 200 || !client.jar.names().some((n) => n.includes('session_token'))) {
       throw new Error(`void driver: register ${user.email} failed: ${res.status} ${res.bodyText.slice(0, 300)}`)
     }
   }
 
   async login(client: Client, creds: Credentials): Promise<{ ok: boolean; status: number }> {
-    const res = await this.send(client, 'POST', '/api/auth/sign-in/email', { email: creds.email, password: creds.password }, false)
+    const res = await this.mutate(client, 'POST', '/api/auth/sign-in/email', { email: creds.email, password: creds.password }, { pages: false })
     if (res.status !== 200) return { ok: false, status: res.status }
     const profile = await this.getProfile(client)
     return { ok: profile?.email === creds.email.trim().toLowerCase(), status: res.status }
@@ -144,9 +151,13 @@ export class VoidDriver implements Driver {
   }
 
   async deletePost(client: Client, id: Id): Promise<MutationResult> {
-    const { location: _location, ...rest } = await this.mutate(client, 'DELETE', `/posts/${id}?delete`)
+    const res = await this.mutate(client, 'DELETE', `/posts/${id}?delete`)
     // Void's success contract: the action redirects (302) to the list.
-    return { ...rest, ok: [302, 303].includes(rest.status) }
+    return { ...res, ok: [302, 303].includes(res.status) }
+  }
+
+  updatePost(client: Client, id: Id, data: Record<string, unknown>): Promise<Submit> {
+    return this.mutate(client, 'PUT', `/posts/${id}?update`, data)
   }
 
   async getPostStatus(client: Client, id: Id): Promise<number> {
@@ -163,7 +174,7 @@ export class VoidDriver implements Driver {
   async listPosts(client: Client, opts: { page?: number } = {}): Promise<ListResult> {
     const path = opts.page === undefined ? '/posts' : `/posts?page=${opts.page}`
     const { status, page } = await this.visitRaw(client, path)
-    if (status !== 200 || !page || page.component !== 'posts') {
+    if (status !== 200 || !page || page.component !== this.components.postIndex) {
       throw new Error(`void driver: GET ${path} did not return the posts page (status ${status}, component ${page?.component})`)
     }
     const meta = page.props.pagination?.meta ?? {}
@@ -188,15 +199,22 @@ export class VoidDriver implements Driver {
   }
 
   async updateProfile(client: Client, body: Record<string, unknown>): Promise<MutationResult> {
-    const { location: _location, ...rest } = await this.mutate(client, 'PUT', '/profile', body)
+    const res = await this.mutate(client, 'PUT', '/profile', body)
     // Void's contract: success re-runs the loader (200 page object, no
     // errors) or redirects; validation failure is a page object with errors.
-    const rejected = Object.keys(rest.errors).length > 0
-    return { ...rest, ok: !rejected && [200, 302, 303].includes(rest.status) }
+    const rejected = Object.keys(res.errors).length > 0
+    return { ...res, ok: !rejected && [200, 302, 303].includes(res.status) }
   }
 
   absentUserId(): Id {
     return `absent${crypto.randomUUID().replaceAll('-', '')}`
+  }
+
+  /** Better Auth keeps accounts in the `user` table, with string ids. */
+  userIdByEmail(email: string): Id {
+    const rows = this.sql<{ id: Id }>('SELECT id FROM "user" WHERE email = ?', [email])
+    if (rows.length !== 1) throw new Error(`void driver: no account row for ${email}`)
+    return rows[0]!.id
   }
 
   sql<T = Record<string, unknown>>(query: string, params: unknown[] = []): T[] {
@@ -208,6 +226,22 @@ export class VoidDriver implements Driver {
   /** Any page as `{ status, component, props, errors }`; component/props are null when the response is not a 200 page object. */
   async page(client: Client, path: string): Promise<PageResult> {
     const { status, page } = await this.visitRaw(client, path)
-    return { status, component: page?.component ?? null, props: page?.props ?? null, errors: ((page as any)?.errors ?? {}) as Record<string, unknown> }
+    return { status, component: page?.component ?? null, props: page?.props ?? null }
+  }
+}
+
+/**
+ * Void's own origin refusals, matched exactly so an app's 403 is never taken
+ * for one: page actions answer "Cross-origin page actions are not allowed."
+ * (void/dist protocol), Better Auth answers JSON with an origin error code.
+ */
+function isOriginRejection(status: number, bodyText: string): boolean {
+  if (status !== 403) return false
+  if (bodyText.includes('Cross-origin page actions are not allowed.')) return true
+  try {
+    const code = (JSON.parse(bodyText) as { code?: unknown }).code
+    return code === 'MISSING_OR_NULL_ORIGIN' || code === 'INVALID_ORIGIN'
+  } catch {
+    return false
   }
 }

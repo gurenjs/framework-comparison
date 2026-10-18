@@ -1,14 +1,12 @@
 // Task helpers for tests/post-revisions.test.ts. Everything that differs
 // between the frameworks for this ticket lives here, built from the Driver's
-// generic building blocks (mutate, page, raw, sql):
-//
-//   - update URL:  Guren PUT /posts/:id    Void PUT /posts/:id?update
-//
-// The revisions page (GET /posts/:id/revisions) and the restore endpoint
+// generic building blocks (mutate, page, raw, sql). The revisions page (GET /posts/:id/revisions) and the restore endpoint
 // (POST /posts/:id/revisions/:revisionId/restore) are pinned with the same URL
 // on both apps. The page data is read through driver.page (Guren: Inertia
 // props, Void: the loader's page data); the component name is not pinned.
-import type { Client, Driver, Id, MutationResult, PageResult } from '../types.ts'
+import type { Client, Driver, Id, PageResult, Submit } from '../types.ts'
+
+export type { Submit }
 
 export interface PostContent {
   title: string
@@ -16,12 +14,9 @@ export interface PostContent {
   body: string
 }
 
-export type Submit = MutationResult & { location: string | null }
-
 /** Submit the edit-post form for post `id`. */
 export function submitUpdate(driver: Driver, client: Client, id: Id, data: PostContent): Promise<Submit> {
-  const path = driver.name === 'void' ? `/posts/${id}?update` : `/posts/${id}`
-  return driver.mutate(client, 'PUT', path, data)
+  return driver.updatePost(client, id, { ...data })
 }
 
 /** POST /posts/:id/revisions/:revisionId/restore, sent the way the framework's client sends a mutation. */

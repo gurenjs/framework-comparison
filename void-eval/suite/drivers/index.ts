@@ -1,6 +1,7 @@
 // Picks the driver for this run: SUITE_DRIVER=guren|void, SUITE_BASE_URL=http://127.0.0.1:<port>
 import type { Driver } from './types.ts'
 import { GurenDriver } from './guren.ts'
+import { VoidDriver } from './void.ts'
 
 export function loadDriver(): Driver {
   const name = process.env.SUITE_DRIVER ?? 'guren'
@@ -9,12 +10,8 @@ export function loadDriver(): Driver {
   switch (name) {
     case 'guren':
       return new GurenDriver(baseUrl)
-    case 'void': {
-      // Written separately against ./types.ts. Expected export:
-      //   export class VoidDriver implements Driver { constructor(baseUrl: string) }
-      const { VoidDriver } = require('./void.ts') as { VoidDriver: new (baseUrl: string) => Driver }
+    case 'void':
       return new VoidDriver(baseUrl)
-    }
     default:
       throw new Error(`unknown SUITE_DRIVER: ${name}`)
   }

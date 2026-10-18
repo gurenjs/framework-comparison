@@ -11,13 +11,6 @@
 //     validators answer 400, and its statement allows 400 or 422.
 // Bearer requests are framework-neutral: a brand-new cookie jar per request,
 // so no session cookie (and no CSRF cookie) can ever ride along.
-//
-// Void dev-server retry: when a Void handler answers a request without
-// reading its body (a 401 to a POST, say), `vp dev`'s proxy to workerd
-// sometimes fails the *next* request with its own HTML 500 page
-// ("fetch failed"). That request never reaches the worker (probed: no row
-// created, no rate-limit hit counted), so it is re-sent once. The signature
-// is Vite's error page, which app code does not produce.
 import type { Client, Driver, Id } from '../types.ts'
 import type { TestUser } from '../../lib/fixtures.ts'
 
@@ -34,30 +27,6 @@ export function jsonValidationStatuses(driver: Driver): number[] {
   return driver.name === 'void' ? [400, 422] : [422]
 }
 
-let retries = 0
-
-/** How many requests were re-sent after the Void dev server's own "fetch failed" page. */
-export function devServerRetries(): number {
-  return retries
-}
-
-function isDevServerFetchFailure(driver: Driver, sent: Sent): boolean {
-  return (
-    driver.name === 'void' &&
-    sent.status === 500 &&
-    // Vite's error page carries no Content-Type header.
-    /^\s*<!DOCTYPE html>/i.test(sent.bodyText) &&
-    sent.bodyText.includes('"message":"fetch failed"')
-  )
-}
-
-async function send(driver: Driver, client: Client, method: string, path: string, init: RequestInit): Promise<Sent> {
-  const sent = await finish(await driver.raw(client, method, path, init))
-  if (!isDevServerFetchFailure(driver, sent)) return sent
-  retries += 1
-  return finish(await driver.raw(client, method, path, init))
-}
-
 async function finish(res: Response): Promise<Sent> {
   const bodyText = await res.text()
   let json: any
@@ -67,27 +36,14 @@ async function finish(res: Response): Promise<Sent> {
   return { status: res.status, headers: res.headers, bodyText, json }
 }
 
-/** A request from a signed-in (or guest) browser session, JSON in and out. Redirects not followed. */
+/** A request from a signed-in (or guest) browser session, JSON in and out, without the page protocol. Redirects not followed. */
 export async function sessionRequest(driver: Driver, client: Client, method: string, path: string, body?: unknown): Promise<Sent> {
-  const headers: Record<string, string> = { Accept: 'application/json' }
-  if (driver.name === 'void') {
-    headers.Origin = new URL(driver.baseUrl).origin
-  } else {
-    if (!client.jar.has('XSRF-TOKEN')) await (await driver.raw(client, 'GET', '/health')).arrayBuffer()
-    const token = client.jar.get('XSRF-TOKEN')
-    if (!token) throw new Error('suite: no XSRF-TOKEN cookie after GET /health')
-    headers['X-XSRF-TOKEN'] = decodeURIComponent(token)
-  }
-  const init: RequestInit = { headers }
-  if (body !== undefined) {
-    headers['Content-Type'] = 'application/json'
-    init.body = JSON.stringify(body)
-  }
-  const sent = await send(driver, client, method, path, init)
-  if (sent.status === 403 && (/CSRF token mismatch/.test(sent.bodyText) || (driver.name === 'void' && /origin/i.test(sent.bodyText)))) {
-    throw new Error(`suite: ${method} ${path} was rejected by the CSRF/origin check (harness bug, not app behaviour)`)
-  }
-  return sent
+  const res = await driver.mutate(client, method, path, body, { pages: false })
+  let json: any
+  try {
+    json = JSON.parse(res.bodyText)
+  } catch {}
+  return { status: res.status, headers: res.headers, bodyText: res.bodyText, json }
 }
 
 /**
@@ -103,7 +59,7 @@ export async function apiRequest(driver: Driver, method: string, path: string, a
     headers['Content-Type'] = 'application/json'
     init.body = JSON.stringify(body)
   }
-  return send(driver, driver.newClient(), method, path, init)
+  return finish(await driver.raw(driver.newClient(), method, path, init))
 }
 
 /** The redirect target's pathname, or null. */
@@ -116,12 +72,9 @@ export function isJson(sent: Sent): boolean {
   return (sent.headers.get('content-type') ?? '').includes('application/json')
 }
 
-/** The account id of a registered test user, read from the framework's users table by email. */
+/** The account id of a registered test user. */
 export function userId(driver: Driver, user: TestUser): Id {
-  const table = driver.name === 'void' ? '"user"' : 'users'
-  const rows = driver.sql<{ id: Id }>(`SELECT id FROM ${table} WHERE email = ?`, [user.email])
-  if (rows.length !== 1) throw new Error(`suite: no account row for ${user.email}`)
-  return rows[0]!.id
+  return driver.userIdByEmail(user.email)
 }
 
 // --- the pinned api_tokens table and the existing posts table ---------------

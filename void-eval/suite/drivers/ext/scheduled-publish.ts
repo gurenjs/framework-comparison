@@ -2,14 +2,14 @@
 // between the frameworks for this ticket lives here, built from the Driver's
 // generic building blocks (mutate, page, sql):
 //
-//   - page components: Guren posts/Index, posts/Show (Inertia)
-//                      Void  posts, posts/[id]      (VoidPages)
 //   - search:          Guren QUERY /posts/search with JSON { keywords } -> { data }
 //                      Void  the posts list's keyword search, GET /posts?q=… -> page data `data`
 //   - validation:      Guren 422 JSON { errors }   Void 200 page JSON with errors
 //   - the posts table is the same on both (pinned: posts.published_at, text)
 import { expect } from 'bun:test'
-import type { Client, Driver, Id, MutationResult, PageResult } from '../types.ts'
+import type { Client, Driver, Id, PageResult, Submit } from '../types.ts'
+
+export type { Submit }
 
 export interface PostProp {
   id: Id
@@ -22,13 +22,6 @@ export interface PostRow {
   title: string
   author_id: Id
   published_at: string | null
-}
-
-export type Submit = MutationResult & { location: string | null }
-
-const COMPONENTS: Record<string, { index: string; show: string }> = {
-  guren: { index: 'posts/Index', show: 'posts/Show' },
-  void: { index: 'posts', show: 'posts/[id]' },
 }
 
 /** Submit the create-post form (POST /posts) with `data` as the body, sent verbatim. */
@@ -45,7 +38,7 @@ export function postPage(driver: Driver, client: Client, id: Id): Promise<PageRe
 export async function showProps<T>(driver: Driver, client: Client, id: Id): Promise<T> {
   const page = await postPage(driver, client, id)
   expect(page.status, `GET /posts/${id}`).toBe(200)
-  expect(page.component).toBe(COMPONENTS[driver.name].show)
+  expect(page.component).toBe(driver.components.postShow)
   return page.props as T
 }
 
@@ -53,7 +46,7 @@ export async function showProps<T>(driver: Driver, client: Client, id: Id): Prom
 export async function indexProps<T>(driver: Driver, client: Client): Promise<T> {
   const page = await driver.page(client, '/posts')
   expect(page.status, 'GET /posts').toBe(200)
-  expect(page.component).toBe(COMPONENTS[driver.name].index)
+  expect(page.component).toBe(driver.components.postIndex)
   return page.props as T
 }
 
@@ -62,7 +55,7 @@ export async function searchData(driver: Driver, client: Client, keyword: string
   if (driver.name === 'void') {
     const page = await driver.page(client, `/posts?q=${encodeURIComponent(keyword)}`)
     expect(page.status, 'GET /posts?q=').toBe(200)
-    expect(page.component).toBe(COMPONENTS.void.index)
+    expect(page.component).toBe(driver.components.postIndex)
     const data = page.props?.data
     expect(Array.isArray(data)).toBe(true)
     return data as PostProp[]

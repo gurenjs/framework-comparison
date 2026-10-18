@@ -30,15 +30,15 @@ guren:
    guren-cli               900 chars   2.1 calls
    edit-test               238 chars   1.2 calls
 void:
-   read-framework        14161 chars   4.3 calls
-   codegen/migrate        6811 chars   2.1 calls
+   read-framework        14534 chars   4.3 calls
+   codegen/migrate        6866 chars   2.2 calls
    edit-src               1195 chars   7.3 calls
-   typecheck              1100 chars   2.2 calls
    bash-read/other         898 chars   1.3 calls
+   typecheck               671 chars   2.1 calls
    read-src                124 chars   0.1 calls
-   guren-cli                 0 chars   0.0 calls
-   run-tests                 0 chars   0.0 calls
    edit-test                 0 chars   0.0 calls
+   run-tests                 0 chars   0.0 calls
+   guren-cli                 0 chars   0.0 calls
 
 ## 3. PostToolUse blocks (exit 2), by message
 

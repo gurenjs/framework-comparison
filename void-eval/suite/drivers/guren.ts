@@ -30,8 +30,10 @@ import type {
   NewPost,
   NewUser,
   PostView,
+  MutateOptions,
   PageResult,
   ProfileView,
+  Submit,
 } from './types.ts'
 
 interface InertiaPage {
@@ -42,12 +44,14 @@ interface InertiaPage {
 export class GurenDriver implements Driver {
   readonly name = 'guren'
   readonly capabilities = { profilePassword: true, integerUserIds: true }
+  readonly components = { postIndex: 'posts/Index', postShow: 'posts/Show' }
+  readonly formValidationStatus = 422
   private inertiaVersion: string | null = null
 
   constructor(readonly baseUrl: string) {}
 
   newClient(): Client {
-    return { jar: new CookieJar(), state: {} }
+    return { jar: new CookieJar() }
   }
 
   async raw(client: Client, method: string, path: string, init: RequestInit = {}): Promise<Response> {
@@ -68,9 +72,11 @@ export class GurenDriver implements Driver {
     if (!client.jar.has('XSRF-TOKEN')) throw new Error('guren driver: no XSRF-TOKEN cookie after GET /health')
   }
 
-  async mutate(client: Client, method: string, path: string, body?: unknown): Promise<MutationResult & { location: string | null }> {
+  // Guren never sends X-Inertia on mutations, so `opts.pages` changes nothing here.
+  async mutate(client: Client, method: string, path: string, body?: unknown, opts: MutateOptions = {}): Promise<Submit> {
     await this.ensureCsrf(client)
     const headers: Record<string, string> = {
+      ...opts.headers,
       'X-XSRF-TOKEN': decodeURIComponent(client.jar.get('XSRF-TOKEN')!),
       Accept: 'application/json',
     }
@@ -91,7 +97,7 @@ export class GurenDriver implements Driver {
       } catch {}
     }
     const location = res.headers.get('location')
-    return { status: res.status, ok: false, errors, bodyText, location: location ? new URL(location, this.baseUrl).pathname : null }
+    return { status: res.status, ok: false, errors, bodyText, location: location ? new URL(location, this.baseUrl).pathname : null, headers: res.headers }
   }
 
   /** GET an Inertia page as JSON. `page` is null when the response is not a 200 page object. */
@@ -155,9 +161,13 @@ export class GurenDriver implements Driver {
   }
 
   async deletePost(client: Client, id: Id): Promise<MutationResult> {
-    const { location: _location, ...rest } = await this.mutate(client, 'DELETE', `/posts/${id}`)
+    const res = await this.mutate(client, 'DELETE', `/posts/${id}`)
     // Guren's success contract (hidden test): a redirect, 302 or 303.
-    return { ...rest, ok: [302, 303].includes(rest.status) }
+    return { ...res, ok: [302, 303].includes(res.status) }
+  }
+
+  updatePost(client: Client, id: Id, data: Record<string, unknown>): Promise<Submit> {
+    return this.mutate(client, 'PUT', `/posts/${id}`, data)
   }
 
   async getPostStatus(client: Client, id: Id): Promise<number> {
@@ -174,7 +184,7 @@ export class GurenDriver implements Driver {
   async listPosts(client: Client, opts: { page?: number } = {}): Promise<ListResult> {
     const path = opts.page === undefined ? '/posts' : `/posts?page=${opts.page}`
     const { status, page } = await this.visitRaw(client, path)
-    if (status !== 200 || !page || page.component !== 'posts/Index') {
+    if (status !== 200 || !page || page.component !== this.components.postIndex) {
       throw new Error(`guren driver: GET ${path} did not return the posts/Index page (status ${status}, component ${page?.component})`)
     }
     const meta = page.props.pagination?.meta ?? {}
@@ -199,14 +209,20 @@ export class GurenDriver implements Driver {
   }
 
   async updateProfile(client: Client, body: Record<string, unknown>): Promise<MutationResult> {
-    const { location: _location, ...rest } = await this.mutate(client, 'PUT', '/profile', body)
+    const res = await this.mutate(client, 'PUT', '/profile', body)
     // Guren's contract (hidden test): validation failure is exactly 422 with
     // JSON `{ errors }` (errors are only parsed on 422); success is 200/302/303.
-    return { ...rest, ok: [200, 302, 303].includes(rest.status) }
+    return { ...res, ok: [200, 302, 303].includes(res.status) }
   }
 
   absentUserId(): Id {
     return 2_000_000_000
+  }
+
+  userIdByEmail(email: string): Id {
+    const rows = this.sql<{ id: Id }>('SELECT id FROM users WHERE email = ?', [email])
+    if (rows.length !== 1) throw new Error(`guren driver: no account row for ${email}`)
+    return rows[0]!.id
   }
 
   sql<T = Record<string, unknown>>(query: string, params: unknown[] = []): T[] {
@@ -218,6 +234,6 @@ export class GurenDriver implements Driver {
   /** Any page as `{ status, component, props, errors }`; component/props are null when the response is not a 200 page object. */
   async page(client: Client, path: string): Promise<PageResult> {
     const { status, page } = await this.visitRaw(client, path)
-    return { status, component: page?.component ?? null, props: page?.props ?? null, errors: ((page as any)?.errors ?? {}) as Record<string, unknown> }
+    return { status, component: page?.component ?? null, props: page?.props ?? null }
   }
 }

@@ -12,11 +12,9 @@
 
 import type { CookieJar } from '../lib/cookies.ts'
 
-/** One simulated browser: a cookie jar plus free-form per-driver state. */
+/** One simulated browser: a cookie jar. */
 export interface Client {
   jar: CookieJar
-  /** Driver-private scratch space (e.g. a cached token). Tests never read it. */
-  state: Record<string, unknown>
 }
 
 /** Record ids: Guren uses integer autoincrement ids, Void (Better Auth) string ids. Tests only compare them. */
@@ -95,8 +93,20 @@ export interface PageResult {
   status: number
   component: string | null
   props: Record<string, any> | null
-  /** Validation errors carried by the page object (Void); `{}` otherwise. */
-  errors: Record<string, unknown>
+}
+
+/** A submitted mutation: the result plus the redirect pathname (query dropped) and the response headers. */
+export type Submit = MutationResult & { location: string | null; headers: Headers }
+
+export interface MutateOptions {
+  /** Extra request headers (e.g. Referer), added after the framework's own; they cannot replace them. */
+  headers?: Record<string, string>
+  /**
+   * Send as the framework's page client (default) or as a plain JSON client
+   * (`false`: no X-VoidPages on Void; Guren never sends X-Inertia on
+   * mutations). Page-object validation errors are only read for page requests.
+   */
+  pages?: boolean
 }
 
 export interface DriverCapabilities {
@@ -118,6 +128,10 @@ export interface Driver {
   readonly name: string
   readonly baseUrl: string
   readonly capabilities: DriverCapabilities
+  /** Page component names of the base app's post list and post page. */
+  readonly components: { postIndex: string; postShow: string }
+  /** The status a page-form validation failure answers with (Guren 422 JSON, Void 200 page data). */
+  readonly formValidationStatus: number
 
   /** A fresh, signed-out browser with an empty cookie jar. */
   newClient(): Client
@@ -145,6 +159,12 @@ export interface Driver {
    * author's own delete.
    */
   deletePost(client: Client, id: Id): Promise<MutationResult>
+
+  /** Submit the edit-post form (Guren: PUT /posts/:id; Void: PUT /posts/:id?update) with `data` verbatim. */
+  updatePost(client: Client, id: Id, data: Record<string, unknown>): Promise<Submit>
+
+  /** The account id of a registered user, read from the base app's users table by email. Throws when there is no such row. */
+  userIdByEmail(email: string): Id
 
   /** Status of the post's public page (200 when it exists, 404 when not). */
   getPostStatus(client: Client, id: Id): Promise<number>
@@ -178,7 +198,8 @@ export interface Driver {
   /**
    * Escape hatch for public, framework-neutral endpoints whose contract is
    * itself under test (e.g. GET /api/posts). Uses the client's cookies,
-   * `redirect: 'manual'`, and adds nothing else.
+   * `redirect: 'manual'`, and adds no headers. (The Void driver re-sends once
+   * when `vp dev` answers with its own "fetch failed" page; see void.ts.)
    */
   raw(client: Client, method: string, path: string, init?: RequestInit): Promise<Response>
 
@@ -193,9 +214,10 @@ export interface Driver {
    * `mutate` submits a form the way the framework's client does (Guren:
    * CSRF header, JSON, no Inertia header -> 422 JSON on validation failure;
    * Void: Origin + X-VoidPages, validation failure -> 200 page JSON with
-   * errors). `ok` is always false here; callers decide success. `location`
-   * is the redirect pathname (query dropped). `page` reads page data.
+   * errors). A request refused by the framework's own CSRF/origin check
+   * throws (a harness bug, never app behaviour). `ok` is always false here;
+   * callers decide success. `page` reads page data.
    */
-  mutate(client: Client, method: string, path: string, body?: unknown): Promise<MutationResult & { location: string | null }>
+  mutate(client: Client, method: string, path: string, body?: unknown, opts?: MutateOptions): Promise<Submit>
   page(client: Client, path: string): Promise<PageResult>
 }

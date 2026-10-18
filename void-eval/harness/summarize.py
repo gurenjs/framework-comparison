@@ -11,15 +11,15 @@ A cell "verified" when it ran a typecheck at least once AFTER its last edit.
 Stop-hook runs/blocks are counted separately: Guren's shipped harness runs its
 gate from a Stop hook, which is not something the agent chose to do.
 """
-import glob, json, os, re, statistics, sys
+import glob, json, os, statistics, sys
 from collections import defaultdict
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from streams import GATE, TESTS, TYPECHECK, events, tool_uses  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(ROOT, 'results')
 
-TYPECHECK = re.compile(r'\btsc\b|\btypecheck\b|\bvoid prepare\b|\btsgo\b')
-TESTS = re.compile(r'\bbun test\b|\bvitest\b|\bvp test\b')
-GATE = re.compile(r'\bguren (check|gate|audit|doctor)\b')
 EDIT_TOOLS = {'Edit', 'Write', 'MultiEdit', 'NotebookEdit'}
 
 
@@ -29,21 +29,15 @@ def stream_facts(path):
     last_edit = last_tc = -1
     seen = set()
     i = 0
-    for line in open(path):
-        try:
-            e = json.loads(line)
-        except json.JSONDecodeError:
-            continue
+    for e in events(path):
         i += 1
         if e.get('type') == 'system' and e.get('subtype') == 'hook_response' and (e.get('hook_event') or e.get('hook_event_name')) == 'Stop':
             f['stop_runs'] += 1
             f['stop_blocks'] += e.get('exit_code') == 2
         if e.get('type') == 'system' and e.get('subtype') == 'permission_denied':
             f['denials'] += 1
-        if e.get('type') != 'assistant':
-            continue
-        for c in (e.get('message') or {}).get('content') or []:
-            if not isinstance(c, dict) or c.get('type') != 'tool_use' or c.get('id') in seen:
+        for c in tool_uses(e):
+            if c.get('id') in seen:
                 continue
             seen.add(c.get('id'))
             name, inp = c.get('name'), c.get('input') or {}

@@ -1,7 +1,7 @@
 // Port of agents-on-guren tasks/json-api-tokens/hidden/json-api-tokens.test.ts
 // (10 cases, the same as the hidden test). Framework differences live in
 // drivers/ext/json-api-tokens.ts.
-import { afterAll, beforeAll, describe, expect, it } from 'bun:test'
+import { beforeAll, describe, expect, it } from 'bun:test'
 import { loadDriver } from '../drivers/index.ts'
 import type { Driver, Id } from '../drivers/types.ts'
 import { makeUser, type TestUser } from '../lib/fixtures.ts'
@@ -9,7 +9,6 @@ import {
   apiRequest,
   apiTokenCells,
   apiTokenRows,
-  devServerRetries,
   findPost,
   insertPost,
   isJson,
@@ -45,11 +44,6 @@ let driver: Driver
 
 beforeAll(() => {
   driver = loadDriver()
-})
-
-afterAll(() => {
-  // Void only: requests re-sent after the dev server's own "fetch failed" page (see the ext file).
-  if (devServerRetries() > 0) console.log(`suite: ${devServerRetries()} request(s) re-sent after a dev-server "fetch failed" page`)
 })
 
 function postToken(user: TestUser, name: unknown): Promise<Sent> {

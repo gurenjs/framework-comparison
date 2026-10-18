@@ -33,14 +33,15 @@ SUITE_DRIVER=guren SUITE_BASE_URL=http://127.0.0.1:4100 bun test --timeout 30000
   * Deletes `data/suite.db*` and starts `bun bin/serve.ts` with `NODE_ENV=production`, `GUREN_STRICT_PORT=1`, `APP_URL=http://127.0.0.1:<port>` and `DATABASE_URL=./data/suite.db`.
   * Production mode applies migrations on boot and does **not** seed. Every run therefore starts on a migrated, empty database.
   * Polls `/health`, checks the PID is still alive, and prints the PID. The server log is `<app>/data/suite-server.log`. Set `SUITE_REBUILD=1` to force the vite build.
-* `boot-void.sh` has not been written yet. It must give the same guarantees: a fresh, empty, migrated DB, a ready server, and the PID on stdout.
+* `boot-void.sh <app> <port>` starts `vp dev` (Void's local runtime: miniflare, local D1, no Cloudflare account) on an emptied local state (`.void/v3` removed), waits for `/posts` to answer 200, which also means the migrations ran, and prints the PID. It retries a stalled cold start up to 3 times.
+* Void runs hold a machine-wide lock (`/tmp/void-suite.lock`) from boot to shutdown in `run.sh`, because two `vp dev` servers at once collide. Never start a Void server outside `run.sh` while a validation or a matrix is running.
 * There are no dependencies beyond bun built-ins (`bun:test`, `fetch`).
 
 Some tests require an empty posts table at start: pagination and API. They check `meta.total === 0` on the post list first and throw a clear harness error otherwise, so leftover rows can't skew the counts. All other tests register fresh users with unique emails, so they are independent of each other and of reruns.
 
 ## Driver contract (`drivers/types.ts`)
 
-The driver is selected by `SUITE_DRIVER=guren|void` and gets its base URL from `SUITE_BASE_URL`. `drivers/index.ts` expects `drivers/void.ts` to export `class VoidDriver implements Driver { constructor(baseUrl: string) }`.
+The driver is selected by `SUITE_DRIVER=guren|void` and gets its base URL from `SUITE_BASE_URL`. `drivers/index.ts` returns a `GurenDriver` or a `VoidDriver`.
 
 * **Every request** uses `redirect: 'manual'`, so 302 and 303 stay observable. Every request also goes through the `Client`'s cookie jar (`lib/cookies.ts`).
 * **Ids** are `Id = string | number`. Tests only compare ids; they never do arithmetic on them.
@@ -147,3 +148,15 @@ The extra, `tests/extras/api-posts-contract.integer-author.test.ts`, runs only w
 5. Removes the worktree.
 
 Logs go to `/tmp/suite-validate-logs/`. For the results, see the report that accompanied this suite. On the last run, every task failed seeded and passed with the reference patch, 2/2 each.
+
+## Stage 2 tickets and the generic driver API
+
+The five Stage 2 tickets (post-tags, comments-moderation, post-revisions, json-api-tokens, scheduled-publish) add a test per ticket and a helper file `drivers/ext/<ticket>.ts`. The helpers branch on `driver.name` only for what the ticket's statements pin differently, such as a named action URL or a JSON validation status. Everything about the base app goes through the driver:
+
+* `mutate(client, method, path, body?, { headers?, pages? })` sends a form submission the way the framework's client does: the CSRF header on Guren, `Origin` (+ `X-VoidPages` unless `pages: false`) on Void. It returns `{ status, ok, errors, bodyText, location, headers }`. A refusal by the framework's own CSRF or origin check throws, because it is a harness bug. On Void the check is matched exactly: `Cross-origin page actions are not allowed.` or a Better Auth `MISSING_OR_NULL_ORIGIN` / `INVALID_ORIGIN` code.
+* `page(client, path)` returns `{ status, component, props }` through the page-data protocol.
+* `updatePost`, `userIdByEmail`, `components.{postIndex,postShow}` and `formValidationStatus` are base-app facts the tickets share.
+* `sql(query, params)` runs SQL on the app's SQLite (`lib/db.ts`): Guren `data/suite.db`, Void's local D1 file. The running Void dev server sees outside writes at once. Use it only for the tables a ticket pins.
+* The Void driver's `raw` re-sends a request once when `vp dev` answers with its own HTML "fetch failed" page instead of reaching the Worker. That happens after a handler answered without reading the request body. The re-send is logged to the console.
+
+Each ticket's statement differences, the case-by-case mapping to the hidden test, and its validation results are in `../tasks/<ticket>/PORTING.md`.
