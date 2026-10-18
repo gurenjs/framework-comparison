@@ -1,0 +1,8 @@
+# harness/probe-context.sh guren ... (2026-10-19). Columns as printed by the first version of the
+# script were swapped; corrected here: input tokens of the last model call, then file size in chars.
+(start)                                 input_tokens=35602  file_chars=-
+README.md                               input_tokens=36258  file_chars=1163
+.env.example                            input_tokens=35996  file_chars=481
+app/Http/Controllers/PostController.ts  input_tokens=44060  file_chars=3841
+app/Models/Post.ts                      input_tokens=42737  file_chars=699
+tests/PostController.test.ts            input_tokens=40334  file_chars=806

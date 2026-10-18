@@ -162,30 +162,45 @@ leading newline. The same patch was regraded after the fix and passed
 
 - **UI:** both arms changed the same number of UI files on every ticket, so
   neither arm skipped the forms.
-- **Size of the change:** the median patch adds 511 lines on Guren and 613 on
+- **Size of the change:** the median patch adds 538 lines on Guren and 620 on
   Void. The Void cells did the same work for half the tokens.
 
 ### Where Guren's extra tokens go
 
 The gap is mostly context per turn, not turns: about 49k input tokens per
-turn on Guren against 25k on Void. Reading the cells' event streams (scripts
-under `void-eval/harness/`), it breaks down like this:
+turn on Guren against 25k on Void. Reading the cells' event streams with `harness/analyze.py` (output in
+`results/ANALYSIS-STAGE2.md`) and `harness/probe-context.sh`, it breaks
+down like this. Items 1, 2, 4, 5 and 6 are measured. Item 3 is inferred from
+tool-output sizes.
 
 1. **Session start: +7k tokens.** A one-turn probe in each start state
    measured 35.6k on Guren (CLAUDE.md, SessionStart "Project Context", 10
    skill descriptions) and 28.4k on Void. Every turn carries it.
-2. **Path-scoped rules that attach mid-session: up to +11k.** The six rules
-   total 43k characters (`controllers-http` 10k, `orm-models` 10k, `testing`
-   9k, …). A ticket that reads controllers, models, routes and tests ends
-   with all of them attached.
-   - In the `post-tags` trace, a single `cat` of four Guren files added 15.5k
-     tokens. On Void the largest single jump was 6k.
+2. **Path-scoped rules that attach mid-session: about 4–8k per kind of
+   file.** The six rules total 43k characters (`controllers-http` 10k,
+   `orm-models` 10k, `testing` 9k, …). `probe-context.sh` reads one file in
+   the Guren start state and reports the context afterwards
+   (`logs/probe-context-guren-2026-10-19.log`):
+
+   | file read | file size | context after the read |
+   |---|---|---|
+   | README.md | 1.2k chars | +0.7k tokens (the file alone) |
+   | app/Http/Controllers/PostController.ts | 3.8k chars | +8.5k |
+   | app/Models/Post.ts | 0.7k chars | +7.1k |
+   | tests/PostController.test.ts | 0.8k chars | +4.7k |
+
+   A ticket that touches controllers, models, routes and tests carries all of
+   them on every later turn. In the `post-tags` trace, one `cat` of four
+   Guren files added 15.5k tokens; on Void the largest single jump was 6k.
 3. **A bigger app to read.** Guren cells' file reads and `cat`s returned
    about 13k characters per cell; Void cells' returned 2k. This is mostly
    the confound above.
 4. **Tests the agents wrote.** Guren agents added tests in 11/15 cells and
    ran `bun test` in 15/15. Void agents wrote none: the app has no test
-   runner, and the Void docs describe no testing story for apps.
+   runner, and the Void docs describe no testing story for apps. Part of
+   this is the eval's design, not Guren's nature: the Guren preamble's
+   definition of done says "`bun test` (the project's existing test suite,
+   plus any tests you add) passes", and the Void preamble has no such line.
    - The ticket without tests shows the size of this effect. post-revisions
      had no test cells and only a 1.17× token gap. post-tags and
      comments-moderation had tests in every Guren cell and gaps of 2.7× and
@@ -204,22 +219,28 @@ under `void-eval/harness/`), it breaks down like this:
      had wired a route before writing the schema or controller it imports.
    - oxlint "imported but never used" warnings on a half-written file.
 
-   The agent's next action after a block was almost always the edit it had
-   planned anyway. These blocks cost context and caught nothing a later
-   check would have missed.
+   After most blocks the agent's next action was the edit it had planned
+   anyway. One kind of block is different: "routes/api.ts exports a route
+   registrar that nothing reachable from routes/web.ts calls". That is a
+   real defect a typecheck does not catch. It fired 3 times, all in one
+   json-api-tokens cell, and the agent wired `routes/web.ts` within its next
+   three edits. The stream cannot tell whether the agent would have done so
+   unprompted.
 
 ### Verification: done, but no visible effect on the outcome
 
-- **Tests:** in no Guren cell did a failing `bun test` lead to a source
-  change (0/15). The tests the agents wrote passed on the first run, or
-  failed for reasons inside the test itself.
+- **Tests:** as far as the (often `| tail`-truncated) outputs show, in no
+  Guren cell did a failing `bun test` lead to a source change (0/15).
 - **The gate:** the Stop-hook gate ran in all 15 Guren cells and blocked 0.
+- **Edit-time checks:** the PostToolUse check caught one real defect, an
+  unmounted route file (see 6 above). That is the only observed case where
+  Guren's verification may have changed the result.
 - **Booting the app:** no agent in either arm started the app to check its
   work.
 - **Typecheck:** every cell in both arms ran it.
 
 On Sonnet 5.5 and these tickets, Guren's extra verification bought no
-difference in pass rate. The black-box suite passed Void's unverified
+measurable difference in pass rate. The black-box suite passed Void's unverified
 patches just as often. The verification pitch may still pay where models make
 more mistakes. In agents-on-guren Stage 2, Haiku 4.5 moved from 30% bare to
 44% shipped. A Haiku run of this comparison is the experiment that could show
@@ -280,7 +301,8 @@ pagination-skips-page, raw-body-no-validation, api-posts-contract): 8/8 pass.
 
 ## Where Guren could do better (proposals for gurenjs)
 
-Ordered by measured effect in this round:
+Ordered by effect in this round. Items 1–5 rest on measurements; items 6
+and 7 are judgement.
 
 1. **Document the API-token and rate-limit story where the agent looks.**
    json-api-tokens cost 4.5× Void's tokens, and the agents spent it grepping
@@ -294,23 +316,30 @@ Ordered by measured effect in this round:
 
    More generally, `guren check` could log which `@guren/*` dist files agents
    open (in eval mode) to find more gaps of this kind.
-2. **Make path-scoped rules cheaper.** Six rules at 43k characters can add
-   about 11k tokens to every later turn of a feature ticket. Ideas:
+2. **Make path-scoped rules cheaper.** Reading one controller or model adds
+   about 7–8k tokens of rules that stay for the rest of the session
+   (measured above). A feature ticket ends up with most of the six attached.
+   Ideas:
    - split each rule into a short always-true core and a reference section
      the agent reads on demand;
    - narrow the `paths:` globs, for example `testing.md` only for `tests/**`
      and not every `*.ts`;
    - check for overlap with CLAUDE.md and the SessionStart context.
-3. **Stop blocking on mid-edit states in PostToolUse.** 33 blocks in 15
-   cells, mostly a route graph that cannot load yet or unused imports in a
-   half-written file. Options:
+3. **Stop blocking on mid-edit states in PostToolUse.** There were 33 blocks
+   in 15 cells. Most were a route graph that cannot load yet, or unused
+   imports in a half-written file. Keep the blocks that catch real defects,
+   such as the unmounted-routes check, which found the one real defect in
+   this round. Options for the rest:
    - report "route graph failed to load: X is not defined" as non-blocking
      context, and leave it to the Stop gate, which runs on the finished
      change;
    - drop oxlint warnings (not errors) from the blocking set.
 4. **Decide what the tests are for, and make them earn their cost.** Guren
    agents wrote tests in 11/15 cells, which roughly doubled tokens on those
-   tickets. No test changed an outcome. Two options:
+   tickets. No test changed an outcome. Part of the cause is this eval's
+   prompt, which asks for passing tests only on Guren. A fairer next round
+   should either ask both arms for tests or neither. Two options for
+   Guren:
    - **keep them as a deliverable**, and say so in the report and the
      product pitch: "Guren agents leave tests behind; Void agents do not";
    - **make them cheaper**, for example a test-scaffold command that writes
@@ -335,13 +364,16 @@ Ordered by measured effect in this round:
 
 ```bash
 cd void-eval
-# fixture gate (both apps; seeded/start must fail, reference must pass)
+# fixture gate (both apps; the start state must fail, the reference must pass)
 SUITE_PORT=4100 bash suite/validate-guren.sh post-tags comments-moderation post-revisions json-api-tokens scheduled-publish
 SUITE_PORT=4200 bash suite/validate-void.sh  post-tags comments-moderation post-revisions json-api-tokens scheduled-publish
 # the matrix (trial-outermost, resumable, verifies after each cell)
 SUITE_PORT=4300 bash harness/run-matrix.sh --tasks post-tags,comments-moderation,post-revisions,json-api-tokens,scheduled-publish \
   --arms guren,void --models claude-sonnet-5-5 --trials 3
-python3 harness/summarize.py --out results/RESULTS.md
+python3 harness/summarize.py --out results/RESULTS.md      # per-cell verdicts and verification columns
+python3 harness/analyze.py > results/ANALYSIS-STAGE2.md    # the tables in this report (needs the streams)
+bash harness/probe-context.sh guren README.md app/Http/Controllers/PostController.ts app/Models/Post.ts
+bash harness/probe-context.sh void                         # start context only
 ```
 
 Requirements:
@@ -357,5 +389,6 @@ Requirements:
 - `patch`, `result.json`, `meta.json`
 - `verdict.json`, `suite.log`, `typecheck.log`
 
-Event streams (`*.stream.jsonl`) are gitignored. Attach them to a release if
-the PR is merged.
+Event streams (`*.stream.jsonl`) are gitignored. They are packed as
+`void-eval-streams-2026-10-19.tar.zst`. Unpack it into `void-eval/`
+before running `analyze.py`.
