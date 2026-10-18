@@ -53,7 +53,17 @@ export class VoidDriver implements Driver {
     const headers = new Headers(init.headers)
     const cookie = client.jar.header()
     if (cookie) headers.set('Cookie', cookie)
-    const res = await fetch(new URL(path, this.baseUrl), { ...init, method, headers, redirect: 'manual' })
+    const send = () => fetch(new URL(path, this.baseUrl), { ...init, method, headers, redirect: 'manual' })
+    let res = await send()
+    // `vp dev` sometimes answers the request after one whose body the app
+    // never read with Vite's own HTML error page ("fetch failed") instead of
+    // forwarding it to the app; the request never reaches the Worker (the
+    // json-api-tokens port checked row counts and rate-limit tallies). That is
+    // the dev server, not the app under test, so retry exactly that once.
+    if (res.status === 500 && !res.headers.get('content-type')) {
+      const text = await res.clone().text()
+      if (/^<!DOCTYPE html>/i.test(text) && text.includes('"message":"fetch failed"')) res = await send()
+    }
     client.jar.store(res)
     return res
   }
