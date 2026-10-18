@@ -62,7 +62,7 @@ export class VoidDriver implements Driver {
     // the dev server, not the app under test, so retry exactly that once.
     if (res.status === 500 && !res.headers.get('content-type')) {
       const text = await res.clone().text()
-      if (/^<!DOCTYPE html>/i.test(text) && text.includes('"message":"fetch failed"')) res = await send()
+      if (/^\s*<!DOCTYPE html>/i.test(text) && text.includes('"message":"fetch failed"')) res = await send()
     }
     client.jar.store(res)
     return res
