@@ -6,7 +6,7 @@ same black-box acceptance test can grade an AI agent's work on two apps:
 - the Guren blog app `agents-on-guren-app`, commit 0fd1654, after `bun update`
 - the Void blog app `void-eval/app`, written on Void 1.1.11
 
-Work only in `/Users/daiki/Development/framework-comparison-void-eval/void-eval`,
+Work only in `~/Development/framework-comparison-void-eval/void-eval`,
 and only in the files listed under "What you own". Do not commit, push, or edit
 any other file. That includes `suite/drivers/{types,guren,void}.ts`,
 `suite/lib/*`, `suite/run.sh`, `suite/boot-*.sh`, `harness/*` and `app/*`.
@@ -15,9 +15,9 @@ shared file, stop and report it.
 
 ## Read first
 
-- `/Users/daiki/Development/agents-on-guren/CORPUS-STAGE2.md`, the section for
+- `~/Development/agents-on-guren/CORPUS-STAGE2.md`, the section for
   your ticket.
-- `/Users/daiki/Development/agents-on-guren/tasks/<id>/`:
+- `~/Development/agents-on-guren/tasks/<id>/`:
   - `statement.md`
   - `hidden/*.ts`: the in-process tests to port
   - `reference.patch`: the Guren solution

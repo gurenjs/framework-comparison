@@ -22,9 +22,9 @@ error: void driver: register user-mvdvkoyifdrq-6@example.com failed: 500
             <title>Error</title>
             <script type="module">
               const error = {"message":"fetch failed","stack":"    at Object.processResponse (/private/tmp/ve-worktrees/verify-j
-      at register (/Users/daiki/Development/framework-comparison-void-eval/void-eval/suite/drivers/void.ts:126:17)
-      at async makeUser (/Users/daiki/Development/framework-comparison-void-eval/void-eval/suite/lib/fixtures.ts:27:16)
-      at async <anonymous> (/Users/daiki/Development/framework-comparison-void-eval/void-eval/suite/tests/json-api-tokens.test.ts:133:24)
+      at register (~/Development/framework-comparison-void-eval/void-eval/suite/drivers/void.ts:126:17)
+      at async makeUser (~/Development/framework-comparison-void-eval/void-eval/suite/lib/fixtures.ts:27:16)
+      at async <anonymous> (~/Development/framework-comparison-void-eval/void-eval/suite/tests/json-api-tokens.test.ts:133:24)
 (fail) personal API tokens > revokes a token with 204, after which it is refused while the owner's other tokens keep working [182.59ms]
 suite: 1 request(s) re-sent after a dev-server "fetch failed" page
 
