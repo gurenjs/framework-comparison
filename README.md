@@ -150,6 +150,16 @@ path**, with a 1.8× faster cold start (GitHub Actions, medians of 5 rounds).
 Methodology, caveats, and how to reproduce it yourself with one click:
 [BENCHMARK.md](./BENCHMARK.md).
 
+## Typecheck cost
+
+A separate benchmark generates 100/300/500 API endpoints and measures what
+they add to `tsc --noEmit` on TypeScript 7. At 500 endpoints Guren's codegen
+adds 396k instantiations, close to Void's 351k and 12× fewer than a chained
+Hono RPC app (4.87M); both codegen stacks grow linearly. Guren's check time
+(+0.33 s) trails Void's (+0.22 s), and the attribution traces that to the
+routes registrar rather than the generated types. Tables, attribution, and
+the gurenjs changes it suggests: [TYPECHECK.md](./TYPECHECK.md).
+
 ## Fairness
 
 Each implementation is written idiomatically, the way its framework's own

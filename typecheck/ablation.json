@@ -1,0 +1,449 @@
+{
+  "generatedAt": "2026-10-18T02:13:57.529Z",
+  "n": 500,
+  "runs": 3,
+  "variants": [
+    {
+      "stack": "guren",
+      "variant": "baseline",
+      "description": "scaffold, 0 endpoints",
+      "n": 0,
+      "instantiations": 8081,
+      "types": 7247,
+      "checkTime": 0.011,
+      "totalTime": 0.102,
+      "memoryKB": 156919,
+      "runs": [
+        {
+          "instantiations": 8081,
+          "types": 7247,
+          "checkTime": 0.01,
+          "totalTime": 0.095,
+          "memoryKB": 156861
+        },
+        {
+          "instantiations": 8081,
+          "types": 7247,
+          "checkTime": 0.011,
+          "totalTime": 0.106,
+          "memoryKB": 156919
+        },
+        {
+          "instantiations": 8081,
+          "types": 7247,
+          "checkTime": 0.011,
+          "totalTime": 0.102,
+          "memoryKB": 156942
+        }
+      ]
+    },
+    {
+      "stack": "guren",
+      "variant": "full",
+      "description": "N endpoints, api client + route() + typed <Link> consumers",
+      "n": 500,
+      "instantiations": 403816,
+      "types": 119478,
+      "checkTime": 0.312,
+      "totalTime": 0.411,
+      "memoryKB": 328233,
+      "runs": [
+        {
+          "instantiations": 403816,
+          "types": 119478,
+          "checkTime": 0.345,
+          "totalTime": 0.473,
+          "memoryKB": 328090
+        },
+        {
+          "instantiations": 403816,
+          "types": 119478,
+          "checkTime": 0.312,
+          "totalTime": 0.41,
+          "memoryKB": 328233
+        },
+        {
+          "instantiations": 403816,
+          "types": 119478,
+          "checkTime": 0.312,
+          "totalTime": 0.411,
+          "memoryKB": 328331
+        }
+      ]
+    },
+    {
+      "stack": "guren",
+      "variant": "server-only",
+      "description": "no client consumer files (routes, controllers, contracts, generated files only)",
+      "n": 500,
+      "instantiations": 244071,
+      "types": 91930,
+      "checkTime": 0.287,
+      "totalTime": 0.392,
+      "memoryKB": 283411,
+      "runs": [
+        {
+          "instantiations": 244071,
+          "types": 91930,
+          "checkTime": 0.302,
+          "totalTime": 0.4,
+          "memoryKB": 283411
+        },
+        {
+          "instantiations": 244071,
+          "types": 91930,
+          "checkTime": 0.287,
+          "totalTime": 0.392,
+          "memoryKB": 283429
+        },
+        {
+          "instantiations": 244071,
+          "types": 91930,
+          "checkTime": 0.278,
+          "totalTime": 0.385,
+          "memoryKB": 283374
+        }
+      ]
+    },
+    {
+      "stack": "guren",
+      "variant": "no-links",
+      "description": "drop Links.tsx (typed <Link> + route())",
+      "n": 500,
+      "instantiations": 302847,
+      "types": 106627,
+      "checkTime": 0.292,
+      "totalTime": 0.389,
+      "memoryKB": 300598,
+      "runs": [
+        {
+          "instantiations": 302847,
+          "types": 106627,
+          "checkTime": 0.276,
+          "totalTime": 0.382,
+          "memoryKB": 300583
+        },
+        {
+          "instantiations": 302847,
+          "types": 106627,
+          "checkTime": 0.294,
+          "totalTime": 0.39,
+          "memoryKB": 300671
+        },
+        {
+          "instantiations": 302847,
+          "types": 106627,
+          "checkTime": 0.292,
+          "totalTime": 0.389,
+          "memoryKB": 300598
+        }
+      ]
+    },
+    {
+      "stack": "guren",
+      "variant": "no-api-client",
+      "description": "drop api.ts (createApiClient().request())",
+      "n": 500,
+      "instantiations": 344903,
+      "types": 107398,
+      "checkTime": 0.297,
+      "totalTime": 0.394,
+      "memoryKB": 311809,
+      "runs": [
+        {
+          "instantiations": 344903,
+          "types": 107398,
+          "checkTime": 0.297,
+          "totalTime": 0.394,
+          "memoryKB": 311790
+        },
+        {
+          "instantiations": 344903,
+          "types": 107398,
+          "checkTime": 0.283,
+          "totalTime": 0.389,
+          "memoryKB": 311809
+        },
+        {
+          "instantiations": 344903,
+          "types": 107398,
+          "checkTime": 0.303,
+          "totalTime": 0.404,
+          "memoryKB": 311814
+        }
+      ]
+    },
+    {
+      "stack": "guren",
+      "variant": "no-href-union",
+      "description": "types/generated/routes.d.ts: RoutePath union → string (Inertia href augmentation)",
+      "n": 500,
+      "instantiations": 403816,
+      "types": 119478,
+      "checkTime": 0.307,
+      "totalTime": 0.402,
+      "memoryKB": 328078,
+      "runs": [
+        {
+          "instantiations": 403816,
+          "types": 119478,
+          "checkTime": 0.315,
+          "totalTime": 0.412,
+          "memoryKB": 328078
+        },
+        {
+          "instantiations": 403816,
+          "types": 119478,
+          "checkTime": 0.29,
+          "totalTime": 0.395,
+          "memoryKB": 328088
+        },
+        {
+          "instantiations": 403816,
+          "types": 119478,
+          "checkTime": 0.307,
+          "totalTime": 0.402,
+          "memoryKB": 327991
+        }
+      ]
+    },
+    {
+      "stack": "guren",
+      "variant": "no-contract-augmentation",
+      "description": "routes.gen.ts: drop `declare module '@guren/core'` (validated() untyped)",
+      "n": 500,
+      "instantiations": 391678,
+      "types": 115621,
+      "checkTime": 0.314,
+      "totalTime": 0.415,
+      "memoryKB": 324150,
+      "runs": [
+        {
+          "instantiations": 391678,
+          "types": 115621,
+          "checkTime": 0.311,
+          "totalTime": 0.41,
+          "memoryKB": 324150
+        },
+        {
+          "instantiations": 391678,
+          "types": 115621,
+          "checkTime": 0.315,
+          "totalTime": 0.415,
+          "memoryKB": 324140
+        },
+        {
+          "instantiations": 391678,
+          "types": 115621,
+          "checkTime": 0.314,
+          "totalTime": 0.42,
+          "memoryKB": 324221
+        }
+      ]
+    },
+    {
+      "stack": "void",
+      "variant": "baseline",
+      "description": "0 endpoints",
+      "n": 0,
+      "instantiations": 1,
+      "types": 351,
+      "checkTime": 0,
+      "totalTime": 0.053,
+      "memoryKB": 88577,
+      "runs": [
+        {
+          "instantiations": 1,
+          "types": 351,
+          "checkTime": 0.002,
+          "totalTime": 0.078,
+          "memoryKB": 88678
+        },
+        {
+          "instantiations": 1,
+          "types": 351,
+          "checkTime": 0,
+          "totalTime": 0.053,
+          "memoryKB": 88511
+        },
+        {
+          "instantiations": 1,
+          "types": 351,
+          "checkTime": 0,
+          "totalTime": 0.047,
+          "memoryKB": 88577
+        }
+      ]
+    },
+    {
+      "stack": "void",
+      "variant": "full",
+      "description": "N endpoints + typed fetch consumer",
+      "n": 500,
+      "instantiations": 351262,
+      "types": 84989,
+      "checkTime": 0.197,
+      "totalTime": 0.303,
+      "memoryKB": 242924,
+      "runs": [
+        {
+          "instantiations": 351262,
+          "types": 84989,
+          "checkTime": 0.216,
+          "totalTime": 0.343,
+          "memoryKB": 242924
+        },
+        {
+          "instantiations": 351262,
+          "types": 84989,
+          "checkTime": 0.197,
+          "totalTime": 0.303,
+          "memoryKB": 242908
+        },
+        {
+          "instantiations": 351262,
+          "types": 84989,
+          "checkTime": 0.176,
+          "totalTime": 0.295,
+          "memoryKB": 242945
+        }
+      ]
+    },
+    {
+      "stack": "void",
+      "variant": "server-only",
+      "description": "no typed fetch consumer",
+      "n": 500,
+      "instantiations": 99851,
+      "types": 42900,
+      "checkTime": 0.049,
+      "totalTime": 0.151,
+      "memoryKB": 200912,
+      "runs": [
+        {
+          "instantiations": 99851,
+          "types": 42900,
+          "checkTime": 0.035,
+          "totalTime": 0.148,
+          "memoryKB": 200886
+        },
+        {
+          "instantiations": 99851,
+          "types": 42900,
+          "checkTime": 0.053,
+          "totalTime": 0.16,
+          "memoryKB": 200912
+        },
+        {
+          "instantiations": 99851,
+          "types": 42900,
+          "checkTime": 0.049,
+          "totalTime": 0.151,
+          "memoryKB": 200931
+        }
+      ]
+    },
+    {
+      "stack": "hono-chain",
+      "variant": "baseline",
+      "description": "0 endpoints",
+      "n": 0,
+      "instantiations": 141015,
+      "types": 77378,
+      "checkTime": 0.046,
+      "totalTime": 0.074,
+      "memoryKB": 61426,
+      "runs": [
+        {
+          "instantiations": 141015,
+          "types": 77378,
+          "checkTime": 0.047,
+          "totalTime": 0.087,
+          "memoryKB": 61479
+        },
+        {
+          "instantiations": 141015,
+          "types": 77378,
+          "checkTime": 0.044,
+          "totalTime": 0.071,
+          "memoryKB": 61426
+        },
+        {
+          "instantiations": 141015,
+          "types": 77378,
+          "checkTime": 0.046,
+          "totalTime": 0.074,
+          "memoryKB": 61400
+        }
+      ]
+    },
+    {
+      "stack": "hono-chain",
+      "variant": "full",
+      "description": "N endpoints + hc client consumer",
+      "n": 500,
+      "instantiations": 5012632,
+      "types": 661876,
+      "checkTime": 2.31,
+      "totalTime": 2.338,
+      "memoryKB": 349974,
+      "runs": [
+        {
+          "instantiations": 5012632,
+          "types": 661876,
+          "checkTime": 2.315,
+          "totalTime": 2.343,
+          "memoryKB": 349940
+        },
+        {
+          "instantiations": 5012632,
+          "types": 661876,
+          "checkTime": 2.287,
+          "totalTime": 2.315,
+          "memoryKB": 349995
+        },
+        {
+          "instantiations": 5012632,
+          "types": 661876,
+          "checkTime": 2.31,
+          "totalTime": 2.338,
+          "memoryKB": 349974
+        }
+      ]
+    },
+    {
+      "stack": "hono-chain",
+      "variant": "server-only",
+      "description": "no hc client consumer",
+      "n": 500,
+      "instantiations": 2115529,
+      "types": 278246,
+      "checkTime": 0.739,
+      "totalTime": 0.764,
+      "memoryKB": 151646,
+      "runs": [
+        {
+          "instantiations": 2115529,
+          "types": 278246,
+          "checkTime": 0.734,
+          "totalTime": 0.762,
+          "memoryKB": 151649
+        },
+        {
+          "instantiations": 2115529,
+          "types": 278246,
+          "checkTime": 0.739,
+          "totalTime": 0.764,
+          "memoryKB": 151646
+        },
+        {
+          "instantiations": 2115529,
+          "types": 278246,
+          "checkTime": 0.741,
+          "totalTime": 0.769,
+          "memoryKB": 151576
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,529 @@
+{
+  "generatedAt": "2026-10-18T02:12:09.593Z",
+  "runs": 3,
+  "host": "darwin-arm64",
+  "stacks": {
+    "guren": {
+      "versions": {
+        "typescript": "7.0.2",
+        "zod": "4.6.7",
+        "hono": "4.13.13",
+        "@guren/core": "1.24.0",
+        "@guren/cli": "2.31.1",
+        "@guren/inertia-client": "1.2.2"
+      },
+      "counts": {
+        "0": {
+          "instantiations": 8081,
+          "types": 7247,
+          "checkTime": 0.011,
+          "totalTime": 0.116,
+          "memoryKB": 156958,
+          "runs": [
+            {
+              "instantiations": 8081,
+              "types": 7247,
+              "checkTime": 0.019,
+              "totalTime": 0.176,
+              "memoryKB": 156963
+            },
+            {
+              "instantiations": 8081,
+              "types": 7247,
+              "checkTime": 0.011,
+              "totalTime": 0.116,
+              "memoryKB": 156857
+            },
+            {
+              "instantiations": 8081,
+              "types": 7247,
+              "checkTime": 0.011,
+              "totalTime": 0.097,
+              "memoryKB": 156958
+            }
+          ]
+        },
+        "100": {
+          "instantiations": 94416,
+          "types": 31904,
+          "checkTime": 0.074,
+          "totalTime": 0.166,
+          "memoryKB": 199085,
+          "runs": [
+            {
+              "instantiations": 94416,
+              "types": 31904,
+              "checkTime": 0.075,
+              "totalTime": 0.166,
+              "memoryKB": 199092
+            },
+            {
+              "instantiations": 94416,
+              "types": 31904,
+              "checkTime": 0.067,
+              "totalTime": 0.166,
+              "memoryKB": 198936
+            },
+            {
+              "instantiations": 94416,
+              "types": 31904,
+              "checkTime": 0.074,
+              "totalTime": 0.165,
+              "memoryKB": 199085
+            }
+          ]
+        },
+        "300": {
+          "instantiations": 249116,
+          "types": 75696,
+          "checkTime": 0.2,
+          "totalTime": 0.3,
+          "memoryKB": 265155,
+          "runs": [
+            {
+              "instantiations": 249116,
+              "types": 75696,
+              "checkTime": 0.2,
+              "totalTime": 0.3,
+              "memoryKB": 265052
+            },
+            {
+              "instantiations": 249116,
+              "types": 75696,
+              "checkTime": 0.206,
+              "totalTime": 0.302,
+              "memoryKB": 265155
+            },
+            {
+              "instantiations": 249116,
+              "types": 75696,
+              "checkTime": 0.171,
+              "totalTime": 0.274,
+              "memoryKB": 265203
+            }
+          ]
+        },
+        "500": {
+          "instantiations": 403816,
+          "types": 119478,
+          "checkTime": 0.345,
+          "totalTime": 0.453,
+          "memoryKB": 328345,
+          "runs": [
+            {
+              "instantiations": 403816,
+              "types": 119478,
+              "checkTime": 0.345,
+              "totalTime": 0.453,
+              "memoryKB": 328204
+            },
+            {
+              "instantiations": 403816,
+              "types": 119478,
+              "checkTime": 0.313,
+              "totalTime": 0.414,
+              "memoryKB": 328362
+            },
+            {
+              "instantiations": 403816,
+              "types": 119478,
+              "checkTime": 0.347,
+              "totalTime": 0.464,
+              "memoryKB": 328345
+            }
+          ]
+        }
+      }
+    },
+    "void": {
+      "versions": {
+        "typescript": "7.0.2",
+        "zod": "4.6.7",
+        "hono": "4.13.13",
+        "void": "1.1.11"
+      },
+      "counts": {
+        "0": {
+          "instantiations": 1,
+          "types": 351,
+          "checkTime": 0,
+          "totalTime": 0.064,
+          "memoryKB": 88535,
+          "runs": [
+            {
+              "instantiations": 1,
+              "types": 351,
+              "checkTime": 0.002,
+              "totalTime": 0.104,
+              "memoryKB": 88545
+            },
+            {
+              "instantiations": 1,
+              "types": 351,
+              "checkTime": 0,
+              "totalTime": 0.064,
+              "memoryKB": 88535
+            },
+            {
+              "instantiations": 1,
+              "types": 351,
+              "checkTime": 0,
+              "totalTime": 0.061,
+              "memoryKB": 88470
+            }
+          ]
+        },
+        "100": {
+          "instantiations": 76962,
+          "types": 32039,
+          "checkTime": 0.051,
+          "totalTime": 0.139,
+          "memoryKB": 189172,
+          "runs": [
+            {
+              "instantiations": 76962,
+              "types": 32039,
+              "checkTime": 0.06,
+              "totalTime": 0.166,
+              "memoryKB": 189112
+            },
+            {
+              "instantiations": 76962,
+              "types": 32039,
+              "checkTime": 0.047,
+              "totalTime": 0.134,
+              "memoryKB": 189172
+            },
+            {
+              "instantiations": 76962,
+              "types": 32039,
+              "checkTime": 0.051,
+              "totalTime": 0.139,
+              "memoryKB": 189203
+            }
+          ]
+        },
+        "300": {
+          "instantiations": 214112,
+          "types": 58514,
+          "checkTime": 0.124,
+          "totalTime": 0.226,
+          "memoryKB": 215648,
+          "runs": [
+            {
+              "instantiations": 214112,
+              "types": 58514,
+              "checkTime": 0.124,
+              "totalTime": 0.222,
+              "memoryKB": 215606
+            },
+            {
+              "instantiations": 214112,
+              "types": 58514,
+              "checkTime": 0.134,
+              "totalTime": 0.236,
+              "memoryKB": 215699
+            },
+            {
+              "instantiations": 214112,
+              "types": 58514,
+              "checkTime": 0.124,
+              "totalTime": 0.226,
+              "memoryKB": 215648
+            }
+          ]
+        },
+        "500": {
+          "instantiations": 351262,
+          "types": 84989,
+          "checkTime": 0.216,
+          "totalTime": 0.327,
+          "memoryKB": 242968,
+          "runs": [
+            {
+              "instantiations": 351262,
+              "types": 84989,
+              "checkTime": 0.216,
+              "totalTime": 0.327,
+              "memoryKB": 242874
+            },
+            {
+              "instantiations": 351262,
+              "types": 84989,
+              "checkTime": 0.219,
+              "totalTime": 0.332,
+              "memoryKB": 242968
+            },
+            {
+              "instantiations": 351262,
+              "types": 84989,
+              "checkTime": 0.197,
+              "totalTime": 0.318,
+              "memoryKB": 243008
+            }
+          ]
+        }
+      }
+    },
+    "hono-chain": {
+      "versions": {
+        "typescript": "7.0.2",
+        "zod": "4.6.7",
+        "hono": "4.13.13",
+        "@hono/zod-validator": "0.9.1"
+      },
+      "counts": {
+        "0": {
+          "instantiations": 141015,
+          "types": 77378,
+          "checkTime": 0.053,
+          "totalTime": 0.082,
+          "memoryKB": 61443,
+          "runs": [
+            {
+              "instantiations": 141015,
+              "types": 77378,
+              "checkTime": 0.053,
+              "totalTime": 0.092,
+              "memoryKB": 61462
+            },
+            {
+              "instantiations": 141015,
+              "types": 77378,
+              "checkTime": 0.054,
+              "totalTime": 0.082,
+              "memoryKB": 61443
+            },
+            {
+              "instantiations": 141015,
+              "types": 77378,
+              "checkTime": 0.045,
+              "totalTime": 0.071,
+              "memoryKB": 61395
+            }
+          ]
+        },
+        "100": {
+          "instantiations": 599632,
+          "types": 187484,
+          "checkTime": 0.211,
+          "totalTime": 0.24,
+          "memoryKB": 115822,
+          "runs": [
+            {
+              "instantiations": 599632,
+              "types": 187484,
+              "checkTime": 0.213,
+              "totalTime": 0.25,
+              "memoryKB": 115827
+            },
+            {
+              "instantiations": 599632,
+              "types": 187484,
+              "checkTime": 0.211,
+              "totalTime": 0.24,
+              "memoryKB": 115816
+            },
+            {
+              "instantiations": 599632,
+              "types": 187484,
+              "checkTime": 0.209,
+              "totalTime": 0.237,
+              "memoryKB": 115822
+            }
+          ]
+        },
+        "300": {
+          "instantiations": 2286132,
+          "types": 424728,
+          "checkTime": 0.946,
+          "totalTime": 0.974,
+          "memoryKB": 229241,
+          "runs": [
+            {
+              "instantiations": 2286132,
+              "types": 424728,
+              "checkTime": 0.946,
+              "totalTime": 0.974,
+              "memoryKB": 229241
+            },
+            {
+              "instantiations": 2286132,
+              "types": 424728,
+              "checkTime": 1.138,
+              "totalTime": 1.173,
+              "memoryKB": 229196
+            },
+            {
+              "instantiations": 2286132,
+              "types": 424728,
+              "checkTime": 0.898,
+              "totalTime": 0.925,
+              "memoryKB": 229250
+            }
+          ]
+        },
+        "500": {
+          "instantiations": 5012632,
+          "types": 661876,
+          "checkTime": 2.323,
+          "totalTime": 2.35,
+          "memoryKB": 349944,
+          "runs": [
+            {
+              "instantiations": 5012632,
+              "types": 661876,
+              "checkTime": 2.284,
+              "totalTime": 2.312,
+              "memoryKB": 349944
+            },
+            {
+              "instantiations": 5012632,
+              "types": 661876,
+              "checkTime": 2.576,
+              "totalTime": 2.606,
+              "memoryKB": 349855
+            },
+            {
+              "instantiations": 5012632,
+              "types": 661876,
+              "checkTime": 2.323,
+              "totalTime": 2.35,
+              "memoryKB": 350131
+            }
+          ]
+        }
+      }
+    },
+    "hono-split": {
+      "versions": {
+        "typescript": "7.0.2",
+        "zod": "4.6.7",
+        "hono": "4.13.13",
+        "@hono/zod-validator": "0.9.1"
+      },
+      "counts": {
+        "0": {
+          "instantiations": 141015,
+          "types": 77377,
+          "checkTime": 0.044,
+          "totalTime": 0.066,
+          "memoryKB": 51815,
+          "runs": [
+            {
+              "instantiations": 141015,
+              "types": 77377,
+              "checkTime": 0.047,
+              "totalTime": 0.107,
+              "memoryKB": 51815
+            },
+            {
+              "instantiations": 141015,
+              "types": 77377,
+              "checkTime": 0.043,
+              "totalTime": 0.066,
+              "memoryKB": 51815
+            },
+            {
+              "instantiations": 141015,
+              "types": 77377,
+              "checkTime": 0.044,
+              "totalTime": 0.066,
+              "memoryKB": 51762
+            }
+          ]
+        },
+        "100": {
+          "instantiations": 757732,
+          "types": 269518,
+          "checkTime": 0.219,
+          "totalTime": 0.252,
+          "memoryKB": 155380,
+          "runs": [
+            {
+              "instantiations": 757732,
+              "types": 269518,
+              "checkTime": 0.208,
+              "totalTime": 0.237,
+              "memoryKB": 155435
+            },
+            {
+              "instantiations": 757732,
+              "types": 269518,
+              "checkTime": 0.244,
+              "totalTime": 0.274,
+              "memoryKB": 155368
+            },
+            {
+              "instantiations": 757732,
+              "types": 269518,
+              "checkTime": 0.219,
+              "totalTime": 0.252,
+              "memoryKB": 155380
+            }
+          ]
+        },
+        "300": {
+          "instantiations": 1712932,
+          "types": 548154,
+          "checkTime": 0.754,
+          "totalTime": 0.782,
+          "memoryKB": 288620,
+          "runs": [
+            {
+              "instantiations": 1712932,
+              "types": 548154,
+              "checkTime": 0.785,
+              "totalTime": 0.82,
+              "memoryKB": 288620
+            },
+            {
+              "instantiations": 1712932,
+              "types": 548154,
+              "checkTime": 0.754,
+              "totalTime": 0.782,
+              "memoryKB": 288743
+            },
+            {
+              "instantiations": 1712932,
+              "types": 548154,
+              "checkTime": 0.739,
+              "totalTime": 0.768,
+              "memoryKB": 288538
+            }
+          ]
+        },
+        "500": {
+          "instantiations": 2773732,
+          "types": 826672,
+          "checkTime": 1.881,
+          "totalTime": 1.914,
+          "memoryKB": 436518,
+          "runs": [
+            {
+              "instantiations": 2773732,
+              "types": 826672,
+              "checkTime": 1.837,
+              "totalTime": 1.87,
+              "memoryKB": 436627
+            },
+            {
+              "instantiations": 2773732,
+              "types": 826672,
+              "checkTime": 1.881,
+              "totalTime": 1.914,
+              "memoryKB": 436468
+            },
+            {
+              "instantiations": 2773732,
+              "types": 826672,
+              "checkTime": 1.928,
+              "totalTime": 1.961,
+              "memoryKB": 436518
+            }
+          ]
+        }
+      }
+    }
+  }
+}
