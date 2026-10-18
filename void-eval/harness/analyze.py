@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Where the tokens go: the per-ticket table and breakdowns in AGENT-EVAL-VOID.md.
 
-Usage: python3 harness/analyze.py [ticket ...]   (default: the five Stage 2 tickets)
+Usage: env MODEL=<model id> python3 harness/analyze.py [ticket ...]
+       (default model claude-sonnet-5-5, default tickets: the five Stage 2 tickets)
 
 Reads results/<ticket>/<arm>-<model>-<trial>.{result.json,verdict.json,patch,stream.jsonl}.
 Event streams are gitignored; unpack the release tarball first.
@@ -28,6 +29,7 @@ from streams import TESTS, TYPECHECK, events as stream_events, tool_uses, total_
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(ROOT, 'results')
+MODEL = os.environ.get('MODEL', 'claude-sonnet-5-5')
 TICKETS = sys.argv[1:] or ['post-tags', 'comments-moderation', 'post-revisions', 'json-api-tokens', 'scheduled-publish']
 TEST_PATH = re.compile(r'/tests?/|\.test\.')
 # Files a patch adds that no one wrote by hand: migration SQL and Drizzle
@@ -49,7 +51,7 @@ def added_lines(patch):
 
 def cells():
     for t in TICKETS:
-        for res in sorted(glob.glob(os.path.join(RESULTS, t, '*.result.json'))):
+        for res in sorted(glob.glob(os.path.join(RESULTS, t, f'*-{MODEL}-*.result.json'))):
             base = res[:-len('.result.json')]
             arm = os.path.basename(base).split('-')[0]
             yield t, arm, base

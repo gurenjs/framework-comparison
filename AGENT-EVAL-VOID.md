@@ -1,7 +1,9 @@
 # Agent eval: Guren (with its harness) vs Void
 
-**Result (Sonnet 5.5, 5 Stage 2 tickets × 2 arms × 3 trials, 2026-10-18):
-both arms pass 15/15.** On the same tickets, Guren cells used 2.4× the input
+**Result (5 Stage 2 tickets × 2 arms × 3 trials, on Sonnet 5.5 and on Haiku
+5.5): every cell passes, 60/60.** The Sonnet numbers follow, and the Haiku
+section repeats the comparison: Guren used 2.0× Void's tokens there, also with
+no pass-rate difference. On the same tickets, Guren cells used 2.4× the input
 tokens and 2.1× the dollars of Void cells (medians 1.12M vs 0.47M tokens,
 $0.55 vs $0.25). They also took more turns (23 vs 19). This sample shows no
 evidence that agents do better on Guren than on Void. It does show where
@@ -250,10 +252,10 @@ tool-output sizes.
 
 On Sonnet 5.5 and these tickets, Guren's extra verification bought no
 measurable difference in pass rate. The black-box suite passed Void's unverified
-patches just as often. The verification pitch may still pay where models make
+patches just as often. The verification pitch might still pay where models make
 more mistakes. In agents-on-guren Stage 2, Haiku 4.5 moved from 30% bare to
-44% shipped. A Haiku run of this comparison is the experiment that could show
-it.
+44% shipped. The Haiku 5.5 run below tested that, and found no pass-rate
+difference there either.
 
 ### What this does and does not show
 
@@ -266,6 +268,54 @@ it.
 - **Sample size:** n=3 per cell, one model, and ranges that sometimes
   overlap (comments-moderation turns: 21–33 vs 19–24). The medians locate
   the effect; they do not size it precisely.
+
+## Haiku 5.5 (same 30 cells, 2026-10-19)
+
+The same five tickets × 2 arms × 3 trials on `claude-haiku-5-5`. Every cell
+passed again (30/30). Per-ticket tables are in
+`results/ANALYSIS-STAGE2-haiku55.md`, produced by
+`env MODEL=claude-haiku-5-5 python3 harness/analyze.py`.
+
+| ticket | arm | pass | turns | input tokens (med) | output tokens (med) | cells with tests | hand-written lines (med) |
+|---|---|---|---|---|---|---|---|
+| post-tags | Guren | 3/3 | 70, 65, 58 | 4455k | 40.8k | 3/3 | 297 |
+| post-tags | Void | 3/3 | 41, 44, 35 | 1873k | 22.6k | 0/3 | 139 |
+| comments-moderation | Guren | 3/3 | 39, 41, 56 | 2621k | 35.1k | 3/3 | 399 |
+| comments-moderation | Void | 3/3 | 42, 49, 32 | 1894k | 22.9k | 0/3 | 218 |
+| post-revisions | Guren | 3/3 | 31, 34, 27 | 1993k | 18.4k | 3/3 | 271 |
+| post-revisions | Void | 3/3 | 24, 30, 30 | 1110k | 14.7k | 0/3 | 114 |
+| json-api-tokens | Guren | 3/3 | 52, 56, 44 | 4542k | 42.3k | 3/3 | 369 |
+| json-api-tokens | Void | 3/3 | 38, 27, 19 | 990k | 21.1k | 0/3 | 210 |
+| scheduled-publish | Guren | 3/3 | 58, 61, 53 | 3191k | 32.3k | 3/3 | 205 |
+| scheduled-publish | Void | 3/3 | 32, 33, 34 | 1911k | 22.8k | 0/3 | 83 |
+| **all** | **Guren** | **15/15** | median 53 | 3191k | | 15/15 | 297 |
+| **all** | **Void** | **15/15** | median 33 | 1571k | | 0/15 | 139 |
+
+- **Pass rate:** no difference on Haiku 5.5 either. The weaker model needed
+  2–4× Sonnet's tokens on both arms, but made no mistake the suite catches on
+  either framework.
+- **Token ratio:** Guren used 2.0× Void's input tokens, close to the 2.4× on
+  Sonnet. The causes are the same ones listed above.
+  - Every Guren cell wrote tests (15/15).
+  - Guren cells named `@guren/*` dist paths 225 times in 15 cells; Void cells
+    named `void/docs` and `void/dist` 217 times.
+  - Rules attached on reads: in the `post-tags` trace one read of
+    `routes/web.ts` added 18.5k tokens.
+- **Where Guren's verification did something:** the PostToolUse check
+  "routes/api.ts exports a route registrar that nothing reachable from
+  routes/web.ts calls" fired in all three Haiku json-api-tokens cells (4–5
+  times each).
+  - Each time, the agent had not yet wired the file.
+  - It wired `routes/web.ts` within 1–4 actions after the first block.
+  - This is the clearest case in either run of the harness catching a real
+    defect, an unmounted API. Without the check, the suite would have failed
+    every request with 404, unless the agent caught it some other way.
+  - The defect class is Guren's own, though. Void routes are file-based, and
+    a file under `routes/api/` is mounted by being there.
+- **Cost:** Claude Code 2.1.289 does not know `claude-haiku-5-5`. It warns
+  `unrecognized_model` and appears to price the model at Sonnet rates. Its
+  per-cell figures (total $48.5 for 30 cells; medians Guren $2.01, Void
+  $1.12) overstate the real cost and are not used here. Compare tokens.
 
 ## Pilot (round-1 bug tasks, for the record)
 
@@ -367,9 +417,13 @@ and 7 are judgement.
    read them. A `--minimal` blueprint, or terser pages, would cut the cost
    of every task in a new app. It would also let a later round separate app
    size from framework cost.
-7. **Run the comparison on Haiku 4.5.** If Guren's verification is worth its
-   cost anywhere, it should show on a model that makes mistakes. This round
-   cannot show it, because Sonnet 5.5 made none that the suite catches.
+7. **Find tickets where verification pays.** On both Sonnet 5.5 and Haiku
+   5.5 every cell passed, so the extra verification bought no pass-rate
+   difference. Only the unmounted-routes check did visible work, and only
+   against a defect class Guren's own routing creates. Two ways to look:
+   - harder tickets, more subsystems, longer specs;
+   - a mutation-style round that seeds subtle defects the agent must find,
+     where an agent that runs tests should have an edge.
 
 ## Reproduce
 

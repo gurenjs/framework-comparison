@@ -36,9 +36,9 @@ void:
    bash-read/other         898 chars   1.3 calls
    typecheck               671 chars   2.1 calls
    read-src                124 chars   0.1 calls
-   edit-test                 0 chars   0.0 calls
    run-tests                 0 chars   0.0 calls
    guren-cli                 0 chars   0.0 calls
+   edit-test                 0 chars   0.0 calls
 
 ## 3. PostToolUse blocks (exit 2), by message
 
