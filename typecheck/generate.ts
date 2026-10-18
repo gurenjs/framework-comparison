@@ -31,6 +31,8 @@ const GUREN_WEB_MARK = '  // typecheck-bench\n'
 function generateGuren(n: number, dir: string): void {
   rmSync(join(dir, 'app/Http/Controllers/Bench'), { recursive: true, force: true })
   rmSync(join(dir, 'resources/js/bench'), { recursive: true, force: true })
+  // Left behind by experiments.ts's split variant if it was interrupted.
+  for (let g = 0; g < 10; g++) rmSync(join(dir, `routes/bench-${g}.ts`), { force: true })
 
   const imports: string[] = []
   const registrations: string[] = []

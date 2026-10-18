@@ -94,8 +94,8 @@ tsgo checks files on four checkers in parallel, and one file is always checked
 by one checker. Guren's server-side cost is concentrated in `routes/bench.ts`,
 which registers all 500 routes; the trace (`tsc --generateTrace`) shows that
 file alone taking ~350 ms of checking (traced, so slower than an untraced
-run), while the 500 controller files together take ~140 ms spread over the
-four checkers. The registrar is what sets the wall-clock check time. Void's cost is spread over 500 route files plus one client file.
+run), while the 500 controller files together took ~140 ms spread over the
+four checkers in a one-off trace (not recorded in the JSON files). The registrar is what sets the wall-clock check time. Void's cost is spread over 500 route files plus one client file.
 
 What makes the registrar expensive is the zod schemas in the route contracts.
 Every Guren endpoint in this benchmark references two schemas from its
@@ -103,8 +103,9 @@ contract (`params` or `body`, plus `output` so the client gets a typed
 response), so the registrar refers to 1,000 `z.object(...)` declarations.
 TypeScript has to infer each of them to type the argument, and because checkers
 do not share a type cache, the registrar's checker infers them again even
-though the controller files' checkers already did (with `--checkers 1` the full
-app drops from 404k to 360k instantiations). Void needs a schema only for the
+though the controller files' checkers already did (a one-off `--checkers 1` run,
+not recorded in the JSON files, dropped the full app from 404k to 360k
+instantiations). Void needs a schema only for the
 250 POST bodies and infers responses from the handler's return type.
 
 <!-- typecheck:experiments:begin -->

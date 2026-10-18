@@ -150,10 +150,10 @@ if (import.meta.main) {
       out.push({ group: x.group, experiment: x.name, n: N, routesFileMs, ...d })
       console.log(`${x.name.padEnd(64)} inst=${d.instantiations} check=${d.checkTime}s routes/bench.ts=${routesFileMs}ms`)
       writeFileSync(ROUTER_DTS, routerOrig)
-      for (let g = 0; g < 10; g++) rmSync(join(DIR, `routes/bench-${g}.ts`), { force: true })
     }
   } finally {
     writeFileSync(ROUTER_DTS, routerOrig)
+    for (let g = 0; g < 10; g++) rmSync(join(DIR, `routes/bench-${g}.ts`), { force: true })
   }
   writeFileSync(join(ROOT, 'experiments.json'), `${JSON.stringify({ generatedAt: new Date().toISOString(), n: N, runs: RUNS, experiments: out }, null, 2)}\n`)
 }
