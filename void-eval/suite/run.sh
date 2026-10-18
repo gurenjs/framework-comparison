@@ -36,19 +36,28 @@ if [ "$DRIVER" = void ]; then
 fi
 release() { [ -n "$LOCK" ] && rm -rf "$LOCK"; return 0; }
 
-PID="$("$BOOT" "$APP" "$PORT")" || { echo "boot failed" >&2; release; exit 3; }
 # The server PID can be the root of a tree (npx -> vp -> vite -> workerd);
 # stop every descendant too, or a survivor keeps the port and the local DB.
+# The trap is set before the boot: if this script is killed mid-boot, the
+# boot script's tree (our children) goes too and the lock is released.
 tree() { local p; for p in $(pgrep -P "$1"); do tree "$p"; done; echo "$1"; }
+PID=""
 cleanup() {
-  local pids; pids="$(tree "$PID")"
-  kill $pids 2>/dev/null || true
-  for _ in $(seq 1 25); do kill -0 $pids 2>/dev/null || break; sleep 0.2; done
-  kill -9 $pids 2>/dev/null || true
+  local pids=""
+  if [ -n "$PID" ]; then pids="$(tree "$PID")"; fi
+  for c in $(pgrep -P $$); do pids="$pids $(tree "$c")"; done
+  if [ -n "${pids// /}" ]; then
+    kill $pids 2>/dev/null || true
+    for _ in $(seq 1 25); do kill -0 $pids 2>/dev/null || break; sleep 0.2; done
+    kill -9 $pids 2>/dev/null || true
+  fi
   for _ in $(seq 1 25); do lsof -tiTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1 || break; sleep 0.2; done
   release
 }
 trap cleanup EXIT
+trap 'exit 130' INT TERM
+
+PID="$("$BOOT" "$APP" "$PORT")" || { echo "boot failed" >&2; exit 3; }
 
 cd "$SUITE"
 export SUITE_DRIVER="$DRIVER" SUITE_BASE_URL="http://127.0.0.1:$PORT" SUITE_APP_DIR="$(cd "$APP" && pwd)"
