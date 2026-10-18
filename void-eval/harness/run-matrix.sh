@@ -13,7 +13,7 @@ while [ $# -gt 0 ]; do case "$1" in
 IFS=, read -ra T <<<"$TASKS"; IFS=, read -ra A <<<"$ARMS"; IFS=, read -ra M <<<"$MODELS"
 for trial in $(seq 1 "$TRIALS"); do for task in "${T[@]}"; do for model in "${M[@]}"; do for arm in "${A[@]}"; do
   out="$RESULTS/$(cell_id "$task" "$arm" "$model" "$trial")"
-  [ -f "$out.verdict.json" ] && { echo "skip $task $arm $model $trial"; continue; }
+  if [ -f "$out.verdict.json" ] && ! grep -q BOOT-ERROR "$out.verdict.json"; then echo "skip $task $arm $model $trial"; continue; fi
   if [ ! -f "$out.patch" ]; then
     FORCE=1 bash "$HERE/run-cell.sh" "$task" "$arm" "$model" "$trial" || { echo "RUN FAILED $task $arm $model $trial"; continue; }
   fi

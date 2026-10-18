@@ -24,7 +24,7 @@ EDIT_TOOLS = {'Edit', 'Write', 'MultiEdit', 'NotebookEdit'}
 
 
 def stream_facts(path):
-    f = dict(typecheck=0, tests=0, gate=0, stop_runs=0, stop_blocks=0, docs_reads=0, skill_uses=0,
+    f = dict(tc_runs=0, tests=0, gate=0, stop_runs=0, stop_blocks=0, docs_reads=0, skill_uses=0,
              agents_md_read=False, verified_after_last_edit=False, denials=0)
     last_edit = last_tc = -1
     seen = set()
@@ -52,7 +52,7 @@ def stream_facts(path):
             elif name == 'Bash':
                 cmd = inp.get('command', '')
                 if TYPECHECK.search(cmd):
-                    f['typecheck'] += 1; last_tc = i
+                    f['tc_runs'] += 1; last_tc = i
                 f['tests'] += bool(TESTS.search(cmd))
                 f['gate'] += bool(GATE.search(cmd))
                 if 'void/docs' in cmd:
@@ -100,7 +100,7 @@ def main():
             model, arm, n, sum(c['status'] == 'PASS' for c in cs), n,
             med([c['turns'] for c in cs]), round(med([c['cost'] for c in cs]) or 0, 2), sum(c['cost'] or 0 for c in cs),
             sum(c.get('verified_after_last_edit', False) for c in cs), n,
-            sum(c.get('typecheck', 0) > 0 for c in cs), n,
+            sum(c.get('tc_runs', 0) > 0 for c in cs), n,
             sum(c.get('tests', 0) > 0 for c in cs), n,
             sum(c.get('gate', 0) > 0 for c in cs), n,
             sum(c.get('stop_runs', 0) for c in cs), sum(c.get('stop_blocks', 0) for c in cs),
@@ -110,9 +110,9 @@ def main():
            '| task | arm | model | trial | status | typecheck | suite | turns | cost | tc runs | tc after last edit | tests | gate | stop runs/blocks | docs reads | skills | denials |',
            '|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|']
     for c in sorted(cells, key=lambda c: (c['task'], c['arm'], c['model'], c['trial'])):
-        md.append('| {task} | {arm} | {model} | {trial} | {status} | {typecheck} | {suite} ({suite_summary}) | {turns} | {cost} | {tc} | {va} | {tests} | {gate} | {sr}/{sb} | {dr} | {sk} | {dn} |'.format(
-            **c, cost=round(c['cost'] or 0, 3), tc=c.get('typecheck'), va=c.get('verified_after_last_edit'),
-            tests=c.get('tests'), gate=c.get('gate'), sr=c.get('stop_runs'), sb=c.get('stop_blocks'),
+        md.append('| {task} | {arm} | {model} | {trial} | {status} | {typecheck} | {suite} ({suite_summary}) | {turns} | {cost_r} | {tc} | {va} | {tests_n} | {gate_n} | {sr}/{sb} | {dr} | {sk} | {dn} |'.format(
+            **c, cost_r=round(c["cost"] or 0, 3), tc=c.get('tc_runs'), va=c.get('verified_after_last_edit'),
+            tests_n=c.get('tests'), gate_n=c.get('gate'), sr=c.get('stop_runs'), sb=c.get('stop_blocks'),
             dr=c.get('docs_reads'), sk=c.get('skill_uses'), dn=c.get('denials')))
     text = '\n'.join(md) + '\n'
     if out:

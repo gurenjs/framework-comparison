@@ -58,7 +58,7 @@ drop_start_state() {
   local arm="$1" dest="$2"
   cd / || true
   # Servers the agent (or the suite) left running from this directory.
-  pkill -f "$dest/" 2>/dev/null; sleep 1; pkill -9 -f "$dest/" 2>/dev/null
+  pkill -f "$dest/" 2>/dev/null || true; sleep 1; pkill -9 -f "$dest/" 2>/dev/null || true
   if [ "$arm" = guren ]; then
     git -C "$GUREN_APP_REPO" worktree remove --force "$dest" 2>/dev/null || rm -rf "$dest"
     git -C "$GUREN_APP_REPO" worktree prune

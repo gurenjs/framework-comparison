@@ -29,9 +29,11 @@ setup_app "$ARM" "$WT"
 
 TC=fail; SU=fail
 typecheck "$ARM" "$WT" "$OUT.typecheck.log" && TC=pass
-"$VE_ROOT/suite/run.sh" "$ARM" "$WT" "$TASK" "$PORT" > "$OUT.suite.log" 2>&1 && SU=pass
+"$VE_ROOT/suite/run.sh" "$ARM" "$WT" "$TASK" "$PORT" > "$OUT.suite.log" 2>&1
+case $? in 0) SU=pass ;; 3) SU=boot-error ;; esac
 CNT="$(grep -oE '^ *[0-9]+ (pass|fail)$' "$OUT.suite.log" | tr -s ' ' | tr '\n' ' ' | sed 's/^ //; s/ $//')"
 
-if [ "$TC" = pass ] && [ "$SU" = pass ]; then STATUS=PASS; else STATUS=FAIL; fi
+if [ "$SU" = boot-error ]; then STATUS=BOOT-ERROR
+elif [ "$TC" = pass ] && [ "$SU" = pass ]; then STATUS=PASS; else STATUS=FAIL; fi
 verdict "$STATUS" "$TC" "$SU" "$CNT"
 drop_start_state "$ARM" "$WT"

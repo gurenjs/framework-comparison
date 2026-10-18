@@ -1,0 +1,6 @@
+$ void prepare && tsc --noEmit
+
+● No generated files changed.
+
+✓ Project codegen is ready.
+
