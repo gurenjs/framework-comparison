@@ -1,0 +1,27 @@
+{
+  "name": "void-blog",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev",
+    "build": "vp build",
+    "preview": "vp preview",
+    "typecheck": "void prepare && tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "^4.11.9",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@void/react": "1.1.11",
+    "oxc-transform-react": "^0.149.0",
+    "typescript": "^7.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@^1.2.0",
+    "vite-plus": "^1.2.0",
+    "void": "1.1.11"
+  }
+}
