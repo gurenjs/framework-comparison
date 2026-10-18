@@ -1,2 +1,2 @@
-results/*/*.stream.jsonl
-results/*/*.stderr.log
+results*/*/*.stream.jsonl
+results*/*/*.stderr.log

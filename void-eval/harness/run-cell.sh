@@ -46,6 +46,7 @@ if [ "$ARM" = guren ]; then
   (cd "$WT" && bunx guren agent:init --target claude >/dev/null 2>&1)
   git -C "$WT" add -A && git -C "$WT" "${GIT_ID[@]}" commit -q -m "harness: agent:init" --no-verify
 fi
+GUREN_CLI_VERSION="$( [ "$ARM" = guren ] && (cd "$WT" && bunx guren --version 2>/dev/null | head -1) || echo -)"
 echo "== guidance: $(cd "$WT" && ls -d CLAUDE.md AGENTS.md .claude/skills/* .claude/rules .claude/settings.json 2>/dev/null | tr '\n' ' ')"
 
 PROMPT="$(build_prompt "$ARM" "$TASK")"
@@ -77,12 +78,12 @@ for line in open(sys.argv[1]):
     if ev.get('type') == 'result': last = line
 open(sys.argv[2], 'w').write((last or '{}') + '\n')
 PY
-python3 - "$TASK" "$ARM" "$MODEL" "$TRIAL" "$((END-START))" "$START_COMMIT" "$MAX_TURNS" "$(claude --version 2>/dev/null | head -1)" "$OUT.stream.jsonl" > "$OUT.meta.json" <<'PY'
+python3 - "$TASK" "$ARM" "$MODEL" "$TRIAL" "$((END-START))" "$START_COMMIT" "$MAX_TURNS" "$(claude --version 2>/dev/null | head -1)" "$OUT.stream.jsonl" "$GUREN_CLI_VERSION" > "$OUT.meta.json" <<'PY'
 import json, sys
-t, a, m, tr, w, sc, mt, cv, stream = sys.argv[1:10]
+t, a, m, tr, w, sc, mt, cv, stream, gcli = sys.argv[1:11]
 init = next((e for e in map(json.loads, filter(str.strip, open(stream))) if e.get("subtype") == "init"), {})
 json.dump({"task": t, "arm": a, "model": m, "trial": int(tr), "wall_seconds": int(w), "start_commit": sc,
-           "max_turns": int(mt), "claude_version": cv, "memory_paths": init.get("memory_paths"),
+           "max_turns": int(mt), "claude_version": cv, "guren_cli": gcli, "memory_paths": init.get("memory_paths"),
            "skills": init.get("skills"), "slash_commands": init.get("slash_commands")}, sys.stdout)
 print()
 PY

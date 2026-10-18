@@ -36,6 +36,13 @@ make_start_state() {
       git -C "$GUREN_APP_REPO" worktree remove --force "$dest" 2>/dev/null || true
       git -C "$GUREN_APP_REPO" worktree prune
       git -C "$GUREN_APP_REPO" worktree add --detach "$dest" "$GUREN_BASE" >/dev/null || return 1
+      # GUREN_UPDATE=1 (default): move the app to the current @guren/*
+      # releases within its semver ranges (RUNBOOK: `bun update` before an
+      # app arm), so the arm measures today's Guren, not 0fd1654's 2.27 CLI.
+      if [ "${GUREN_UPDATE:-1}" = 1 ]; then
+        (cd "$dest" && bun install --frozen-lockfile >/dev/null 2>&1 && bun update >/dev/null 2>&1) || { echo "BUN-UPDATE-FAILED"; return 1; }
+        git -C "$dest" add -A && git -C "$dest" "${GIT_ID[@]}" commit -q -m "harness: bun update (@guren/cli $(cd "$dest" && bunx guren --version 2>/dev/null | head -1))" --no-verify
+      fi
       if [ -f "$AOG_ROOT/tasks/$task/seed.patch" ]; then
         git -C "$dest" apply --whitespace=nowarn "$AOG_ROOT/tasks/$task/seed.patch" || { echo "SEED-APPLY-FAILED"; return 1; }
         git -C "$dest" add -A && git -C "$dest" "${GIT_ID[@]}" commit -q -m "seed: $task" --no-verify

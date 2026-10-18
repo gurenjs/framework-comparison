@@ -55,29 +55,22 @@ index 846382c..903a59c 100644
        'posts.store': { body: { title: string; excerpt: string; body: string } }
        'posts.update': { body: { title: string; excerpt: string; body: string } }
 diff --git a/app/Http/Controllers/PostController.ts b/app/Http/Controllers/PostController.ts
-index 8f702c5..f7e85a1 100644
+index 8f702c5..1cab7dd 100644
 --- a/app/Http/Controllers/PostController.ts
 +++ b/app/Http/Controllers/PostController.ts
-@@ -25,6 +25,25 @@ export default class PostController extends Controller {
+@@ -25,6 +25,18 @@ export default class PostController extends Controller {
      } satisfies PostsIndexProps)
    }
  
 +  async apiIndex(): Promise<Response> {
-+    const { page, author } = this.validated('api.posts.index').query
-+    const result = await Post.newQuery()
-+      .with('author')
-+      .where(author === undefined ? {} : { authorId: author })
-+      .orderBy('id', 'desc')
-+      .paginate({ page, perPage: 10 })
++    const { query } = this.validated('api.posts.index')
++    const builder = Post.newQuery().with('author')
++    if (query.author !== undefined) builder.where('authorId', query.author)
++    const result = await builder.orderBy('id', 'desc').paginate({ page: query.page, perPage: 10 })
 +
 +    return this.json({
 +      data: PostResource.collection(result.data),
-+      meta: {
-+        currentPage: result.meta.currentPage,
-+        lastPage: result.meta.totalPages,
-+        perPage: result.meta.perPage,
-+        total: result.meta.total,
-+      },
++      meta: paginate(result, { path: '/api/posts' }).meta(),
 +    })
 +  }
 +
@@ -85,7 +78,7 @@ index 8f702c5..f7e85a1 100644
    // criteria in a JSON body. Matches posts with any keyword in title or
    // excerpt; `%` and `_` in a keyword act as SQL LIKE wildcards, which this
 diff --git a/app/Http/Validators/PostValidator.ts b/app/Http/Validators/PostValidator.ts
-index 804642a..2bc355a 100644
+index 804642a..d3b86b6 100644
 --- a/app/Http/Validators/PostValidator.ts
 +++ b/app/Http/Validators/PostValidator.ts
 @@ -8,6 +8,11 @@ export const ListPostsQuerySchema = z.object({
@@ -94,7 +87,7 @@ index 804642a..2bc355a 100644
  
 +export const ApiListPostsQuerySchema = z.object({
 +  page: z.coerce.number().int().min(1).default(1),
-+  author: z.coerce.number().int().min(1).optional(),
++  author: z.coerce.number().int().positive().optional(),
 +})
 +
  export const PostSearchSchema = z.object({
@@ -127,7 +120,7 @@ index 4c174ac..9dc2fa7 100644
      // Registered before '/:id', or "create" is read as a post id.
      posts.middleware('auth').group((authed) => {
 diff --git a/tests/PostController.test.ts b/tests/PostController.test.ts
-index 16a6a79..1267603 100644
+index 16a6a79..c96c6c5 100644
 --- a/tests/PostController.test.ts
 +++ b/tests/PostController.test.ts
 @@ -20,3 +20,15 @@ describe('posts.search', () => {
@@ -143,6 +136,6 @@ index 16a6a79..1267603 100644
 +  })
 +
 +  it.each(['page=0', 'page=abc', 'author=abc', 'author=0'])('rejects ?%s', async (qs) => {
-+    await http.json().get(`/api/posts?${qs}`).assertStatus(422)
++    await http.get(`/api/posts?${qs}`).assertStatus(422)
 +  })
 +})

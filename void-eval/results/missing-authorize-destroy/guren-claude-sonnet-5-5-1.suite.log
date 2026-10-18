@@ -1,9 +1,9 @@
 [boot-guren] codegen
 [boot-guren] vite build (client + ssr)
-[boot-guren] ready on http://127.0.0.1:4300 (pid 33498)
+[boot-guren] ready on http://127.0.0.1:4100 (pid 33622)
 bun test v1.3.14 (0d9b296a)
 
  3 pass
  0 fail
  7 expect() calls
-Ran 3 tests across 1 file. [3.38s]
+Ran 3 tests across 1 file. [1.94s]

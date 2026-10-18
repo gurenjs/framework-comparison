@@ -117,65 +117,96 @@ reference must pass, twice each.
 
 ## Pilot results (Sonnet 5.5, 1 trial, 2026-10-18)
 
+The Guren arm runs on the current releases: `bun update` in the start state
+gives @guren/cli 2.31.1, then `agent:init`. A first pass on 0fd1654's locked
+CLI 2.27.0 is kept in `void-eval/results-guren-cli227/`. That CLI's rules use
+the `globs:` key, which Claude Code ignores (fixed in 2.28), so all rules
+loaded at session start. Its Guren cells cost about 2× the Void cells. That
+gap was a fixed bug, not Guren today.
+
 | model | arm | cells | pass | med turns | med cost (USD) | total cost (USD) | typecheck after last edit | ran typecheck at all | ran tests | guren gate CLI | stop-hook runs / blocks | Void docs reads (med) | Skill uses | denials |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| claude-sonnet-5-5 | guren | 4 | 4/4 | 5.5 | 0.2 | 0.91 | 3/4 | 4/4 | 4/4 | 0/4 | 4 / 0 | 0.0 | 0 | 0 |
+| claude-sonnet-5-5 | guren | 4 | 4/4 | 6.5 | 0.14 | 0.74 | 2/4 | 4/4 | 4/4 | 0/4 | 4 / 0 | 0.0 | 0 | 1 |
 | claude-sonnet-5-5 | void | 4 | 4/4 | 7.5 | 0.09 | 0.35 | 4/4 | 4/4 | 0/4 | 0/4 | 0 / 0 | 0.0 | 0 | 1 |
 
 Per cell:
 
 | task | arm | model | trial | status | typecheck | suite | turns | cost | tc runs | tc after last edit | tests | gate | stop runs/blocks | docs reads | skills | denials |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| api-posts-contract | guren | claude-sonnet-5-5 | 1 | PASS | pass | pass (8 pass  0 fail) | 17 | 0.32 | 1 | True | 1 | 0 | 1/0 | 0 | 0 | 0 |
+| api-posts-contract | guren | claude-sonnet-5-5 | 1 | PASS | pass | pass (8 pass  0 fail) | 19 | 0.339 | 1 | False | 3 | 0 | 1/0 | 0 | 0 | 1 |
 | api-posts-contract | void | claude-sonnet-5-5 | 1 | PASS | pass | pass (8 pass  0 fail) | 6 | 0.107 | 2 | True | 0 | 0 | 0/0 | 2 | 0 | 1 |
-| missing-authorize-destroy | guren | claude-sonnet-5-5 | 1 | PASS | pass | pass (3 pass  0 fail) | 5 | 0.189 | 1 | True | 1 | 0 | 1/0 | 0 | 0 | 0 |
+| missing-authorize-destroy | guren | claude-sonnet-5-5 | 1 | PASS | pass | pass (3 pass  0 fail) | 5 | 0.129 | 1 | True | 1 | 0 | 1/0 | 0 | 0 | 0 |
 | missing-authorize-destroy | void | claude-sonnet-5-5 | 1 | PASS | pass | pass (3 pass  0 fail) | 6 | 0.066 | 1 | True | 0 | 0 | 0/0 | 0 | 0 | 0 |
-| pagination-skips-page | guren | claude-sonnet-5-5 | 1 | PASS | pass | pass (6 pass  0 fail) | 5 | 0.181 | 1 | True | 1 | 0 | 1/0 | 0 | 0 | 0 |
+| pagination-skips-page | guren | claude-sonnet-5-5 | 1 | PASS | pass | pass (6 pass  0 fail) | 6 | 0.139 | 2 | True | 2 | 0 | 1/0 | 0 | 0 | 0 |
 | pagination-skips-page | void | claude-sonnet-5-5 | 1 | PASS | pass | pass (6 pass  0 fail) | 9 | 0.083 | 1 | True | 0 | 0 | 0/0 | 0 | 0 | 0 |
-| raw-body-no-validation | guren | claude-sonnet-5-5 | 1 | PASS | pass | pass (6 pass  0 fail) | 6 | 0.216 | 1 | False | 1 | 0 | 1/0 | 0 | 0 | 0 |
+| raw-body-no-validation | guren | claude-sonnet-5-5 | 1 | PASS | pass | pass (6 pass  0 fail) | 7 | 0.133 | 1 | False | 1 | 0 | 1/0 | 0 | 0 | 0 |
 | raw-body-no-validation | void | claude-sonnet-5-5 | 1 | PASS | pass | pass (6 pass  0 fail) | 9 | 0.094 | 2 | True | 0 | 0 | 0/0 | 0 | 0 | 0 |
+
+Session-start context, measured with a one-turn "reply OK" session in each
+start state (input + cache-write + cache-read tokens). The order of the arms
+did not change these numbers.
+
+| start state | tokens |
+|---|---|
+| Void (`AGENTS.md` + 2 skills) | 28.4k |
+| Guren, @guren/cli 2.31.1 harness | 35.6k |
+| Guren, @guren/cli 2.27.0 harness | 53.8k |
+
+Tokens per cell (all input tokens processed, plus output). Dollar costs above
+depend on which cell wrote the shared prompt cache first, so they are not
+comparable across arms. These are:
+
+| task | Guren turns / input / output | Void turns / input / output |
+|---|---|---|
+| missing-authorize-destroy | 5 / 159k / 0.7k | 6 / 148k / 0.7k |
+| pagination-skips-page | 6 / 239k / 0.8k | 9 / 183k / 1.2k |
+| raw-body-no-validation | 7 / 236k / 1.3k | 9 / 244k / 1.2k |
+| api-posts-contract | 19 / 686k / 4.0k | 6 / 169k / 2.1k |
 
 What this shows:
 
 - **Every cell passes.** These four tasks are too easy to separate the two
-  frameworks: 5–17 turns, and every agent found and fixed the defect in a few
-  edits. Success rate will not discriminate on round-1 tasks. A full run
-  needs the Stage 2 tickets (three or more subsystems, where Sonnet 5.5 bare
-  was 96% and Haiku 30–44% on Guren) or harder ports of them.
-- **Guren cells cost about 2× Void cells** ($0.19–0.32 vs $0.07–0.11).
-  Turns are similar, so it is not more work. The difference is context
-  loaded at session start. A one-turn "reply OK" session in each start state
-  takes 53.8k input tokens on Guren and 28.4k on Void ($0.13 vs $0.03 cold).
-  The extra 25k on Guren come from its shipped guidance:
-  - CLAUDE.md
-  - `.claude/rules`
-  - 10 skill descriptions
-  - an 8k-character SessionStart "Project Context" block
-
-  On small tasks this fixed cost dominates. It matches
-  framework-comparison round 8, which put Guren's guidance at session start
-  at 25.5k tokens.
-- **Verification behaviour is the same in kind.**
-  - Every cell in both arms ran a typecheck. The last one came after the
-    final edit in 4/4 Void cells and 3/4 Guren cells. In the fourth Guren
-    cell the agent edited once more after typechecking, and the Stop-hook
-    gate passed it.
-  - Guren cells also ran `bun test`, because the preamble names it and the
-    app has tests. Void has no test suite to run.
-  - On Guren the Stop hook ran its gate once per cell and never blocked.
-  - No Guren agent called `guren check`/`gate` itself.
-  - The verification difference the pitch relies on (the agent proves the
-    change works) did not appear in either arm on these tasks.
-- **Void's pull-model guidance was barely used.**
-  - Claude Code loads `AGENTS.md` (checked with a no-tool probe in the Void
-    start state). Void's 2-line pointer to `node_modules/void/docs/` is
-    therefore in context.
-  - The `void` skill is listed, but no agent invoked it.
-  - Only the API task touched the bundled docs: one `ls` of the docs
-    folder, then a `grep` for validator/query in `server-routing.md` and
-    `typed-fetch.md`. That was enough to write a validated route.
-  - The bug tasks needed no Void API knowledge. A model that already knows
-    Hono, Drizzle and React needed nothing Void-specific to fix them.
+  frameworks. Success rate will not discriminate on round-1 tasks. A full
+  run needs harder tasks: the Stage 2 tickets (three or more subsystems,
+  where Sonnet 5.5 bare was 96% and Haiku 30–44% on Guren) ported to Void,
+  or a weaker model such as Haiku 4.5.
+- **On the three bug fixes the work is about the same.**
+  - Each arm took 5–9 turns and processed 150–245k input tokens.
+  - Guren starts with 7k more tokens of context and takes slightly fewer
+    turns.
+  - No efficiency claim either way follows from n=1.
+- **The API feature is where the arms differ, and the tasks are not equal
+  there.**
+  - The Guren statement asks for a named route `api.posts.index` in the
+    generated client with a declared `resource` response type. Its agent read
+    `@guren/server` route types, hit a `guren check` PostToolUse block
+    ("route graph failed to load") and fixed it.
+  - It also added an `api.posts.index` test to `tests/PostController.test.ts`
+    and ran it, plus a throwaway probe test. That took 19 turns, 4× Void's
+    tokens.
+  - The Void agent `grep`ped two bundled guides, wrote one route file,
+    typechecked, and stopped after 6 turns. It never exercised the endpoint.
+  - Both pass the black-box suite. The extra Guren work is the "verified, not
+    just written" behaviour the pitch is about, but n=1. It is driven partly
+    by the stricter Guren statement and partly by the presence of an
+    existing test suite and a `bun test` line in the definition of done.
+- **Verification behaviour.**
+  - All 8 cells ran a typecheck. The last run came after the final edit in
+    4/4 Void cells and 2/4 Guren cells. In the other two Guren cells the agent
+    edited once more after checking, and the Stop-hook gate ran and passed
+    them.
+  - Guren cells also ran `bun test` (4/4), and one wrote a new test. Void
+    has no test suite to run.
+  - No Guren agent called `guren check`/`gate` itself. The checks came from
+    hooks.
+- **Void's guidance was barely needed.**
+  - Claude Code does load `AGENTS.md` (checked with a no-tool probe in the
+    Void start state), so Void's pointer to `node_modules/void/docs/` is in
+    context.
+  - No agent invoked the `void` skill.
+  - Only the API cell touched the bundled docs, and two `grep`s were
+    enough. A model that knows Hono, Drizzle and React needed nothing
+    Void-specific for these tasks.
 
 ## Findings about Void along the way
 
@@ -206,6 +237,14 @@ What this shows:
   affected. Earlier rounds ran with those entries active.
 - Built-in Claude Code skills (deep-research, design, …) are listed in both
   arms alike.
+- The Guren side of the suite gate was validated on 0fd1654's locked
+  dependencies. The Guren cells run after `bun update`. All four of them
+  passed the suite, but the gate itself was not rerun on the updated
+  dependencies. Rerun `suite/validate-guren.sh` with the update before a
+  full run.
+- `run-matrix.sh` runs the arms in a fixed order per task (Guren first), so
+  whichever cell writes the shared prompt cache first pays for it. For a
+  full run, alternate the order and compare token totals, not dollars.
 
 ## Cost of a full run (estimate)
 
@@ -226,15 +265,14 @@ plan fixtures, more subsystems.
 
 ## Where Guren could do better (proposals for gurenjs)
 
-1. **Session-start size.** About 25k more input tokens at session start than
-   Void, paid on every task however small. Ideas:
-   - Make the SessionStart "Project Context" (8k characters) shorter by
-     default.
-   - Expand it on demand (`guren context --full`).
-   - Keep the skill list to what the app uses: `github-projects`,
-     `plugin-authoring` and `ai-agent` are loaded for a blog.
-
-   This is the cheapest win and is measurable with this harness.
+1. **Keep the session-start budget in check.** With CLI 2.31.1, Guren's start
+   context is 7k tokens over Void's (35.6k vs 28.4k). With 2.27 it was 25k
+   over. Any app still on a pre-2.28 harness pays the 25k, so
+   `guren upgrade --check-only` / `agent:sync` should flag an outdated agent
+   harness. Further trims:
+   - load the 8k-character SessionStart "Project Context" on demand;
+   - drop skills a blog does not use (`github-projects`, `plugin-authoring`,
+     `ai-agent`).
 2. **Make verification visible in the outcome, not only in hooks.** The
    pitch is "the result is checked", but on these tasks the agent's own
    behaviour was the same as on Void: typecheck, then stop. A Stop gate that
