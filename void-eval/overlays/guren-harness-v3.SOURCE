@@ -1,0 +1,1 @@
+gurenjs perf/agent-harness-cost cf131ac79 templates/agent, same assembly as v2 (entry-body = branch version; skills changed on main since 2.31.1 = 2.31.1 + branch diff)

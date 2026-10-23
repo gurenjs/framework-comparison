@@ -1,0 +1,34 @@
+missing-authorize-destroy  seeded  run1  -> fail [ 2 pass  1 fail ] (expected fail) OK
+missing-authorize-destroy  seeded  run2  -> fail [ 2 pass  1 fail ] (expected fail) OK
+missing-authorize-destroy  reference  run1  -> pass [ 3 pass  0 fail ] (expected pass) OK
+missing-authorize-destroy  reference  run2  -> pass [ 3 pass  0 fail ] (expected pass) OK
+pagination-skips-page  seeded  run1  -> fail [ 0 pass  6 fail ] (expected fail) OK
+pagination-skips-page  seeded  run2  -> fail [ 0 pass  6 fail ] (expected fail) OK
+pagination-skips-page  reference  run1  -> pass [ 6 pass  0 fail ] (expected pass) OK
+pagination-skips-page  reference  run2  -> pass [ 6 pass  0 fail ] (expected pass) OK
+raw-body-no-validation  seeded  run1  -> fail [ 2 pass  4 fail ] (expected fail) OK
+raw-body-no-validation  seeded  run2  -> fail [ 2 pass  4 fail ] (expected fail) OK
+raw-body-no-validation  reference  run1  -> pass [ 6 pass  0 fail ] (expected pass) OK
+raw-body-no-validation  reference  run2  -> pass [ 6 pass  0 fail ] (expected pass) OK
+api-posts-contract  seeded  run1  -> fail [ 0 pass  8 fail ] (expected fail) OK
+api-posts-contract  seeded  run2  -> fail [ 0 pass  8 fail ] (expected fail) OK
+api-posts-contract  reference  run1  -> pass [ 8 pass  0 fail ] (expected pass) OK
+api-posts-contract  reference  run2  -> pass [ 8 pass  0 fail ] (expected pass) OK
+
+summary:
+  missing-authorize-destroy|seeded|run1|fail|OK
+  missing-authorize-destroy|seeded|run2|fail|OK
+  missing-authorize-destroy|reference|run1|pass|OK
+  missing-authorize-destroy|reference|run2|pass|OK
+  pagination-skips-page|seeded|run1|fail|OK
+  pagination-skips-page|seeded|run2|fail|OK
+  pagination-skips-page|reference|run1|pass|OK
+  pagination-skips-page|reference|run2|pass|OK
+  raw-body-no-validation|seeded|run1|fail|OK
+  raw-body-no-validation|seeded|run2|fail|OK
+  raw-body-no-validation|reference|run1|pass|OK
+  raw-body-no-validation|reference|run2|pass|OK
+  api-posts-contract|seeded|run1|fail|OK
+  api-posts-contract|seeded|run2|fail|OK
+  api-posts-contract|reference|run1|pass|OK
+  api-posts-contract|reference|run2|pass|OK

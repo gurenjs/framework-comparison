@@ -1,0 +1,1 @@
+{"task": "scheduled-publish-authz", "arm": "void", "model": "claude-sonnet-5-5", "trial": 2, "wall_seconds": 46, "start_commit": "b4e179bf5f2ba218c74876b60bf8a521c5b85e83", "max_turns": 200, "claude_version": "2.1.289 (Claude Code)", "guren_cli": "-", "guren_base": "c0a533c", "guren_preamble": "typecheck-only", "guren_overlay": ""}

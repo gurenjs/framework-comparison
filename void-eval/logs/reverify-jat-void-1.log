@@ -1,0 +1,1 @@
+verdict json-api-tokens/void-claude-sonnet-5-5-1: PASS (typecheck=pass suite=pass 10 pass  0 fail)

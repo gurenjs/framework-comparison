@@ -1,0 +1,700 @@
+diff --git a/db/migrations/20261020001325_useful_frank_castle.sql b/db/migrations/20261020001325_useful_frank_castle.sql
+new file mode 100644
+index 0000000..fbe769f
+--- /dev/null
++++ b/db/migrations/20261020001325_useful_frank_castle.sql
+@@ -0,0 +1,8 @@
++CREATE TABLE `post_revisions` (
++	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
++	`post_id` integer NOT NULL,
++	`title` text NOT NULL,
++	`excerpt` text NOT NULL,
++	`body` text NOT NULL,
++	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
++);
+diff --git a/db/migrations/meta/20261020001325_snapshot.json b/db/migrations/meta/20261020001325_snapshot.json
+new file mode 100644
+index 0000000..3c09504
+--- /dev/null
++++ b/db/migrations/meta/20261020001325_snapshot.json
+@@ -0,0 +1,469 @@
++{
++  "version": "6",
++  "dialect": "sqlite",
++  "id": "27bcb24f-134a-4db2-a7c2-36d7bccdc8fd",
++  "prevId": "d4a43e98-9576-4bfd-b3af-1ce1cef5eb2a",
++  "tables": {
++    "post_revisions": {
++      "name": "post_revisions",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "integer",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": true
++        },
++        "post_id": {
++          "name": "post_id",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "title": {
++          "name": "title",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "excerpt": {
++          "name": "excerpt",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "body": {
++          "name": "body",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "posts": {
++      "name": "posts",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "integer",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": true
++        },
++        "title": {
++          "name": "title",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "excerpt": {
++          "name": "excerpt",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "body": {
++          "name": "body",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "author_id": {
++          "name": "author_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "account": {
++      "name": "account",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "accountId": {
++          "name": "accountId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "providerId": {
++          "name": "providerId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "userId": {
++          "name": "userId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "accessToken": {
++          "name": "accessToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "refreshToken": {
++          "name": "refreshToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "idToken": {
++          "name": "idToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "accessTokenExpiresAt": {
++          "name": "accessTokenExpiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "refreshTokenExpiresAt": {
++          "name": "refreshTokenExpiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "scope": {
++          "name": "scope",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "password": {
++          "name": "password",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "account_userId_idx": {
++          "name": "account_userId_idx",
++          "columns": [
++            "userId"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {
++        "account_userId_user_id_fk": {
++          "name": "account_userId_user_id_fk",
++          "tableFrom": "account",
++          "tableTo": "user",
++          "columnsFrom": [
++            "userId"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "session": {
++      "name": "session",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expiresAt": {
++          "name": "expiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "token": {
++          "name": "token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "ipAddress": {
++          "name": "ipAddress",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "userAgent": {
++          "name": "userAgent",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "userId": {
++          "name": "userId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "session_token_unique": {
++          "name": "session_token_unique",
++          "columns": [
++            "token"
++          ],
++          "isUnique": true
++        },
++        "session_userId_idx": {
++          "name": "session_userId_idx",
++          "columns": [
++            "userId"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {
++        "session_userId_user_id_fk": {
++          "name": "session_userId_user_id_fk",
++          "tableFrom": "session",
++          "tableTo": "user",
++          "columnsFrom": [
++            "userId"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "user": {
++      "name": "user",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "name": {
++          "name": "name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "email": {
++          "name": "email",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "emailVerified": {
++          "name": "emailVerified",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "image": {
++          "name": "image",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "user_email_unique": {
++          "name": "user_email_unique",
++          "columns": [
++            "email"
++          ],
++          "isUnique": true
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "verification": {
++      "name": "verification",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "identifier": {
++          "name": "identifier",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "value": {
++          "name": "value",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expiresAt": {
++          "name": "expiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "verification_identifier_idx": {
++          "name": "verification_identifier_idx",
++          "columns": [
++            "identifier"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    }
++  },
++  "views": {},
++  "enums": {},
++  "_meta": {
++    "schemas": {},
++    "tables": {},
++    "columns": {}
++  },
++  "internal": {
++    "indexes": {}
++  }
++}
+\ No newline at end of file
+diff --git a/db/migrations/meta/_journal.json b/db/migrations/meta/_journal.json
+index 42c5e52..d03db64 100644
+--- a/db/migrations/meta/_journal.json
++++ b/db/migrations/meta/_journal.json
+@@ -8,6 +8,13 @@
+       "when": 1792295224188,
+       "tag": "20261018034704_sturdy_orphan",
+       "breakpoints": true
++    },
++    {
++      "idx": 1,
++      "version": "6",
++      "when": 1792455205699,
++      "tag": "20261020001325_useful_frank_castle",
++      "breakpoints": true
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/db/schema.ts b/db/schema.ts
+index f256712..c4f74db 100644
+--- a/db/schema.ts
++++ b/db/schema.ts
+@@ -11,3 +11,13 @@ export const posts = sqliteTable("posts", {
+   authorId: text("author_id").notNull(),
+   createdAt: text("created_at").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+ });
++
++// One row per kept earlier version of a post (title, excerpt, body).
++export const postRevisions = sqliteTable("post_revisions", {
++  id: integer("id").primaryKey({ autoIncrement: true }),
++  postId: integer("post_id").notNull(),
++  title: text("title").notNull(),
++  excerpt: text("excerpt").notNull(),
++  body: text("body").notNull(),
++  createdAt: text("created_at").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
++});
+diff --git a/lib/posts.ts b/lib/posts.ts
+index 594e2a5..3b6985d 100644
+--- a/lib/posts.ts
++++ b/lib/posts.ts
+@@ -1,5 +1,5 @@
+ import { HTTPException } from "hono/http-exception";
+-import { posts } from "@schema";
++import { postRevisions, posts } from "@schema";
+ import { db, eq } from "void/db";
+ import type { AuthUser } from "void/auth";
+ import { users } from "./users";
+@@ -34,6 +34,23 @@ export async function findPostOrFail(id: number): Promise<PostWithAuthor> {
+   return post;
+ }
+ 
++/** Keeps the post's current title, excerpt and body as a revision, then applies `next`. */
++export async function savePostEdit(
++  post: { id: number; title: string; excerpt: string; body: string },
++  next: { title: string; excerpt: string; body: string },
++): Promise<void> {
++  await db.insert(postRevisions).values({
++    postId: post.id,
++    title: post.title,
++    excerpt: post.excerpt,
++    body: post.body,
++  });
++  await db
++    .update(posts)
++    .set({ title: next.title, excerpt: next.excerpt, body: next.body })
++    .where(eq(posts.id, post.id));
++}
++
+ /** Only a post's author may edit or delete it. */
+ export function authorizeAuthor(user: AuthUser, post: { authorId: string }): void {
+   if (post.authorId !== user.id) throw new HTTPException(403, { message: "Forbidden" });
+diff --git a/pages/posts/[id].server.ts b/pages/posts/[id].server.ts
+index ea530d0..720c906 100644
+--- a/pages/posts/[id].server.ts
++++ b/pages/posts/[id].server.ts
+@@ -1,8 +1,8 @@
+ import { defineHandler, type InferProps } from "void";
+ import { getUser, requireAuth } from "void/auth";
+ import { db, eq } from "void/db";
+-import { posts } from "@schema";
+-import { authorizeAuthor, findPostOrFail, parsePostId } from "../../lib/posts";
++import { postRevisions, posts } from "@schema";
++import { authorizeAuthor, findPostOrFail, parsePostId, savePostEdit } from "../../lib/posts";
+ import { postPayloadSchema } from "../../lib/validators";
+ 
+ export type Props = InferProps<typeof loader>;
+@@ -18,7 +18,8 @@ export const actions = {
+   })(async (c, { body }) => {
+     const user = requireAuth(c);
+     const post = await findPostOrFail(parsePostId(c.req.param("id")));
+-    await db.update(posts).set(body).where(eq(posts.id, post.id));
++    authorizeAuthor(user, post);
++    await savePostEdit(post, body);
+     return c.redirect(`/posts/${post.id}`);
+   }),
+ 
+@@ -26,6 +27,7 @@ export const actions = {
+     const user = requireAuth(c);
+     const post = await findPostOrFail(parsePostId(c.req.param("id")));
+     authorizeAuthor(user, post);
++    await db.delete(postRevisions).where(eq(postRevisions.postId, post.id));
+     await db.delete(posts).where(eq(posts.id, post.id));
+     return c.redirect("/posts");
+   }),
+diff --git a/pages/posts/[id].tsx b/pages/posts/[id].tsx
+index 2cb334c..ad0c2e9 100644
+--- a/pages/posts/[id].tsx
++++ b/pages/posts/[id].tsx
+@@ -20,6 +20,7 @@ export default function PostShow({ post, canManage }: Props) {
+       {canManage && (
+         <p>
+           <Link href={`/posts/${post.id}/edit`}>Edit</Link>{" "}
++          <Link href={`/posts/${post.id}/revisions`}>Revisions</Link>{" "}
+           <button type="button" onClick={destroy}>Delete</button>
+         </p>
+       )}
+diff --git a/pages/posts/[id]/revisions.server.ts b/pages/posts/[id]/revisions.server.ts
+new file mode 100644
+index 0000000..9e7347e
+--- /dev/null
++++ b/pages/posts/[id]/revisions.server.ts
+@@ -0,0 +1,20 @@
++import { defineHandler, type InferProps } from "void";
++import { postRevisions } from "@schema";
++import { db, desc, eq } from "void/db";
++import { authorizeAuthor, findPostOrFail, parsePostId } from "../../../lib/posts";
++import { userOrRedirect } from "../../../lib/guards";
++
++export type Props = InferProps<typeof loader>;
++
++export const loader = defineHandler(async (c) => {
++  const user = userOrRedirect(c);
++  if (user instanceof Response) return user;
++  const post = await findPostOrFail(parsePostId(c.req.param("id")));
++  authorizeAuthor(user, post);
++  const revisions = await db
++    .select({ id: postRevisions.id, title: postRevisions.title, createdAt: postRevisions.createdAt })
++    .from(postRevisions)
++    .where(eq(postRevisions.postId, post.id))
++    .orderBy(desc(postRevisions.createdAt), desc(postRevisions.id));
++  return { post: { id: post.id, title: post.title }, revisions };
++});
+diff --git a/pages/posts/[id]/revisions.tsx b/pages/posts/[id]/revisions.tsx
+new file mode 100644
+index 0000000..dc49909
+--- /dev/null
++++ b/pages/posts/[id]/revisions.tsx
+@@ -0,0 +1,30 @@
++import { Link } from "@void/react";
++import type { Props } from "./revisions.server";
++
++export default function PostRevisions({ post, revisions }: Props) {
++  async function restore(revisionId: number) {
++    const res = await fetch(`/posts/${post.id}/revisions/${revisionId}/restore`, { method: "POST" });
++    if (res.ok) window.location.href = `/posts/${post.id}`;
++  }
++
++  return (
++    <section>
++      <h1>Revisions of “{post.title}”</h1>
++      <p>
++        <Link href={`/posts/${post.id}`}>Back to post</Link>
++      </p>
++      {revisions.length === 0 ? (
++        <p>No earlier versions yet.</p>
++      ) : (
++        <ul>
++          {revisions.map((revision) => (
++            <li key={revision.id}>
++              {revision.title} · <small>{new Date(revision.createdAt).toLocaleString()}</small>{" "}
++              <button type="button" onClick={() => restore(revision.id)}>Restore</button>
++            </li>
++          ))}
++        </ul>
++      )}
++    </section>
++  );
++}
+diff --git a/routes/posts/[id]/revisions/[revisionId]/restore.ts b/routes/posts/[id]/revisions/[revisionId]/restore.ts
+new file mode 100644
+index 0000000..fdbc046
+--- /dev/null
++++ b/routes/posts/[id]/revisions/[revisionId]/restore.ts
+@@ -0,0 +1,25 @@
++import { defineHandler } from "void";
++import { HTTPException } from "hono/http-exception";
++import { userOrRedirect } from "../../../../../lib/guards";
++import { and, db, eq } from "void/db";
++import { postRevisions } from "@schema";
++import { authorizeAuthor, findPostOrFail, parsePostId, savePostEdit } from "../../../../../lib/posts";
++
++// Restoring is itself an edit: the current version is kept as a new revision.
++export const POST = defineHandler(async (c) => {
++  const user = userOrRedirect(c);
++  if (user instanceof Response) return user;
++  const post = await findPostOrFail(parsePostId(c.req.param("id")));
++  authorizeAuthor(user, post);
++  const revisionId = Number(c.req.param("revisionId"));
++  if (!Number.isSafeInteger(revisionId) || revisionId < 1) {
++    throw new HTTPException(404, { message: "Revision not found" });
++  }
++  const [revision] = await db
++    .select()
++    .from(postRevisions)
++    .where(and(eq(postRevisions.id, revisionId), eq(postRevisions.postId, post.id)));
++  if (!revision) throw new HTTPException(404, { message: "Revision not found" });
++  await savePostEdit(post, revision);
++  return c.redirect(`/posts/${post.id}`);
++});

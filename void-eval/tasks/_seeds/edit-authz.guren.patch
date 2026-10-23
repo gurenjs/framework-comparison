@@ -1,0 +1,12 @@
+diff --git a/app/Http/Controllers/PostController.ts b/app/Http/Controllers/PostController.ts
+index 8f702c5..881d3d7 100644
+--- a/app/Http/Controllers/PostController.ts
++++ b/app/Http/Controllers/PostController.ts
+@@ -78,7 +78,6 @@ export default class PostController extends Controller {
+   async edit(): Promise<Response> {
+     const { id } = this.validateParams(PostIdParamSchema)
+     const post = await Post.findOrFail(id)
+-    await this.authorize('update', [Post, post])
+ 
+     return this.inertia(pages.posts.Edit, {
+       post: new PostResource(post).toJSON(),

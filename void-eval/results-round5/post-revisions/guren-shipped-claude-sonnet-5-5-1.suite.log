@@ -1,0 +1,9 @@
+[boot-guren] codegen
+[boot-guren] vite build (client + ssr)
+[boot-guren] ready on http://127.0.0.1:4300 (pid 80206)
+bun test v1.4.3 (c6da4a4d3)
+
+ 6 pass
+ 0 fail
+ 61 expect() calls
+Ran 6 tests across 1 file. [10.46s]

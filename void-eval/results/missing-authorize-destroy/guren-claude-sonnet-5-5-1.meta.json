@@ -1,0 +1,1 @@
+{"task": "missing-authorize-destroy", "arm": "guren", "model": "claude-sonnet-5-5", "trial": 1, "wall_seconds": 57, "start_commit": "2f224c0def647bc60b8b74890a59a8d0cec66031", "max_turns": 120, "claude_version": "2.1.289 (Claude Code)", "guren_cli": "2.31.1"}

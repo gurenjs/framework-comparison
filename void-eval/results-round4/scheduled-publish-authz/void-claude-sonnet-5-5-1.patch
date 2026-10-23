@@ -1,0 +1,256 @@
+diff --git a/db/migrations/20261020000000_scheduled_publish.sql b/db/migrations/20261020000000_scheduled_publish.sql
+new file mode 100644
+index 0000000..c4e4e2c
+--- /dev/null
++++ b/db/migrations/20261020000000_scheduled_publish.sql
+@@ -0,0 +1 @@
++ALTER TABLE `posts` ADD `published_at` text;
+diff --git a/db/migrations/meta/_journal.json b/db/migrations/meta/_journal.json
+index 42c5e52..f0e9c11 100644
+--- a/db/migrations/meta/_journal.json
++++ b/db/migrations/meta/_journal.json
+@@ -8,6 +8,13 @@
+       "when": 1792295224188,
+       "tag": "20261018034704_sturdy_orphan",
+       "breakpoints": true
++    },
++    {
++      "idx": 1,
++      "version": "6",
++      "when": 1792454400000,
++      "tag": "20261020000000_scheduled_publish",
++      "breakpoints": true
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/db/schema.ts b/db/schema.ts
+index f256712..6574d68 100644
+--- a/db/schema.ts
++++ b/db/schema.ts
+@@ -9,5 +9,6 @@ export const posts = sqliteTable("posts", {
+   excerpt: text("excerpt").notNull(),
+   body: text("body").notNull(),
+   authorId: text("author_id").notNull(),
++  publishedAt: text("published_at"),
+   createdAt: text("created_at").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+ });
+diff --git a/lib/posts.ts b/lib/posts.ts
+index 594e2a5..79ffbbd 100644
+--- a/lib/posts.ts
++++ b/lib/posts.ts
+@@ -1,7 +1,8 @@
+ import { HTTPException } from "hono/http-exception";
+ import { posts } from "@schema";
+-import { db, eq } from "void/db";
++import { and, db, eq, isNull, or, sql } from "void/db";
+ import type { AuthUser } from "void/auth";
++import { getUser } from "void/auth";
+ import { users } from "./users";
+ import { postIdSchema } from "./validators";
+ 
+@@ -11,6 +12,7 @@ const postColumns = {
+   excerpt: posts.excerpt,
+   body: posts.body,
+   authorId: posts.authorId,
++  publishedAt: posts.publishedAt,
+   createdAt: posts.createdAt,
+   author: { id: users.id, name: users.name },
+ };
+@@ -28,8 +30,15 @@ export function parsePostId(raw: string | undefined): number {
+   return parsed.data;
+ }
+ 
++/** Posts the current viewer may see: public ones (no date, or date passed) plus their own. */
++export function visiblePosts() {
++  const live = or(isNull(posts.publishedAt), sql`julianday(${posts.publishedAt}) <= julianday('now')`)!;
++  const viewer = getUser();
++  return viewer ? or(live, eq(posts.authorId, viewer.id))! : live;
++}
++
+ export async function findPostOrFail(id: number): Promise<PostWithAuthor> {
+-  const [post] = await selectPosts().where(eq(posts.id, id));
++  const [post] = await selectPosts().where(and(eq(posts.id, id), visiblePosts()));
+   if (!post) throw new HTTPException(404, { message: "Post not found" });
+   return post;
+ }
+diff --git a/lib/validators.ts b/lib/validators.ts
+index c786db6..ba79a1a 100644
+--- a/lib/validators.ts
++++ b/lib/validators.ts
+@@ -1,9 +1,30 @@
+ import { z } from "zod";
+ 
++const ISO_DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?$/i;
++const HAS_ZONE = /(Z|[+-]\d{2}:?\d{2})$/i;
++
++/** Optional "publish at" value: empty means now; otherwise an ISO 8601 date-time (zoneless is read as UTC). */
++const publishAtSchema = z
++  .string()
++  .trim()
++  .nullish()
++  .transform((value, ctx): string | null => {
++    if (!value) return null;
++    const date = ISO_DATE_TIME.test(value)
++      ? new Date(HAS_ZONE.test(value) ? value : `${value}Z`)
++      : new Date(Number.NaN);
++    if (Number.isNaN(date.getTime())) {
++      ctx.addIssue({ code: "custom", message: "Enter a valid date and time." });
++      return z.NEVER;
++    }
++    return date.toISOString();
++  });
++
+ export const postPayloadSchema = z.object({
+   title: z.string().trim().min(1, "Title is required.").max(255, "Title must be 255 characters or fewer."),
+   excerpt: z.string().trim().min(1, "Excerpt is required.").max(500, "Excerpt must be 500 characters or fewer."),
+   body: z.string().trim().min(1, "Body is required."),
++  publishAt: publishAtSchema,
+ });
+ 
+ export const profileUpdateSchema = z.object({
+diff --git a/pages/posts/[id].server.ts b/pages/posts/[id].server.ts
+index ea530d0..b862d50 100644
+--- a/pages/posts/[id].server.ts
++++ b/pages/posts/[id].server.ts
+@@ -18,7 +18,9 @@ export const actions = {
+   })(async (c, { body }) => {
+     const user = requireAuth(c);
+     const post = await findPostOrFail(parsePostId(c.req.param("id")));
+-    await db.update(posts).set(body).where(eq(posts.id, post.id));
++    authorizeAuthor(user, post);
++    const { publishAt, ...fields } = body;
++    await db.update(posts).set({ ...fields, publishedAt: publishAt }).where(eq(posts.id, post.id));
+     return c.redirect(`/posts/${post.id}`);
+   }),
+ 
+diff --git a/pages/posts/[id]/edit.tsx b/pages/posts/[id]/edit.tsx
+index fdd0f27..3e174c3 100644
+--- a/pages/posts/[id]/edit.tsx
++++ b/pages/posts/[id]/edit.tsx
+@@ -1,10 +1,17 @@
+ import { Form, useForm } from "@void/react";
+ import type { Props } from "./edit.server";
+ 
++function toLocalInput(iso: string | null | undefined): string {
++  if (!iso) return "";
++  const d = new Date(iso);
++  if (Number.isNaN(d.getTime())) return "";
++  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
++}
++
+ export default function PostEdit({ post }: Props) {
+   const form = useForm(
+     "/posts/:id?update",
+-    { title: post.title, excerpt: post.excerpt, body: post.body },
++    { title: post.title, excerpt: post.excerpt, body: post.body, publishAt: post.publishedAt ?? "" },
+     { params: { id: String(post.id) } },
+   );
+ 
+@@ -24,6 +31,15 @@ export default function PostEdit({ post }: Props) {
+           Body <textarea rows={10} value={form.data.body} onChange={(e) => form.setData("body", e.target.value)} />
+         </label>
+         {form.errors.body && <p className="error">{form.errors.body}</p>}
++        <label>
++          Publish at{" "}
++          <input
++            type="datetime-local"
++            value={toLocalInput(form.data.publishAt)}
++            onChange={(e) => form.setData("publishAt", e.target.value ? new Date(e.target.value).toISOString() : "")}
++          />
++        </label>
++        {form.errors.publishAt && <p className="error">{form.errors.publishAt}</p>}
+         <button disabled={form.pending}>Save changes</button>
+       </Form>
+     </section>
+diff --git a/pages/posts/create.tsx b/pages/posts/create.tsx
+index 7446382..b150d00 100644
+--- a/pages/posts/create.tsx
++++ b/pages/posts/create.tsx
+@@ -1,7 +1,14 @@
+ import { Form, useForm } from "@void/react";
+ 
++function toLocalInput(iso: string | null | undefined): string {
++  if (!iso) return "";
++  const d = new Date(iso);
++  if (Number.isNaN(d.getTime())) return "";
++  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
++}
++
+ export default function PostCreate() {
+-  const form = useForm("/posts", { title: "", excerpt: "", body: "" });
++  const form = useForm("/posts", { title: "", excerpt: "", body: "", publishAt: "" });
+ 
+   return (
+     <section>
+@@ -19,6 +26,15 @@ export default function PostCreate() {
+           Body <textarea rows={10} value={form.data.body} onChange={(e) => form.setData("body", e.target.value)} />
+         </label>
+         {form.errors.body && <p className="error">{form.errors.body}</p>}
++        <label>
++          Publish at{" "}
++          <input
++            type="datetime-local"
++            value={toLocalInput(form.data.publishAt)}
++            onChange={(e) => form.setData("publishAt", e.target.value ? new Date(e.target.value).toISOString() : "")}
++          />
++        </label>
++        {form.errors.publishAt && <p className="error">{form.errors.publishAt}</p>}
+         <button disabled={form.pending}>Publish</button>
+       </Form>
+     </section>
+diff --git a/pages/posts/index.server.ts b/pages/posts/index.server.ts
+index e1ac737..2e64af5 100644
+--- a/pages/posts/index.server.ts
++++ b/pages/posts/index.server.ts
+@@ -1,8 +1,8 @@
+ import { defineHandler, type InferProps } from "void";
+ import { requireAuth } from "void/auth";
+-import { count, db, desc, like, or } from "void/db";
++import { and, count, db, desc, like, or } from "void/db";
+ import { posts } from "@schema";
+-import { selectPosts } from "../../lib/posts";
++import { selectPosts, visiblePosts } from "../../lib/posts";
+ import { paginationMeta } from "../../lib/pagination";
+ import { listPostsQuerySchema, postPayloadSchema } from "../../lib/validators";
+ 
+@@ -19,9 +19,11 @@ export const loader = defineHandler(async (c) => {
+     ? or(...keywords.flatMap((k) => [like(posts.title, `%${k}%`), like(posts.excerpt, `%${k}%`)]))
+     : undefined;
+ 
+-  const [{ total }] = await db.select({ total: count() }).from(posts).where(search);
++  const where = and(search, visiblePosts());
++
++  const [{ total }] = await db.select({ total: count() }).from(posts).where(where);
+   const data = await selectPosts()
+-    .where(search)
++    .where(where)
+     .orderBy(desc(posts.id))
+     .limit(PER_PAGE)
+     .offset((page - 1) * PER_PAGE);
+@@ -37,9 +39,10 @@ export const action = defineHandler.withValidator({
+   body: postPayloadSchema,
+ })(async (c, { body }) => {
+   const user = requireAuth(c);
++  const { publishAt, ...fields } = body;
+   const [post] = await db
+     .insert(posts)
+-    .values({ ...body, authorId: user.id })
++    .values({ ...fields, publishedAt: publishAt, authorId: user.id })
+     .returning({ id: posts.id });
+   return c.redirect(`/posts/${post.id}`);
+ });
+diff --git a/pages/posts/index.tsx b/pages/posts/index.tsx
+index 94fa731..b7ead95 100644
+--- a/pages/posts/index.tsx
++++ b/pages/posts/index.tsx
+@@ -27,6 +27,9 @@ export default function PostsIndex({ data, q, pagination }: Props) {
+           <Link href={`/posts/${post.id}`}>{post.title}</Link>
+           <p>{post.excerpt}</p>
+           <small>by {post.author.name}</small>
++          {post.publishedAt && new Date(post.publishedAt) > new Date() && (
++            <small> · scheduled for {new Date(post.publishedAt).toLocaleString()}</small>
++          )}
+         </article>
+       ))}
+ 

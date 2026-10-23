@@ -1,0 +1,15 @@
+diff --git a/pages/posts/[id].server.ts b/pages/posts/[id].server.ts
+index 238af46..dde7f3d 100644
+--- a/pages/posts/[id].server.ts
++++ b/pages/posts/[id].server.ts
+@@ -24,8 +24,9 @@ export const actions = {
+   }),
+ 
+   delete: defineHandler(async (c) => {
+-    requireAuth(c);
++    const user = requireAuth(c);
+     const post = await findPostOrFail(parsePostId(c.req.param("id")));
++    authorizeAuthor(user, post);
+     await db.delete(posts).where(eq(posts.id, post.id));
+     return c.redirect("/posts");
+   }),

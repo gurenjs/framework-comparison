@@ -1,0 +1,1 @@
+{"task": "raw-body-no-validation", "arm": "guren", "model": "claude-sonnet-5-5", "trial": 1, "wall_seconds": 103, "start_commit": "de314c7c988c4d16f411799bba1efd2b68b61525", "max_turns": 120, "claude_version": "2.1.289 (Claude Code)"}

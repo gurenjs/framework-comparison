@@ -1,0 +1,18 @@
+# baseline (pinned @guren/cli 2.31.1)
+Preparing worktree (detached HEAD 0fd1654)
+(start)                                                 input_tokens=35594   file_chars=-
+README.md                                               input_tokens=36242   file_chars=1163
+app/Http/Controllers/PostController.ts                  input_tokens=44055   file_chars=3841
+app/Models/Post.ts                                      input_tokens=42725   file_chars=699
+tests/PostController.test.ts                            input_tokens=40330   file_chars=806
+routes/web.ts                                           input_tokens=42039   file_chars=2378
+db/schema.ts                                            input_tokens=42816   file_chars=889
+# overlay-v1 (rules core/reference split, docs-and-spec docs/** only, CLAUDE.md trim)
+Preparing worktree (detached HEAD 0fd1654)
+(start)                                                 input_tokens=34698   file_chars=-
+README.md                                               input_tokens=35349   file_chars=1163
+app/Http/Controllers/PostController.ts                  input_tokens=38617   file_chars=3841
+app/Models/Post.ts                                      input_tokens=37191   file_chars=699
+tests/PostController.test.ts                            input_tokens=37607   file_chars=806
+routes/web.ts                                           input_tokens=37499   file_chars=2378
+db/schema.ts                                            input_tokens=37286   file_chars=889

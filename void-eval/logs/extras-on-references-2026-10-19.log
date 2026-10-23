@@ -1,0 +1,64 @@
+######## guren-lean reference post-tags
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## void reference post-tags
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## guren-lean reference comments-moderation
+ 8 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/comments-moderation.robustness.test.ts
+ 5 pass
+ 0 fail
+--- extra exit: 0
+######## void reference comments-moderation
+ 8 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/comments-moderation.robustness.test.ts
+ 5 pass
+ 0 fail
+--- extra exit: 0
+######## guren-lean reference post-revisions
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## void reference post-revisions
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## guren-lean reference json-api-tokens
+ 10 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/json-api-tokens.robustness.test.ts
+ 4 pass
+ 0 fail
+--- extra exit: 0
+######## void reference json-api-tokens
+ 10 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/json-api-tokens.robustness.test.ts
+ 4 pass
+ 0 fail
+--- extra exit: 0
+######## guren-lean reference scheduled-publish
+ 5 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/scheduled-publish.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## void reference scheduled-publish

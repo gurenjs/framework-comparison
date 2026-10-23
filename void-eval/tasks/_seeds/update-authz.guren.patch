@@ -1,0 +1,12 @@
+diff --git a/app/Http/Controllers/PostController.ts b/app/Http/Controllers/PostController.ts
+index 8f702c5..4e93caf 100644
+--- a/app/Http/Controllers/PostController.ts
++++ b/app/Http/Controllers/PostController.ts
+@@ -88,7 +88,6 @@ export default class PostController extends Controller {
+   async update(): Promise<Response> {
+     const { id } = this.validateParams(PostIdParamSchema)
+     const post = await Post.findOrFail(id)
+-    await this.authorize('update', [Post, post])
+ 
+     const { body: data } = this.validated('posts.update')
+     await Post.update({ id: post.id }, data)

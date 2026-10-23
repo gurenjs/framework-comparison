@@ -1,0 +1,1 @@
+{"task": "api-posts-contract", "arm": "guren", "model": "claude-sonnet-5-5", "trial": 1, "wall_seconds": 123, "start_commit": "279209b80d4a3193fabc9cc909df9be6e7001fe3", "max_turns": 120, "claude_version": "2.1.289 (Claude Code)"}

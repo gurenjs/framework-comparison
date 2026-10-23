@@ -1,0 +1,30 @@
+[boot-void] ready on http://127.0.0.1:4200 (pid 79015, attempt 1)
+bun test v1.3.14 (0d9b296a)
+
+tests/post-revisions.test.ts:
+123 | 
+124 |     const res = await restoreRevision(driver, client, postId, original!.id)
+125 |     expect([302, 303], `status ${res.status}: ${res.bodyText.slice(0, 300)}`).toContain(res.status)
+126 |     expect(res.location).toBe(`/posts/${postId}`)
+127 | 
+128 |     expect(postContent(postId)).toEqual(ORIGINAL)
+                                      ^
+error: expect(received).toEqual(expected)
+
+- {
+-   "body": "First body.",
+-   "excerpt": "First excerpt",
+-   "title": "First title",
+- }
++ null
+
+- Expected  - 5
++ Received  + 1
+
+      at <anonymous> (void-eval/suite/tests/post-revisions.test.ts:128:33)
+(fail) post revisions > restores a revision, redirects to the post, and keeps the pre-restore state as a revision [1338.04ms]
+
+ 5 pass
+ 1 fail
+ 59 expect() calls
+Ran 6 tests across 1 file. [11.13s]

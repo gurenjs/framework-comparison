@@ -1,0 +1,12 @@
+diff --git a/pages/posts/[id].server.ts b/pages/posts/[id].server.ts
+index dde7f3d..ea530d0 100644
+--- a/pages/posts/[id].server.ts
++++ b/pages/posts/[id].server.ts
+@@ -18,7 +18,6 @@ export const actions = {
+   })(async (c, { body }) => {
+     const user = requireAuth(c);
+     const post = await findPostOrFail(parsePostId(c.req.param("id")));
+-    authorizeAuthor(user, post);
+     await db.update(posts).set(body).where(eq(posts.id, post.id));
+     return c.redirect(`/posts/${post.id}`);
+   }),

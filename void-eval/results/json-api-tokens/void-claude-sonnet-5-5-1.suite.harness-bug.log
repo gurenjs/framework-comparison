@@ -1,0 +1,34 @@
+[boot-void] no answer from http://127.0.0.1:4300/posts (attempt 1); log tail:
+10:38:30 PM [void] Applied 2 migration(s): 20261018034704_sturdy_orphan.sql, 20261018133424_lowly_drax.sql
+10:38:30 PM [void] Applied Better Auth migrations
+10:38:34 PM [vite+] (void_worker) [optimizer] scanning dependencies...
+10:38:38 PM [vite+] (void_worker) [optimizer] bundling dependencies...
+[boot-void] ready on http://127.0.0.1:4300 (pid 70598, attempt 2)
+bun test v1.3.14 (0d9b296a)
+
+tests/json-api-tokens.test.ts:
+121 |       name: user.name,
+122 |       email: user.email,
+123 |       password: user.password,
+124 |     }, false)
+125 |     if (res.status !== 200 || !client.jar.names().some((n) => n.includes('session_token'))) {
+126 |       throw new Error(`void driver: register ${user.email} failed: ${res.status} ${res.bodyText.slice(0, 300)}`)
+                      ^
+error: void driver: register user-mvdvkoyifdrq-6@example.com failed: 500 
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta charset="UTF-8" />
+            <title>Error</title>
+            <script type="module">
+              const error = {"message":"fetch failed","stack":"    at Object.processResponse ($WT_ROOT/verify-j
+      at register (void-eval/suite/drivers/void.ts:126:17)
+      at async makeUser (void-eval/suite/lib/fixtures.ts:27:16)
+      at async <anonymous> (void-eval/suite/tests/json-api-tokens.test.ts:133:24)
+(fail) personal API tokens > revokes a token with 204, after which it is refused while the owner's other tokens keep working [182.59ms]
+suite: 1 request(s) re-sent after a dev-server "fetch failed" page
+
+ 9 pass
+ 1 fail
+ 129 expect() calls
+Ran 10 tests across 1 file. [34.17s]

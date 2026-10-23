@@ -1,0 +1,24 @@
+== cell: post-tags/guren-claude-sonnet-5-5-1
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 108s
+== saved: results/post-tags/guren-claude-sonnet-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict post-tags/guren-claude-sonnet-5-5-1: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: post-tags/guren-claude-sonnet-5-5-2
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 262s
+== saved: results/post-tags/guren-claude-sonnet-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict post-tags/guren-claude-sonnet-5-5-2: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: post-tags/guren-claude-sonnet-5-5-3
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 127s
+== saved: results/post-tags/guren-claude-sonnet-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict post-tags/guren-claude-sonnet-5-5-3: PASS (typecheck=pass suite=pass 6 pass  0 fail)

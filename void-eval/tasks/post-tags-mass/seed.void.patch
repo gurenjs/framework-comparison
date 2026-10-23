@@ -1,0 +1,12 @@
+diff --git a/lib/validators.ts b/lib/validators.ts
+index c786db6..a806efb 100644
+--- a/lib/validators.ts
++++ b/lib/validators.ts
+@@ -4,6 +4,7 @@ export const postPayloadSchema = z.object({
+   title: z.string().trim().min(1, "Title is required.").max(255, "Title must be 255 characters or fewer."),
+   excerpt: z.string().trim().min(1, "Excerpt is required.").max(500, "Excerpt must be 500 characters or fewer."),
+   body: z.string().trim().min(1, "Body is required."),
++  authorId: z.string().optional(),
+ });
+ 
+ export const profileUpdateSchema = z.object({

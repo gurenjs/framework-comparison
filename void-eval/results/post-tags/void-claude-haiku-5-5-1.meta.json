@@ -1,0 +1,1 @@
+{"task": "post-tags", "arm": "void", "model": "claude-haiku-5-5", "trial": 1, "wall_seconds": 119, "start_commit": "0e05cbfd4e6536e5fa0192017915836874a2a95d", "max_turns": 200, "claude_version": "2.1.289 (Claude Code)", "guren_cli": "-"}

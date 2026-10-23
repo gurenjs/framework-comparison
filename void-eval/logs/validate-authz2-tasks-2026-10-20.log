@@ -1,0 +1,231 @@
+######## guren post-tags-dauthz reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-dauthz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-tags-dauthz.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## guren post-tags-dauthz reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-dauthz.authz.test.ts
+(fail) post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it [72.74ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-tags-dauthz.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## void post-tags-dauthz reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-dauthz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-tags-dauthz.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## void post-tags-dauthz reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-dauthz.authz.test.ts
+(fail) post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it [134.87ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-tags-dauthz.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## guren post-revisions-dauthz reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions-dauthz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-revisions-dauthz.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## guren post-revisions-dauthz reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions-dauthz.authz.test.ts
+(fail) post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it [73.37ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-revisions-dauthz.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## void post-revisions-dauthz reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions-dauthz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-revisions-dauthz.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## void post-revisions-dauthz reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions-dauthz.authz.test.ts
+(fail) post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it [229.65ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-revisions-dauthz.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## guren comments-moderation-dauthz reference
+ 8 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/comments-moderation-dauthz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/comments-moderation-dauthz.robustness.test.ts
+ 5 pass
+ 0 fail
+--- extra exit: 0
+######## guren comments-moderation-dauthz reference-nofix
+ 8 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/comments-moderation-dauthz.authz.test.ts
+(fail) post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it [69.87ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/comments-moderation-dauthz.robustness.test.ts
+ 5 pass
+ 0 fail
+--- extra exit: 0
+######## void comments-moderation-dauthz reference
+ 8 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/comments-moderation-dauthz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/comments-moderation-dauthz.robustness.test.ts
+ 5 pass
+ 0 fail
+--- extra exit: 0
+######## void comments-moderation-dauthz reference-nofix
+ 8 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/comments-moderation-dauthz.authz.test.ts
+(fail) post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it [133.61ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/comments-moderation-dauthz.robustness.test.ts
+ 5 pass
+ 0 fail
+--- extra exit: 0
+######## guren post-tags-eauthz reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-eauthz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-tags-eauthz.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## guren post-tags-eauthz reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-eauthz.authz.test.ts
+(fail) post edit page authorization (hidden defect) > refuses another user the edit page of a post [78.60ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-tags-eauthz.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## void post-tags-eauthz reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-eauthz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-tags-eauthz.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## void post-tags-eauthz reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-eauthz.authz.test.ts
+(fail) post edit page authorization (hidden defect) > refuses another user the edit page of a post [152.11ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-tags-eauthz.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## guren scheduled-publish-eauthz reference
+ 5 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/scheduled-publish-eauthz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/scheduled-publish-eauthz.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## guren scheduled-publish-eauthz reference-nofix
+ 5 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/scheduled-publish-eauthz.authz.test.ts
+(fail) post edit page authorization (hidden defect) > refuses another user the edit page of a post [74.35ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/scheduled-publish-eauthz.robustness.test.ts
+(fail) scheduled publishing: robustness (extra) > hides a scheduled post's edit form from other users and refuses their update [52.47ms]
+ 2 pass
+ 1 fail
+--- extra exit: 1
+######## void scheduled-publish-eauthz reference
+ 5 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/scheduled-publish-eauthz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/scheduled-publish-eauthz.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## void scheduled-publish-eauthz reference-nofix
+ 5 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/scheduled-publish-eauthz.authz.test.ts
+(fail) post edit page authorization (hidden defect) > refuses another user the edit page of a post [141.63ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/scheduled-publish-eauthz.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0

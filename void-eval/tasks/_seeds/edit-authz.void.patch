@@ -1,0 +1,18 @@
+diff --git a/pages/posts/[id]/edit.server.ts b/pages/posts/[id]/edit.server.ts
+index c82614d..8909a07 100644
+--- a/pages/posts/[id]/edit.server.ts
++++ b/pages/posts/[id]/edit.server.ts
+@@ -1,5 +1,5 @@
+ import { defineHandler, type InferProps } from "void";
+-import { authorizeAuthor, findPostOrFail, parsePostId } from "../../../lib/posts";
++import { findPostOrFail, parsePostId } from "../../../lib/posts";
+ import { userOrRedirect } from "../../../lib/guards";
+ 
+ export type Props = InferProps<typeof loader>;
+@@ -8,6 +8,5 @@ export const loader = defineHandler(async (c) => {
+   const user = userOrRedirect(c);
+   if (user instanceof Response) return user;
+   const post = await findPostOrFail(parsePostId(c.req.param("id")));
+-  authorizeAuthor(user, post);
+   return { post };
+ });

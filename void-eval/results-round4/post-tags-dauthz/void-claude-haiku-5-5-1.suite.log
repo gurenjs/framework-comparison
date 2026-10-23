@@ -1,0 +1,7 @@
+[boot-void] ready on http://127.0.0.1:4200 (pid 41352, attempt 1)
+bun test v1.3.14 (0d9b296a)
+
+ 6 pass
+ 0 fail
+ 62 expect() calls
+Ran 6 tests across 1 file. [597.00ms]

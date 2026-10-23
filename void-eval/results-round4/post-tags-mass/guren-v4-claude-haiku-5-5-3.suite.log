@@ -1,0 +1,86 @@
+[boot-guren] codegen
+[boot-guren] vite build (client + ssr)
+[boot-guren] ready on http://127.0.0.1:4100 (pid 7783)
+bun test v1.3.14 (0d9b296a)
+
+tests/post-tags.test.ts:
+77 | 
+78 |   /** Create a post through the form endpoint; returns its id. */
+79 |   async function storePost(client: Client, tags?: string): Promise<number> {
+80 |     const data = payload(tags)
+81 |     const res = await submitPost(driver, client, data)
+82 |     expect([302, 303], `status ${res.status}: ${res.bodyText.slice(0, 300)}`).toContain(res.status)
+                                                                                   ^
+error: status 500: {"message":"Internal Server Error"}
+
+Expected to contain: 500
+Received: [ 302, 303 ]
+
+      at storePost (void-eval/suite/tests/post-tags.test.ts:82:79)
+      at async <anonymous> (void-eval/suite/tests/post-tags.test.ts:112:22)
+(fail) post tags > stores "bun, webdev" as two tags of the new post and the post page shows them [57.21ms]
+77 | 
+78 |   /** Create a post through the form endpoint; returns its id. */
+79 |   async function storePost(client: Client, tags?: string): Promise<number> {
+80 |     const data = payload(tags)
+81 |     const res = await submitPost(driver, client, data)
+82 |     expect([302, 303], `status ${res.status}: ${res.bodyText.slice(0, 300)}`).toContain(res.status)
+                                                                                   ^
+error: status 500: {"message":"Internal Server Error"}
+
+Expected to contain: 500
+Received: [ 302, 303 ]
+
+      at storePost (void-eval/suite/tests/post-tags.test.ts:82:79)
+      at async <anonymous> (void-eval/suite/tests/post-tags.test.ts:123:22)
+(fail) post tags > editing the field down to "bun" disassociates webdev from the post [26.62ms]
+77 | 
+78 |   /** Create a post through the form endpoint; returns its id. */
+79 |   async function storePost(client: Client, tags?: string): Promise<number> {
+80 |     const data = payload(tags)
+81 |     const res = await submitPost(driver, client, data)
+82 |     expect([302, 303], `status ${res.status}: ${res.bodyText.slice(0, 300)}`).toContain(res.status)
+                                                                                   ^
+error: status 500: {"message":"Internal Server Error"}
+
+Expected to contain: 500
+Received: [ 302, 303 ]
+
+      at storePost (void-eval/suite/tests/post-tags.test.ts:82:79)
+      at async <anonymous> (void-eval/suite/tests/post-tags.test.ts:139:27)
+(fail) post tags > ?tag=bun lists only the posts carrying bun, an unknown tag lists none, and every listed post carries its tags [26.78ms]
+77 | 
+78 |   /** Create a post through the form endpoint; returns its id. */
+79 |   async function storePost(client: Client, tags?: string): Promise<number> {
+80 |     const data = payload(tags)
+81 |     const res = await submitPost(driver, client, data)
+82 |     expect([302, 303], `status ${res.status}: ${res.bodyText.slice(0, 300)}`).toContain(res.status)
+                                                                                   ^
+error: status 500: {"message":"Internal Server Error"}
+
+Expected to contain: 500
+Received: [ 302, 303 ]
+
+      at storePost (void-eval/suite/tests/post-tags.test.ts:82:79)
+      at async <anonymous> (void-eval/suite/tests/post-tags.test.ts:176:22)
+(fail) post tags > rejects a 31-character tag name and accepts a 30-character one [28.46ms]
+77 | 
+78 |   /** Create a post through the form endpoint; returns its id. */
+79 |   async function storePost(client: Client, tags?: string): Promise<number> {
+80 |     const data = payload(tags)
+81 |     const res = await submitPost(driver, client, data)
+82 |     expect([302, 303], `status ${res.status}: ${res.bodyText.slice(0, 300)}`).toContain(res.status)
+                                                                                   ^
+error: status 500: {"message":"Internal Server Error"}
+
+Expected to contain: 500
+Received: [ 302, 303 ]
+
+      at storePost (void-eval/suite/tests/post-tags.test.ts:82:79)
+      at async <anonymous> (void-eval/suite/tests/post-tags.test.ts:185:22)
+(fail) post tags > collapses " bun ,bun" into the single tag bun [27.44ms]
+
+ 1 pass
+ 5 fail
+ 18 expect() calls
+Ran 6 tests across 1 file. [215.00ms]

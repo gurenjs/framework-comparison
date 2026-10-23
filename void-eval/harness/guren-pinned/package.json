@@ -1,0 +1,48 @@
+{
+  "name": "agents-on-guren-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "codegen": "bunx guren codegen --force",
+    "dev": "bun run codegen && GUREN_MCP=1 GUREN_DOCS=1 bun run dev:server",
+    "dev:server": "bun --hot bin/serve.ts",
+    "console": "bun bin/console.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "bunx oxlint",
+    "lint:fix": "bunx oxlint --fix",
+    "test": "bun test",
+    "build": "bun run codegen && bunx vite build && bunx vite build --ssr",
+    "preview": "NODE_ENV=production bun bin/serve.ts",
+    "db:make": "bunx guren make:migration",
+    "db:migrate": "bunx guren db:migrate",
+    "db:reset": "bunx guren db:reset",
+    "db:status": "bunx guren db:status",
+    "db:seed": "bunx guren db:seed"
+  },
+  "dependencies": {
+    "@guren/cli": "^2.31.1",
+    "@guren/core": "^1.24.0",
+    "@guren/inertia-client": "^1.2.2",
+    "@guren/orm": "^2.14.0",
+    "@inertiajs/react": "^3.9.1",
+    "drizzle-orm": "1.0.0-rc.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@guren/testing": "^1.14.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "bun-types": "^1.4.3",
+    "drizzle-kit": "1.0.0-rc.4",
+    "mermaid": "^11.17.2",
+    "oxlint": "~1.81.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  }
+}

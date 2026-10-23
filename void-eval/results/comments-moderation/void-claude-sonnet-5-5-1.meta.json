@@ -1,0 +1,1 @@
+{"task": "comments-moderation", "arm": "void", "model": "claude-sonnet-5-5", "trial": 1, "wall_seconds": 87, "start_commit": "5066491ac82b43f6b36597992e56f0a9e6720cd3", "max_turns": 200, "claude_version": "2.1.289 (Claude Code)", "guren_cli": "-"}

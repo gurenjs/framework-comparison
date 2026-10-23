@@ -1,0 +1,8 @@
+# lean base c0a533c, v3 (overlays/guren-harness-v3)
+Preparing worktree (detached HEAD c0a533c)
+(start)                                                 input_tokens=33104   file_chars=-
+README.md                                               input_tokens=33753   file_chars=1163
+app/Http/Controllers/PostController.ts                  input_tokens=37071   file_chars=3841
+app/Models/Post.ts                                      input_tokens=35924   file_chars=699
+routes/web.ts                                           input_tokens=35899   file_chars=2378
+db/schema.ts                                            input_tokens=36007   file_chars=889

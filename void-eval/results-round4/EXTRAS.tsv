@@ -1,0 +1,60 @@
+post-tags-dauthz/guren-v4-claude-haiku-5-5-1	 6 pass  0 fail 	16	00	
+post-tags-dauthz/guren-v4-claude-haiku-5-5-2	 6 pass  0 fail 	16	00	
+post-tags-dauthz/guren-v4-claude-haiku-5-5-3	 6 pass  0 fail 	16	00	
+post-tags-dauthz/void-claude-haiku-5-5-1	 6 pass  0 fail 	06	10	post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it|
+post-tags-dauthz/void-claude-haiku-5-5-2	 6 pass  0 fail 	06	10	post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it|
+post-tags-dauthz/void-claude-haiku-5-5-3	 6 pass  0 fail 	06	10	post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it|
+post-revisions-dauthz/guren-v4-claude-haiku-5-5-1	 6 pass  0 fail 	13	00	
+post-revisions-dauthz/guren-v4-claude-haiku-5-5-2	 6 pass  0 fail 	13	00	
+post-revisions-dauthz/guren-v4-claude-haiku-5-5-3	 6 pass  0 fail 	13	00	
+post-revisions-dauthz/void-claude-haiku-5-5-1	 6 pass  0 fail 	03	10	post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it|
+post-revisions-dauthz/void-claude-haiku-5-5-2	 6 pass  0 fail 	03	10	post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it|
+post-revisions-dauthz/void-claude-haiku-5-5-3	 6 pass  0 fail 	03	10	post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it|
+comments-moderation-dauthz/guren-v4-claude-haiku-5-5-1	 8 pass  0 fail 	15	00	
+comments-moderation-dauthz/guren-v4-claude-haiku-5-5-2	 8 pass  0 fail 	15	00	
+comments-moderation-dauthz/guren-v4-claude-haiku-5-5-3	 8 pass  0 fail 	15	00	
+comments-moderation-dauthz/void-claude-haiku-5-5-1	 8 pass  0 fail 	05	10	post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it|
+comments-moderation-dauthz/void-claude-haiku-5-5-2	 8 pass  0 fail 	05	10	post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it|
+comments-moderation-dauthz/void-claude-haiku-5-5-3	 8 pass  0 fail 	05	10	post delete authorization (hidden defect) > refuses another user's delete of a post and keeps it|
+post-tags-eauthz/guren-v4-claude-haiku-5-5-1	 6 pass  0 fail 	06	10	post edit page authorization (hidden defect) > refuses another user the edit page of a post|
+post-tags-eauthz/guren-v4-claude-haiku-5-5-2	 6 pass  0 fail 	06	10	post edit page authorization (hidden defect) > refuses another user the edit page of a post|
+post-tags-eauthz/guren-v4-claude-haiku-5-5-3	 6 pass  0 fail 	06	10	post edit page authorization (hidden defect) > refuses another user the edit page of a post|
+post-tags-eauthz/void-claude-haiku-5-5-1	 6 pass  0 fail 	06	10	post edit page authorization (hidden defect) > refuses another user the edit page of a post|
+post-tags-eauthz/void-claude-haiku-5-5-2	 6 pass  0 fail 	06	10	post edit page authorization (hidden defect) > refuses another user the edit page of a post|
+post-tags-eauthz/void-claude-haiku-5-5-3	 6 pass  0 fail 	06	10	post edit page authorization (hidden defect) > refuses another user the edit page of a post|
+scheduled-publish-eauthz/guren-v4-claude-haiku-5-5-1	 5 pass  0 fail 	03	10	post edit page authorization (hidden defect) > refuses another user the edit page of a post|
+scheduled-publish-eauthz/guren-v4-claude-haiku-5-5-2	 5 pass  0 fail 	02	11	post edit page authorization (hidden defect) > refuses another user the edit page of a post|scheduled publishing: robustness (extra) > hides a scheduled post's edit form from other users and refuses their update|
+scheduled-publish-eauthz/guren-v4-claude-haiku-5-5-3	 5 pass  0 fail 	02	11	post edit page authorization (hidden defect) > refuses another user the edit page of a post|scheduled publishing: robustness (extra) > hides a scheduled post's edit form from other users and refuses their update|
+scheduled-publish-eauthz/void-claude-haiku-5-5-1	 5 pass  0 fail 	13	00	
+scheduled-publish-eauthz/void-claude-haiku-5-5-2	 5 pass  0 fail 	03	10	post edit page authorization (hidden defect) > refuses another user the edit page of a post|
+scheduled-publish-eauthz/void-claude-haiku-5-5-3	 5 pass  0 fail 	03	10	post edit page authorization (hidden defect) > refuses another user the edit page of a post|
+post-tags-mass/guren-v4-claude-haiku-5-5-1	 6 pass  0 fail 	16	00	
+post-tags-mass/guren-v4-claude-haiku-5-5-2	 6 pass  0 fail 	16	00	
+post-tags-mass/guren-v4-claude-haiku-5-5-3	 1 pass  5 fail 	01	15	post author mass assignment (hidden defect) > keeps the author when an edit sends another authorId|post tags: robustness (extra) > ignores empty entries ("a,,b," is the two tags a and b)|post tags: robustness (extra) > treats names as case-sensitive|post tags: robustness (extra) > detaches every tag when an edit sends the field empty|post tags: robustness (extra) > refuses another user's edit of a tagged post and keeps its tags|post tags: robustness (extra) > deletes a tagged post and its post_tags rows|
+post-tags-mass/guren-v4-claude-sonnet-5-5-1	 6 pass  0 fail 	16	00	
+post-tags-mass/guren-v4-claude-sonnet-5-5-2	 6 pass  0 fail 	16	00	
+post-tags-mass/guren-v4-claude-sonnet-5-5-3	 6 pass  0 fail 	16	00	
+post-tags-mass/void-claude-haiku-5-5-1	 6 pass  0 fail 	06	10	post author mass assignment (hidden defect) > keeps the author when an edit sends another authorId|
+post-tags-mass/void-claude-haiku-5-5-2	 6 pass  0 fail 	06	10	post author mass assignment (hidden defect) > keeps the author when an edit sends another authorId|
+post-tags-mass/void-claude-haiku-5-5-3	 6 pass  0 fail 	06	10	post author mass assignment (hidden defect) > keeps the author when an edit sends another authorId|
+post-tags-mass/void-claude-sonnet-5-5-1	 6 pass  0 fail 	06	10	post author mass assignment (hidden defect) > keeps the author when an edit sends another authorId|
+post-tags-mass/void-claude-sonnet-5-5-2	 6 pass  0 fail 	06	10	post author mass assignment (hidden defect) > keeps the author when an edit sends another authorId|
+post-tags-mass/void-claude-sonnet-5-5-3	 6 pass  0 fail 	06	10	post author mass assignment (hidden defect) > keeps the author when an edit sends another authorId|
+post-tags-authz/guren-v4-claude-sonnet-5-5-1	 6 pass  0 fail 	16	00	
+post-tags-authz/guren-v4-claude-sonnet-5-5-2	 6 pass  0 fail 	16	00	
+post-tags-authz/guren-v4-claude-sonnet-5-5-3	 6 pass  0 fail 	16	00	
+post-tags-authz/void-claude-sonnet-5-5-1	 6 pass  0 fail 	16	00	
+post-tags-authz/void-claude-sonnet-5-5-2	 6 pass  0 fail 	16	00	
+post-tags-authz/void-claude-sonnet-5-5-3	 6 pass  0 fail 	16	00	
+post-revisions-authz/guren-v4-claude-sonnet-5-5-1	 6 pass  0 fail 	13	00	
+post-revisions-authz/guren-v4-claude-sonnet-5-5-2	 6 pass  0 fail 	13	00	
+post-revisions-authz/guren-v4-claude-sonnet-5-5-3	 6 pass  0 fail 	13	00	
+post-revisions-authz/void-claude-sonnet-5-5-1	 6 pass  0 fail 	13	00	
+post-revisions-authz/void-claude-sonnet-5-5-2	 6 pass  0 fail 	13	00	
+post-revisions-authz/void-claude-sonnet-5-5-3	 6 pass  0 fail 	13	00	
+scheduled-publish-authz/guren-v4-claude-sonnet-5-5-1	 5 pass  0 fail 	13	00	
+scheduled-publish-authz/guren-v4-claude-sonnet-5-5-2	 5 pass  0 fail 	13	00	
+scheduled-publish-authz/guren-v4-claude-sonnet-5-5-3	 5 pass  0 fail 	13	00	
+scheduled-publish-authz/void-claude-sonnet-5-5-1	 5 pass  0 fail 	13	00	
+scheduled-publish-authz/void-claude-sonnet-5-5-2	 5 pass  0 fail 	13	00	
+scheduled-publish-authz/void-claude-sonnet-5-5-3	 5 pass  0 fail 	13	00	

@@ -1,0 +1,913 @@
+diff --git a/db/migrations/20261018231207_equal_roughhouse.sql b/db/migrations/20261018231207_equal_roughhouse.sql
+new file mode 100644
+index 0000000..15d9ecc
+--- /dev/null
++++ b/db/migrations/20261018231207_equal_roughhouse.sql
+@@ -0,0 +1,17 @@
++CREATE TABLE `comment_reports` (
++	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
++	`comment_id` integer NOT NULL,
++	`user_id` text NOT NULL,
++	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
++	FOREIGN KEY (`comment_id`) REFERENCES `comments`(`id`) ON UPDATE no action ON DELETE cascade
++);
++--> statement-breakpoint
++CREATE UNIQUE INDEX `comment_reports_comment_id_user_id_unique` ON `comment_reports` (`comment_id`,`user_id`);--> statement-breakpoint
++CREATE TABLE `comments` (
++	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
++	`post_id` integer NOT NULL,
++	`user_id` text NOT NULL,
++	`body` text NOT NULL,
++	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
++	FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`) ON UPDATE no action ON DELETE cascade
++);
+diff --git a/db/migrations/meta/20261018231207_snapshot.json b/db/migrations/meta/20261018231207_snapshot.json
+new file mode 100644
+index 0000000..a5d23e0
+--- /dev/null
++++ b/db/migrations/meta/20261018231207_snapshot.json
+@@ -0,0 +1,538 @@
++{
++  "version": "6",
++  "dialect": "sqlite",
++  "id": "16478646-a844-4674-9866-dc99bf9c69ae",
++  "prevId": "d4a43e98-9576-4bfd-b3af-1ce1cef5eb2a",
++  "tables": {
++    "comment_reports": {
++      "name": "comment_reports",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "integer",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": true
++        },
++        "comment_id": {
++          "name": "comment_id",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "user_id": {
++          "name": "user_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
++        }
++      },
++      "indexes": {
++        "comment_reports_comment_id_user_id_unique": {
++          "name": "comment_reports_comment_id_user_id_unique",
++          "columns": [
++            "comment_id",
++            "user_id"
++          ],
++          "isUnique": true
++        }
++      },
++      "foreignKeys": {
++        "comment_reports_comment_id_comments_id_fk": {
++          "name": "comment_reports_comment_id_comments_id_fk",
++          "tableFrom": "comment_reports",
++          "tableTo": "comments",
++          "columnsFrom": [
++            "comment_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "comments": {
++      "name": "comments",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "integer",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": true
++        },
++        "post_id": {
++          "name": "post_id",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "user_id": {
++          "name": "user_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "body": {
++          "name": "body",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {
++        "comments_post_id_posts_id_fk": {
++          "name": "comments_post_id_posts_id_fk",
++          "tableFrom": "comments",
++          "tableTo": "posts",
++          "columnsFrom": [
++            "post_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "posts": {
++      "name": "posts",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "integer",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": true
++        },
++        "title": {
++          "name": "title",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "excerpt": {
++          "name": "excerpt",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "body": {
++          "name": "body",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "author_id": {
++          "name": "author_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "account": {
++      "name": "account",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "accountId": {
++          "name": "accountId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "providerId": {
++          "name": "providerId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "userId": {
++          "name": "userId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "accessToken": {
++          "name": "accessToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "refreshToken": {
++          "name": "refreshToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "idToken": {
++          "name": "idToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "accessTokenExpiresAt": {
++          "name": "accessTokenExpiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "refreshTokenExpiresAt": {
++          "name": "refreshTokenExpiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "scope": {
++          "name": "scope",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "password": {
++          "name": "password",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "account_userId_idx": {
++          "name": "account_userId_idx",
++          "columns": [
++            "userId"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {
++        "account_userId_user_id_fk": {
++          "name": "account_userId_user_id_fk",
++          "tableFrom": "account",
++          "tableTo": "user",
++          "columnsFrom": [
++            "userId"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "session": {
++      "name": "session",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expiresAt": {
++          "name": "expiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "token": {
++          "name": "token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "ipAddress": {
++          "name": "ipAddress",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "userAgent": {
++          "name": "userAgent",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "userId": {
++          "name": "userId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "session_token_unique": {
++          "name": "session_token_unique",
++          "columns": [
++            "token"
++          ],
++          "isUnique": true
++        },
++        "session_userId_idx": {
++          "name": "session_userId_idx",
++          "columns": [
++            "userId"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {
++        "session_userId_user_id_fk": {
++          "name": "session_userId_user_id_fk",
++          "tableFrom": "session",
++          "tableTo": "user",
++          "columnsFrom": [
++            "userId"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "user": {
++      "name": "user",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "name": {
++          "name": "name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "email": {
++          "name": "email",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "emailVerified": {
++          "name": "emailVerified",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "image": {
++          "name": "image",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "user_email_unique": {
++          "name": "user_email_unique",
++          "columns": [
++            "email"
++          ],
++          "isUnique": true
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "verification": {
++      "name": "verification",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "identifier": {
++          "name": "identifier",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "value": {
++          "name": "value",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expiresAt": {
++          "name": "expiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "verification_identifier_idx": {
++          "name": "verification_identifier_idx",
++          "columns": [
++            "identifier"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    }
++  },
++  "views": {},
++  "enums": {},
++  "_meta": {
++    "schemas": {},
++    "tables": {},
++    "columns": {}
++  },
++  "internal": {
++    "indexes": {}
++  }
++}
+\ No newline at end of file
+diff --git a/db/migrations/meta/_journal.json b/db/migrations/meta/_journal.json
+index 42c5e52..1de9a0c 100644
+--- a/db/migrations/meta/_journal.json
++++ b/db/migrations/meta/_journal.json
+@@ -8,6 +8,13 @@
+       "when": 1792295224188,
+       "tag": "20261018034704_sturdy_orphan",
+       "breakpoints": true
++    },
++    {
++      "idx": 1,
++      "version": "6",
++      "when": 1792365127890,
++      "tag": "20261018231207_equal_roughhouse",
++      "breakpoints": true
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/db/schema.ts b/db/schema.ts
+index f256712..6b1beb1 100644
+--- a/db/schema.ts
++++ b/db/schema.ts
+@@ -1,5 +1,5 @@
+ import { sql } from "void/db";
+-import { integer, sqliteTable, text } from "void/schema-d1";
++import { integer, sqliteTable, text, unique } from "void/schema-d1";
+ 
+ // Authors are Better Auth users (the `user` table Void manages); see
+ // lib/users.ts for the read-only mapping used in joins.
+@@ -11,3 +11,22 @@ export const posts = sqliteTable("posts", {
+   authorId: text("author_id").notNull(),
+   createdAt: text("created_at").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+ });
++
++export const comments = sqliteTable("comments", {
++  id: integer("id").primaryKey({ autoIncrement: true }),
++  postId: integer("post_id").notNull().references(() => posts.id, { onDelete: "cascade" }),
++  userId: text("user_id").notNull(),
++  body: text("body").notNull(),
++  createdAt: text("created_at").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
++});
++
++export const commentReports = sqliteTable(
++  "comment_reports",
++  {
++    id: integer("id").primaryKey({ autoIncrement: true }),
++    commentId: integer("comment_id").notNull().references(() => comments.id, { onDelete: "cascade" }),
++    userId: text("user_id").notNull(),
++    createdAt: text("created_at").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
++  },
++  (table) => [unique().on(table.commentId, table.userId)],
++);
+diff --git a/lib/comments.ts b/lib/comments.ts
+new file mode 100644
+index 0000000..e7ca971
+--- /dev/null
++++ b/lib/comments.ts
+@@ -0,0 +1,51 @@
++import { HTTPException } from "hono/http-exception";
++import { commentReports, comments, posts } from "@schema";
++import { asc, count, db, eq, inArray } from "void/db";
++import { users } from "./users";
++import { commentIdSchema } from "./validators";
++
++const REPORTS_TO_HIDE = 3;
++
++export async function listVisibleComments(postId: number) {
++  const rows = await db
++    .select({
++      id: comments.id,
++      body: comments.body,
++      createdAt: comments.createdAt,
++      author: { id: users.id, name: users.name },
++    })
++    .from(comments)
++    .innerJoin(users, eq(users.id, comments.userId))
++    .where(eq(comments.postId, postId))
++    .orderBy(asc(comments.id));
++  if (rows.length === 0) return rows;
++
++  const reported = await db
++    .select({ commentId: commentReports.commentId, reports: count() })
++    .from(commentReports)
++    .where(inArray(commentReports.commentId, rows.map((row) => row.id)))
++    .groupBy(commentReports.commentId);
++  const hidden = new Set(reported.filter((row) => row.reports >= REPORTS_TO_HIDE).map((row) => row.commentId));
++  return rows.filter((row) => !hidden.has(row.id));
++}
++
++export function parseCommentId(raw: string | undefined): number {
++  const parsed = commentIdSchema.safeParse(raw);
++  if (!parsed.success) throw new HTTPException(404, { message: "Comment not found" });
++  return parsed.data;
++}
++
++export async function findCommentOrFail(id: number) {
++  const [comment] = await db
++    .select({
++      id: comments.id,
++      postId: comments.postId,
++      userId: comments.userId,
++      postAuthorId: posts.authorId,
++    })
++    .from(comments)
++    .innerJoin(posts, eq(posts.id, comments.postId))
++    .where(eq(comments.id, id));
++  if (!comment) throw new HTTPException(404, { message: "Comment not found" });
++  return comment;
++}
+diff --git a/lib/validators.ts b/lib/validators.ts
+index c786db6..9b8bf5c 100644
+--- a/lib/validators.ts
++++ b/lib/validators.ts
+@@ -6,6 +6,10 @@ export const postPayloadSchema = z.object({
+   body: z.string().trim().min(1, "Body is required."),
+ });
+ 
++export const commentPayloadSchema = z.object({
++  body: z.string().trim().min(1, "Comment is required.").max(2000, "Comment must be 2000 characters or fewer."),
++});
++
+ export const profileUpdateSchema = z.object({
+   name: z.string().trim().min(1, "Name is required.").max(120, "Name must be 120 characters or fewer."),
+   email: z
+@@ -22,3 +26,4 @@ export const listPostsQuerySchema = z.object({
+ });
+ 
+ export const postIdSchema = z.coerce.number().int().positive();
++export const commentIdSchema = z.coerce.number().int().positive();
+diff --git a/pages/posts/[id].server.ts b/pages/posts/[id].server.ts
+index dde7f3d..a107e04 100644
+--- a/pages/posts/[id].server.ts
++++ b/pages/posts/[id].server.ts
+@@ -1,15 +1,18 @@
+ import { defineHandler, type InferProps } from "void";
+ import { getUser, requireAuth } from "void/auth";
+-import { db, eq } from "void/db";
+-import { posts } from "@schema";
++import { commentReports, comments, posts } from "@schema";
++import { db, eq, inArray } from "void/db";
++import { listVisibleComments } from "../../lib/comments";
++import { userOrRedirect } from "../../lib/guards";
+ import { authorizeAuthor, findPostOrFail, parsePostId } from "../../lib/posts";
+-import { postPayloadSchema } from "../../lib/validators";
++import { commentPayloadSchema, postPayloadSchema } from "../../lib/validators";
+ 
+ export type Props = InferProps<typeof loader>;
+ 
+ export const loader = defineHandler(async (c) => {
+   const post = await findPostOrFail(parsePostId(c.req.param("id")));
+-  return { post, canManage: getUser()?.id === post.authorId };
++  const visibleComments = await listVisibleComments(post.id);
++  return { post, canManage: getUser()?.id === post.authorId, comments: visibleComments };
+ });
+ 
+ export const actions = {
+@@ -27,7 +30,22 @@ export const actions = {
+     const user = requireAuth(c);
+     const post = await findPostOrFail(parsePostId(c.req.param("id")));
+     authorizeAuthor(user, post);
+-    await db.delete(posts).where(eq(posts.id, post.id));
++    const postComments = db.select({ id: comments.id }).from(comments).where(eq(comments.postId, post.id));
++    await db.batch([
++      db.delete(commentReports).where(inArray(commentReports.commentId, postComments)),
++      db.delete(comments).where(eq(comments.postId, post.id)),
++      db.delete(posts).where(eq(posts.id, post.id)),
++    ]);
+     return c.redirect("/posts");
+   }),
++
++  comment: defineHandler.withValidator({
++    body: commentPayloadSchema,
++  })(async (c, { body }) => {
++    const user = userOrRedirect(c);
++    if (user instanceof Response) return user;
++    const post = await findPostOrFail(parsePostId(c.req.param("id")));
++    await db.insert(comments).values({ postId: post.id, userId: user.id, body: body.body });
++    return c.redirect(`/posts/${post.id}`);
++  }),
+ };
+diff --git a/pages/posts/[id].tsx b/pages/posts/[id].tsx
+index 2cb334c..e4a8181 100644
+--- a/pages/posts/[id].tsx
++++ b/pages/posts/[id].tsx
+@@ -1,28 +1,95 @@
+-import { Link, action } from "@void/react";
++import { useEffect, useState } from "react";
++import { Form, Link, action, useForm, useRouter, useShared } from "@void/react";
+ import type { Props } from "./[id].server";
+ 
+-export default function PostShow({ post, canManage }: Props) {
++export default function PostShow({ post, canManage, comments }: Props) {
++  const router = useRouter();
++  const { auth } = useShared();
++  const viewer = auth?.user ?? null;
++  const [reportedIds, setReportedIds] = useState<number[]>([]);
++  const commentForm = useForm("/posts/:id?comment", { body: "" }, { params: { id: String(post.id) } });
++
++  useEffect(() => {
++    if (commentForm.wasSuccessful) commentForm.reset("body");
++  }, [commentForm.wasSuccessful]);
++
+   async function destroy() {
+     if (!confirm("Delete this post?")) return;
+     await action("/posts/:id?delete", { params: { id: String(post.id) }, method: "DELETE" });
+   }
+ 
++  async function removeComment(id: number) {
++    if (!confirm("Delete this comment?")) return;
++    const res = await fetch(`/comments/${id}`, { method: "DELETE" });
++    if (res.ok) await router.refresh();
++  }
++
++  async function reportComment(id: number) {
++    const res = await fetch(`/comments/${id}/report`, { method: "POST" });
++    if (res.ok) setReportedIds((ids) => [...ids, id]);
++  }
++
+   return (
+-    <article>
+-      <h1>{post.title}</h1>
+-      <p>
+-        <small>
+-          by {post.author.name} · {new Date(post.createdAt).toLocaleDateString()}
+-        </small>
+-      </p>
+-      <p>{post.excerpt}</p>
+-      <div>{post.body}</div>
+-      {canManage && (
++    <>
++      <article>
++        <h1>{post.title}</h1>
+         <p>
+-          <Link href={`/posts/${post.id}/edit`}>Edit</Link>{" "}
+-          <button type="button" onClick={destroy}>Delete</button>
++          <small>
++            by {post.author.name} · {new Date(post.createdAt).toLocaleDateString()}
++          </small>
+         </p>
+-      )}
+-    </article>
++        <p>{post.excerpt}</p>
++        <div>{post.body}</div>
++        {canManage && (
++          <p>
++            <Link href={`/posts/${post.id}/edit`}>Edit</Link>{" "}
++            <button type="button" onClick={destroy}>Delete</button>
++          </p>
++        )}
++      </article>
++
++      <section>
++        <h2>Comments</h2>
++        {comments.length === 0 && <p>No comments yet.</p>}
++        {comments.map((comment) => {
++          const canDelete = viewer !== null && (viewer.id === comment.author.id || viewer.id === post.authorId);
++          const reported = reportedIds.includes(comment.id);
++          return (
++            <article key={comment.id}>
++              <p>{comment.body}</p>
++              <small>
++                {comment.author.name} · {new Date(comment.createdAt).toLocaleString()}
++              </small>
++              {viewer && (
++                <p>
++                  {canDelete && (
++                    <button type="button" onClick={() => removeComment(comment.id)}>
++                      Delete
++                    </button>
++                  )}{" "}
++                  <button type="button" disabled={reported} onClick={() => reportComment(comment.id)}>
++                    {reported ? "Reported" : "Report"}
++                  </button>
++                </p>
++              )}
++            </article>
++          );
++        })}
++
++        {viewer ? (
++          <Form form={commentForm}>
++            <label>
++              Comment <textarea rows={3} value={commentForm.data.body} onChange={(e) => commentForm.setData("body", e.target.value)} />
++            </label>
++            {commentForm.errors.body && <p className="error">{commentForm.errors.body}</p>}
++            <button disabled={commentForm.pending}>Post comment</button>
++          </Form>
++        ) : (
++          <p>
++            <Link href="/login">Sign in</Link> to leave a comment.
++          </p>
++        )}
++      </section>
++    </>
+   );
+ }
+diff --git a/routes/comments/[id].ts b/routes/comments/[id].ts
+new file mode 100644
+index 0000000..7010995
+--- /dev/null
++++ b/routes/comments/[id].ts
+@@ -0,0 +1,20 @@
++import { HTTPException } from "hono/http-exception";
++import { defineHandler } from "void";
++import { commentReports, comments } from "@schema";
++import { db, eq } from "void/db";
++import { findCommentOrFail, parseCommentId } from "../../lib/comments";
++import { userOrRedirect } from "../../lib/guards";
++
++export const DELETE = defineHandler(async (c) => {
++  const user = userOrRedirect(c);
++  if (user instanceof Response) return user;
++  const comment = await findCommentOrFail(parseCommentId(c.req.param("id")));
++  if (user.id !== comment.userId && user.id !== comment.postAuthorId) {
++    throw new HTTPException(403, { message: "Forbidden" });
++  }
++  await db.batch([
++    db.delete(commentReports).where(eq(commentReports.commentId, comment.id)),
++    db.delete(comments).where(eq(comments.id, comment.id)),
++  ]);
++  return c.redirect(`/posts/${comment.postId}`);
++});
+diff --git a/routes/comments/[id]/report.ts b/routes/comments/[id]/report.ts
+new file mode 100644
+index 0000000..9b3abee
+--- /dev/null
++++ b/routes/comments/[id]/report.ts
+@@ -0,0 +1,16 @@
++import { defineHandler } from "void";
++import { commentReports } from "@schema";
++import { db } from "void/db";
++import { findCommentOrFail, parseCommentId } from "../../../lib/comments";
++import { userOrRedirect } from "../../../lib/guards";
++
++export const POST = defineHandler(async (c) => {
++  const user = userOrRedirect(c);
++  if (user instanceof Response) return user;
++  const comment = await findCommentOrFail(parseCommentId(c.req.param("id")));
++  await db
++    .insert(commentReports)
++    .values({ commentId: comment.id, userId: user.id })
++    .onConflictDoNothing();
++  return c.body(null, 204);
++});

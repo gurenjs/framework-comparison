@@ -1,0 +1,210 @@
+== cell: post-tags/guren-claude-haiku-5-5-1
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 211s
+== saved: results/post-tags/guren-claude-haiku-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict post-tags/guren-claude-haiku-5-5-1: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: post-tags/void-claude-haiku-5-5-1
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 119s
+== saved: results/post-tags/void-claude-haiku-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+verdict post-tags/void-claude-haiku-5-5-1: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: comments-moderation/guren-claude-haiku-5-5-1
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 153s
+== saved: results/comments-moderation/guren-claude-haiku-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict comments-moderation/guren-claude-haiku-5-5-1: PASS (typecheck=pass suite=pass 8 pass  0 fail)
+== cell: comments-moderation/void-claude-haiku-5-5-1
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 120s
+== saved: results/comments-moderation/void-claude-haiku-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+verdict comments-moderation/void-claude-haiku-5-5-1: PASS (typecheck=pass suite=pass 8 pass  0 fail)
+== cell: post-revisions/guren-claude-haiku-5-5-1
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 95s
+== saved: results/post-revisions/guren-claude-haiku-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict post-revisions/guren-claude-haiku-5-5-1: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: post-revisions/void-claude-haiku-5-5-1
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 77s
+== saved: results/post-revisions/void-claude-haiku-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+verdict post-revisions/void-claude-haiku-5-5-1: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: json-api-tokens/guren-claude-haiku-5-5-1
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 224s
+== saved: results/json-api-tokens/guren-claude-haiku-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict json-api-tokens/guren-claude-haiku-5-5-1: PASS (typecheck=pass suite=pass 10 pass  0 fail)
+== cell: json-api-tokens/void-claude-haiku-5-5-1
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 107s
+== saved: results/json-api-tokens/void-claude-haiku-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+verdict json-api-tokens/void-claude-haiku-5-5-1: PASS (typecheck=pass suite=pass 10 pass  0 fail)
+== cell: scheduled-publish/guren-claude-haiku-5-5-1
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 175s
+== saved: results/scheduled-publish/guren-claude-haiku-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict scheduled-publish/guren-claude-haiku-5-5-1: PASS (typecheck=pass suite=pass 5 pass  0 fail)
+== cell: scheduled-publish/void-claude-haiku-5-5-1
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 104s
+== saved: results/scheduled-publish/void-claude-haiku-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+verdict scheduled-publish/void-claude-haiku-5-5-1: PASS (typecheck=pass suite=pass 5 pass  0 fail)
+== cell: post-tags/void-claude-haiku-5-5-2
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 141s
+== saved: results/post-tags/void-claude-haiku-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+verdict post-tags/void-claude-haiku-5-5-2: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: post-tags/guren-claude-haiku-5-5-2
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 178s
+== saved: results/post-tags/guren-claude-haiku-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict post-tags/guren-claude-haiku-5-5-2: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: comments-moderation/void-claude-haiku-5-5-2
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 121s
+== saved: results/comments-moderation/void-claude-haiku-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+verdict comments-moderation/void-claude-haiku-5-5-2: PASS (typecheck=pass suite=pass 8 pass  0 fail)
+== cell: comments-moderation/guren-claude-haiku-5-5-2
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 174s
+== saved: results/comments-moderation/guren-claude-haiku-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict comments-moderation/guren-claude-haiku-5-5-2: PASS (typecheck=pass suite=pass 8 pass  0 fail)
+== cell: post-revisions/void-claude-haiku-5-5-2
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 83s
+== saved: results/post-revisions/void-claude-haiku-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+verdict post-revisions/void-claude-haiku-5-5-2: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: post-revisions/guren-claude-haiku-5-5-2
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 148s
+== saved: results/post-revisions/guren-claude-haiku-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict post-revisions/guren-claude-haiku-5-5-2: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: json-api-tokens/void-claude-haiku-5-5-2
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 101s
+== saved: results/json-api-tokens/void-claude-haiku-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+verdict json-api-tokens/void-claude-haiku-5-5-2: PASS (typecheck=pass suite=pass 10 pass  0 fail)
+== cell: json-api-tokens/guren-claude-haiku-5-5-2
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 233s
+== saved: results/json-api-tokens/guren-claude-haiku-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict json-api-tokens/guren-claude-haiku-5-5-2: PASS (typecheck=pass suite=pass 10 pass  0 fail)
+== cell: scheduled-publish/void-claude-haiku-5-5-2
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 124s
+== saved: results/scheduled-publish/void-claude-haiku-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+verdict scheduled-publish/void-claude-haiku-5-5-2: PASS (typecheck=pass suite=pass 5 pass  0 fail)
+== cell: scheduled-publish/guren-claude-haiku-5-5-2
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 171s
+== saved: results/scheduled-publish/guren-claude-haiku-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict scheduled-publish/guren-claude-haiku-5-5-2: PASS (typecheck=pass suite=pass 5 pass  0 fail)
+== cell: post-tags/guren-claude-haiku-5-5-3
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 203s
+== saved: results/post-tags/guren-claude-haiku-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict post-tags/guren-claude-haiku-5-5-3: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: post-tags/void-claude-haiku-5-5-3
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 106s
+== saved: results/post-tags/void-claude-haiku-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+verdict post-tags/void-claude-haiku-5-5-3: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: comments-moderation/guren-claude-haiku-5-5-3
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 199s
+== saved: results/comments-moderation/guren-claude-haiku-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict comments-moderation/guren-claude-haiku-5-5-3: PASS (typecheck=pass suite=pass 8 pass  0 fail)
+== cell: comments-moderation/void-claude-haiku-5-5-3
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 140s
+== saved: results/comments-moderation/void-claude-haiku-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+verdict comments-moderation/void-claude-haiku-5-5-3: PASS (typecheck=pass suite=pass 8 pass  0 fail)
+== cell: post-revisions/guren-claude-haiku-5-5-3
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 100s
+== saved: results/post-revisions/guren-claude-haiku-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict post-revisions/guren-claude-haiku-5-5-3: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: post-revisions/void-claude-haiku-5-5-3
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 76s
+== saved: results/post-revisions/void-claude-haiku-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+verdict post-revisions/void-claude-haiku-5-5-3: PASS (typecheck=pass suite=pass 6 pass  0 fail)
+== cell: json-api-tokens/guren-claude-haiku-5-5-3
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 186s
+== saved: results/json-api-tokens/guren-claude-haiku-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict json-api-tokens/guren-claude-haiku-5-5-3: PASS (typecheck=pass suite=pass 10 pass  0 fail)
+== cell: json-api-tokens/void-claude-haiku-5-5-3
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 105s
+== saved: results/json-api-tokens/void-claude-haiku-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+verdict json-api-tokens/void-claude-haiku-5-5-3: PASS (typecheck=pass suite=pass 10 pass  0 fail)
+== cell: scheduled-publish/guren-claude-haiku-5-5-3
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 225s
+== saved: results/scheduled-publish/guren-claude-haiku-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict scheduled-publish/guren-claude-haiku-5-5-3: PASS (typecheck=pass suite=pass 5 pass  0 fail)
+== cell: scheduled-publish/void-claude-haiku-5-5-3
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-haiku-5-5, max-turns: 200)
+== agent finished in 128s
+== saved: results/scheduled-publish/void-claude-haiku-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+verdict scheduled-publish/void-claude-haiku-5-5-3: PASS (typecheck=pass suite=pass 5 pass  0 fail)

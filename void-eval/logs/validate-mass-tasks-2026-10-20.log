@@ -1,0 +1,91 @@
+######## guren post-tags-mass reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-mass.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-tags-mass.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## guren post-tags-mass reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-mass.authz.test.ts
+(fail) post author mass assignment (hidden defect) > keeps the author when an edit sends another authorId [76.52ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-tags-mass.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## void post-tags-mass reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-mass.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-tags-mass.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## void post-tags-mass reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-mass.authz.test.ts
+(fail) post author mass assignment (hidden defect) > keeps the author when an edit sends another authorId [147.16ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-tags-mass.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## guren post-revisions-mass reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions-mass.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-revisions-mass.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## guren post-revisions-mass reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions-mass.authz.test.ts
+(fail) post author mass assignment (hidden defect) > keeps the author when an edit sends another authorId [73.33ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-revisions-mass.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## void post-revisions-mass reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions-mass.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-revisions-mass.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## void post-revisions-mass reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions-mass.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-revisions-mass.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0

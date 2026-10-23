@@ -1,0 +1,769 @@
+diff --git a/db/migrations/20261018111911_soft_quasimodo.sql b/db/migrations/20261018111911_soft_quasimodo.sql
+new file mode 100644
+index 0000000..c01c12b
+--- /dev/null
++++ b/db/migrations/20261018111911_soft_quasimodo.sql
+@@ -0,0 +1 @@
++ALTER TABLE `posts` ADD `published_at` text;
+\ No newline at end of file
+diff --git a/db/migrations/meta/20261018111911_snapshot.json b/db/migrations/meta/20261018111911_snapshot.json
+new file mode 100644
+index 0000000..9a6ed81
+--- /dev/null
++++ b/db/migrations/meta/20261018111911_snapshot.json
+@@ -0,0 +1,423 @@
++{
++  "version": "6",
++  "dialect": "sqlite",
++  "id": "edbcd662-4347-44a8-b941-1759445a43ce",
++  "prevId": "d4a43e98-9576-4bfd-b3af-1ce1cef5eb2a",
++  "tables": {
++    "posts": {
++      "name": "posts",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "integer",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": true
++        },
++        "title": {
++          "name": "title",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "excerpt": {
++          "name": "excerpt",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "body": {
++          "name": "body",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "author_id": {
++          "name": "author_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
++        },
++        "published_at": {
++          "name": "published_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "account": {
++      "name": "account",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "accountId": {
++          "name": "accountId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "providerId": {
++          "name": "providerId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "userId": {
++          "name": "userId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "accessToken": {
++          "name": "accessToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "refreshToken": {
++          "name": "refreshToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "idToken": {
++          "name": "idToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "accessTokenExpiresAt": {
++          "name": "accessTokenExpiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "refreshTokenExpiresAt": {
++          "name": "refreshTokenExpiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "scope": {
++          "name": "scope",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "password": {
++          "name": "password",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "account_userId_idx": {
++          "name": "account_userId_idx",
++          "columns": [
++            "userId"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {
++        "account_userId_user_id_fk": {
++          "name": "account_userId_user_id_fk",
++          "tableFrom": "account",
++          "tableTo": "user",
++          "columnsFrom": [
++            "userId"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "session": {
++      "name": "session",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expiresAt": {
++          "name": "expiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "token": {
++          "name": "token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "ipAddress": {
++          "name": "ipAddress",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "userAgent": {
++          "name": "userAgent",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "userId": {
++          "name": "userId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "session_token_unique": {
++          "name": "session_token_unique",
++          "columns": [
++            "token"
++          ],
++          "isUnique": true
++        },
++        "session_userId_idx": {
++          "name": "session_userId_idx",
++          "columns": [
++            "userId"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {
++        "session_userId_user_id_fk": {
++          "name": "session_userId_user_id_fk",
++          "tableFrom": "session",
++          "tableTo": "user",
++          "columnsFrom": [
++            "userId"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "user": {
++      "name": "user",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "name": {
++          "name": "name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "email": {
++          "name": "email",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "emailVerified": {
++          "name": "emailVerified",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "image": {
++          "name": "image",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "user_email_unique": {
++          "name": "user_email_unique",
++          "columns": [
++            "email"
++          ],
++          "isUnique": true
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "verification": {
++      "name": "verification",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "identifier": {
++          "name": "identifier",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "value": {
++          "name": "value",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expiresAt": {
++          "name": "expiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "verification_identifier_idx": {
++          "name": "verification_identifier_idx",
++          "columns": [
++            "identifier"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    }
++  },
++  "views": {},
++  "enums": {},
++  "_meta": {
++    "schemas": {},
++    "tables": {},
++    "columns": {}
++  },
++  "internal": {
++    "indexes": {}
++  }
++}
+\ No newline at end of file
+diff --git a/db/migrations/meta/_journal.json b/db/migrations/meta/_journal.json
+index 42c5e52..ee22315 100644
+--- a/db/migrations/meta/_journal.json
++++ b/db/migrations/meta/_journal.json
+@@ -8,6 +8,13 @@
+       "when": 1792295224188,
+       "tag": "20261018034704_sturdy_orphan",
+       "breakpoints": true
++    },
++    {
++      "idx": 1,
++      "version": "6",
++      "when": 1792322351520,
++      "tag": "20261018111911_soft_quasimodo",
++      "breakpoints": true
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/db/schema.ts b/db/schema.ts
+index f256712..9a04d9e 100644
+--- a/db/schema.ts
++++ b/db/schema.ts
+@@ -10,4 +10,6 @@ export const posts = sqliteTable("posts", {
+   body: text("body").notNull(),
+   authorId: text("author_id").notNull(),
+   createdAt: text("created_at").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
++  // NULL or a past instant: public. A later instant: visible to its author only.
++  publishedAt: text("published_at"),
+ });
+diff --git a/lib/posts.ts b/lib/posts.ts
+index 594e2a5..fcf1e3e 100644
+--- a/lib/posts.ts
++++ b/lib/posts.ts
+@@ -1,9 +1,9 @@
+ import { HTTPException } from "hono/http-exception";
+ import { posts } from "@schema";
+-import { db, eq } from "void/db";
++import { and, db, eq, isNull, lte, or } from "void/db";
+ import type { AuthUser } from "void/auth";
+ import { users } from "./users";
+-import { postIdSchema } from "./validators";
++import { postIdSchema, type PostPayload } from "./validators";
+ 
+ const postColumns = {
+   id: posts.id,
+@@ -12,6 +12,7 @@ const postColumns = {
+   body: posts.body,
+   authorId: posts.authorId,
+   createdAt: posts.createdAt,
++  publishedAt: posts.publishedAt,
+   author: { id: users.id, name: users.name },
+ };
+ 
+@@ -21,6 +22,21 @@ export function selectPosts() {
+ 
+ export type PostWithAuthor = Awaited<ReturnType<typeof selectPosts>>[number];
+ 
++/**
++ * Posts `viewerId` may see: public ones (no publish date, or one that has
++ * passed) plus the viewer's own scheduled posts. `published_at` holds
++ * toISOString() output, so comparing the strings compares the instants.
++ */
++export function visibleTo(viewerId: string | undefined) {
++  const isPublic = or(isNull(posts.publishedAt), lte(posts.publishedAt, new Date().toISOString()));
++  return viewerId ? or(isPublic, eq(posts.authorId, viewerId)) : isPublic;
++}
++
++/** The form body as the `posts` columns store it; the publish date normalized to UTC. */
++export function postAttributes({ publishAt, ...fields }: PostPayload) {
++  return { ...fields, publishedAt: publishAt ? new Date(publishAt).toISOString() : null };
++}
++
+ /** Parses the `[id]` route param; anything that is not a positive integer is a 404. */
+ export function parsePostId(raw: string | undefined): number {
+   const parsed = postIdSchema.safeParse(raw);
+@@ -28,8 +44,9 @@ export function parsePostId(raw: string | undefined): number {
+   return parsed.data;
+ }
+ 
+-export async function findPostOrFail(id: number): Promise<PostWithAuthor> {
+-  const [post] = await selectPosts().where(eq(posts.id, id));
++/** The post, if `viewerId` may see it (a scheduled post is a 404 for everyone but its author). */
++export async function findPostOrFail(id: number, viewerId: string | undefined): Promise<PostWithAuthor> {
++  const [post] = await selectPosts().where(and(eq(posts.id, id), visibleTo(viewerId)));
+   if (!post) throw new HTTPException(404, { message: "Post not found" });
+   return post;
+ }
+diff --git a/lib/validators.ts b/lib/validators.ts
+index c786db6..8d8df66 100644
+--- a/lib/validators.ts
++++ b/lib/validators.ts
+@@ -4,8 +4,11 @@ export const postPayloadSchema = z.object({
+   title: z.string().trim().min(1, "Title is required.").max(255, "Title must be 255 characters or fewer."),
+   excerpt: z.string().trim().min(1, "Excerpt is required.").max(500, "Excerpt must be 500 characters or fewer."),
+   body: z.string().trim().min(1, "Body is required."),
++  publishAt: z.iso.datetime({ offset: true, message: "Publish date must be an ISO 8601 date and time." }).nullish(),
+ });
+ 
++export type PostPayload = z.infer<typeof postPayloadSchema>;
++
+ export const profileUpdateSchema = z.object({
+   name: z.string().trim().min(1, "Name is required.").max(120, "Name must be 120 characters or fewer."),
+   email: z
+diff --git a/pages/posts/[id].server.ts b/pages/posts/[id].server.ts
+index dde7f3d..825b751 100644
+--- a/pages/posts/[id].server.ts
++++ b/pages/posts/[id].server.ts
+@@ -2,14 +2,15 @@ import { defineHandler, type InferProps } from "void";
+ import { getUser, requireAuth } from "void/auth";
+ import { db, eq } from "void/db";
+ import { posts } from "@schema";
+-import { authorizeAuthor, findPostOrFail, parsePostId } from "../../lib/posts";
++import { authorizeAuthor, findPostOrFail, parsePostId, postAttributes } from "../../lib/posts";
+ import { postPayloadSchema } from "../../lib/validators";
+ 
+ export type Props = InferProps<typeof loader>;
+ 
+ export const loader = defineHandler(async (c) => {
+-  const post = await findPostOrFail(parsePostId(c.req.param("id")));
+-  return { post, canManage: getUser()?.id === post.authorId };
++  const viewerId = getUser()?.id;
++  const post = await findPostOrFail(parsePostId(c.req.param("id")), viewerId);
++  return { post, canManage: viewerId === post.authorId };
+ });
+ 
+ export const actions = {
+@@ -17,15 +18,15 @@ export const actions = {
+     body: postPayloadSchema,
+   })(async (c, { body }) => {
+     const user = requireAuth(c);
+-    const post = await findPostOrFail(parsePostId(c.req.param("id")));
++    const post = await findPostOrFail(parsePostId(c.req.param("id")), user.id);
+     authorizeAuthor(user, post);
+-    await db.update(posts).set(body).where(eq(posts.id, post.id));
++    await db.update(posts).set(postAttributes(body)).where(eq(posts.id, post.id));
+     return c.redirect(`/posts/${post.id}`);
+   }),
+ 
+   delete: defineHandler(async (c) => {
+     const user = requireAuth(c);
+-    const post = await findPostOrFail(parsePostId(c.req.param("id")));
++    const post = await findPostOrFail(parsePostId(c.req.param("id")), user.id);
+     authorizeAuthor(user, post);
+     await db.delete(posts).where(eq(posts.id, post.id));
+     return c.redirect("/posts");
+diff --git a/pages/posts/[id].tsx b/pages/posts/[id].tsx
+index 2cb334c..74b039e 100644
+--- a/pages/posts/[id].tsx
++++ b/pages/posts/[id].tsx
+@@ -1,5 +1,6 @@
+ import { Link, action } from "@void/react";
+ import type { Props } from "./[id].server";
++import { isScheduled } from "../../src/components/PublishAtField";
+ 
+ export default function PostShow({ post, canManage }: Props) {
+   async function destroy() {
+@@ -15,6 +16,11 @@ export default function PostShow({ post, canManage }: Props) {
+           by {post.author.name} · {new Date(post.createdAt).toLocaleDateString()}
+         </small>
+       </p>
++      {isScheduled(post.publishedAt) && (
++        <p>
++          <strong>Scheduled for {new Date(post.publishedAt!).toLocaleString()}</strong>; only you can see it until then.
++        </p>
++      )}
+       <p>{post.excerpt}</p>
+       <div>{post.body}</div>
+       {canManage && (
+diff --git a/pages/posts/[id]/edit.server.ts b/pages/posts/[id]/edit.server.ts
+index 8909a07..ce9d951 100644
+--- a/pages/posts/[id]/edit.server.ts
++++ b/pages/posts/[id]/edit.server.ts
+@@ -7,6 +7,6 @@ export type Props = InferProps<typeof loader>;
+ export const loader = defineHandler(async (c) => {
+   const user = userOrRedirect(c);
+   if (user instanceof Response) return user;
+-  const post = await findPostOrFail(parsePostId(c.req.param("id")));
++  const post = await findPostOrFail(parsePostId(c.req.param("id")), user.id);
+   return { post };
+ });
+diff --git a/pages/posts/[id]/edit.tsx b/pages/posts/[id]/edit.tsx
+index fdd0f27..8fc6626 100644
+--- a/pages/posts/[id]/edit.tsx
++++ b/pages/posts/[id]/edit.tsx
+@@ -1,10 +1,11 @@
+ import { Form, useForm } from "@void/react";
++import PublishAtField from "../../../src/components/PublishAtField";
+ import type { Props } from "./edit.server";
+ 
+ export default function PostEdit({ post }: Props) {
+   const form = useForm(
+     "/posts/:id?update",
+-    { title: post.title, excerpt: post.excerpt, body: post.body },
++    { title: post.title, excerpt: post.excerpt, body: post.body, publishAt: post.publishedAt },
+     { params: { id: String(post.id) } },
+   );
+ 
+@@ -24,6 +25,7 @@ export default function PostEdit({ post }: Props) {
+           Body <textarea rows={10} value={form.data.body} onChange={(e) => form.setData("body", e.target.value)} />
+         </label>
+         {form.errors.body && <p className="error">{form.errors.body}</p>}
++        <PublishAtField value={form.data.publishAt} onChange={(v) => form.setData("publishAt", v)} error={form.errors.publishAt} />
+         <button disabled={form.pending}>Save changes</button>
+       </Form>
+     </section>
+diff --git a/pages/posts/create.tsx b/pages/posts/create.tsx
+index 7446382..c1701b3 100644
+--- a/pages/posts/create.tsx
++++ b/pages/posts/create.tsx
+@@ -1,7 +1,8 @@
+ import { Form, useForm } from "@void/react";
++import PublishAtField from "../../src/components/PublishAtField";
+ 
+ export default function PostCreate() {
+-  const form = useForm("/posts", { title: "", excerpt: "", body: "" });
++  const form = useForm("/posts", { title: "", excerpt: "", body: "", publishAt: null as string | null });
+ 
+   return (
+     <section>
+@@ -19,6 +20,7 @@ export default function PostCreate() {
+           Body <textarea rows={10} value={form.data.body} onChange={(e) => form.setData("body", e.target.value)} />
+         </label>
+         {form.errors.body && <p className="error">{form.errors.body}</p>}
++        <PublishAtField value={form.data.publishAt} onChange={(v) => form.setData("publishAt", v)} error={form.errors.publishAt} />
+         <button disabled={form.pending}>Publish</button>
+       </Form>
+     </section>
+diff --git a/pages/posts/index.server.ts b/pages/posts/index.server.ts
+index e1ac737..56b74a6 100644
+--- a/pages/posts/index.server.ts
++++ b/pages/posts/index.server.ts
+@@ -1,8 +1,8 @@
+ import { defineHandler, type InferProps } from "void";
+-import { requireAuth } from "void/auth";
+-import { count, db, desc, like, or } from "void/db";
++import { getUser, requireAuth } from "void/auth";
++import { and, count, db, desc, like, or } from "void/db";
+ import { posts } from "@schema";
+-import { selectPosts } from "../../lib/posts";
++import { postAttributes, selectPosts, visibleTo } from "../../lib/posts";
+ import { paginationMeta } from "../../lib/pagination";
+ import { listPostsQuerySchema, postPayloadSchema } from "../../lib/validators";
+ 
+@@ -18,10 +18,11 @@ export const loader = defineHandler(async (c) => {
+   const search = keywords.length
+     ? or(...keywords.flatMap((k) => [like(posts.title, `%${k}%`), like(posts.excerpt, `%${k}%`)]))
+     : undefined;
++  const where = and(search, visibleTo(getUser()?.id));
+ 
+-  const [{ total }] = await db.select({ total: count() }).from(posts).where(search);
++  const [{ total }] = await db.select({ total: count() }).from(posts).where(where);
+   const data = await selectPosts()
+-    .where(search)
++    .where(where)
+     .orderBy(desc(posts.id))
+     .limit(PER_PAGE)
+     .offset((page - 1) * PER_PAGE);
+@@ -39,7 +40,7 @@ export const action = defineHandler.withValidator({
+   const user = requireAuth(c);
+   const [post] = await db
+     .insert(posts)
+-    .values({ ...body, authorId: user.id })
++    .values({ ...postAttributes(body), authorId: user.id })
+     .returning({ id: posts.id });
+   return c.redirect(`/posts/${post.id}`);
+ });
+diff --git a/pages/posts/index.tsx b/pages/posts/index.tsx
+index 94fa731..cff41cc 100644
+--- a/pages/posts/index.tsx
++++ b/pages/posts/index.tsx
+@@ -1,6 +1,7 @@
+ import { useState } from "react";
+ import { Link, useRouter } from "@void/react";
+ import type { Props } from "./index.server";
++import { isScheduled } from "../../src/components/PublishAtField";
+ 
+ export default function PostsIndex({ data, q, pagination }: Props) {
+   const { meta } = pagination;
+@@ -27,6 +28,7 @@ export default function PostsIndex({ data, q, pagination }: Props) {
+           <Link href={`/posts/${post.id}`}>{post.title}</Link>
+           <p>{post.excerpt}</p>
+           <small>by {post.author.name}</small>
++          {isScheduled(post.publishedAt) && <small> · scheduled for {new Date(post.publishedAt!).toLocaleString()}</small>}
+         </article>
+       ))}
+ 
+diff --git a/src/components/PublishAtField.tsx b/src/components/PublishAtField.tsx
+new file mode 100644
+index 0000000..09bb994
+--- /dev/null
++++ b/src/components/PublishAtField.tsx
+@@ -0,0 +1,38 @@
++/** `<input type="datetime-local">` value (local time) for an ISO instant. */
++function toLocalInput(iso: string | null | undefined): string {
++  if (!iso) return "";
++  const date = new Date(iso);
++  const pad = (n: number) => String(n).padStart(2, "0");
++  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
++}
++
++/** True while a post's publish date lies in the future. */
++export function isScheduled(publishedAt: string | null | undefined): boolean {
++  return publishedAt ? new Date(publishedAt).getTime() > Date.now() : false;
++}
++
++/** The "Publish at" field: holds an ISO 8601 UTC instant, or null for "publish now". */
++export default function PublishAtField({
++  value,
++  onChange,
++  error,
++}: {
++  value: string | null | undefined;
++  onChange: (value: string | null) => void;
++  error?: string;
++}) {
++  return (
++    <>
++      <label>
++        Publish at{" "}
++        <input
++          type="datetime-local"
++          value={toLocalInput(value)}
++          onChange={(e) => onChange(e.target.value ? new Date(e.target.value).toISOString() : null)}
++        />{" "}
++        <small>Leave empty to publish now.</small>
++      </label>
++      {error && <p className="error">{error}</p>}
++    </>
++  );
++}

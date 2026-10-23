@@ -1,0 +1,16 @@
+[boot-guren] codegen
+[boot-guren] vite build (client + ssr)
+[boot-guren] ready on http://127.0.0.1:4100 (pid 88632)
+bun test v1.3.14 (0d9b296a)
+
+tests/scheduled-publish.test.ts:
+(pass) scheduled publishing > stores a future publishAt and shows the post page to its author only; others and guests get 404 [282.81ms]
+(pass) scheduled publishing > leaves a scheduled post out of the list for guests and other users, and lists it with its date for its author [104.20ms]
+(pass) scheduled publishing > leaves a scheduled post out of search for guests and other users [98.29ms]
+(pass) scheduled publishing > makes a post public once its published_at has passed, with no further action [92.65ms]
+(pass) scheduled publishing > rejects an unparsable publishAt the way an invalid title is rejected, and saves nothing [60.87ms]
+
+ 5 pass
+ 0 fail
+ 70 expect() calls
+Ran 5 tests across 1 file. [664.00ms]

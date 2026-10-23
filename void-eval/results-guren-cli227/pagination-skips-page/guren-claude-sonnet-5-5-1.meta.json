@@ -1,0 +1,1 @@
+{"task": "pagination-skips-page", "arm": "guren", "model": "claude-sonnet-5-5", "trial": 1, "wall_seconds": 140, "start_commit": "6ffe4842515f91cac0c9e5efdd4061039f8dba21", "max_turns": 120, "claude_version": "2.1.289 (Claude Code)"}
