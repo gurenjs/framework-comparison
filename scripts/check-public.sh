@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-public.sh [<rev range>]
+# check-public.sh [--rev <commit>] [<rev range>]
 #
 # Fails when a tracked file (or, with a range, a commit message in it) carries
 # something that must not be published: local absolute paths, Claude Code
@@ -10,6 +10,10 @@
 # void-eval/harness/sanitize-results.py, which removes what this check looks for.
 set -uo pipefail
 cd "$(git rev-parse --show-toplevel)" || exit 2
+
+# --rev scans that commit's tree instead of the working copy (the pre-push hook's case).
+REV=()
+if [ "${1:-}" = --rev ]; then REV=("$2"); shift 2; fi
 
 PATTERN='/Users/[A-Za-z0-9._-]+/'                                   # macOS home
 PATTERN+='|/home/[a-z][a-z0-9_-]*/'                                 # Linux home
@@ -25,13 +29,18 @@ EXCLUDE=(':!scripts/check-public.sh' ':!void-eval/harness/sanitize-results.py'
          ':!*.lock' ':!*lock.yaml' ':!*lock.json')
 
 status=0
-if hits="$(git grep -nIE "$PATTERN" -- . "${EXCLUDE[@]}")"; then
-  echo "check-public: tracked files carry data that must not be published:"
-  echo "$hits" | cut -c1-200
-  status=1
-fi
+# git grep: 0 = hits, 1 = none, anything else = the scan did not run, which is not a pass.
+hits="$(git grep -nIE "$PATTERN" ${REV[@]+"${REV[@]}"} -- . "${EXCLUDE[@]}")"
+case $? in
+  0) echo "check-public: tracked files carry data that must not be published:"
+     echo "$hits" | cut -c1-200
+     status=1 ;;
+  1) ;;
+  *) echo "check-public: git grep failed"; exit 2 ;;
+esac
 if [ -n "${1:-}" ]; then
-  if msgs="$(git log --format='%h %B' "$1" | grep -nE "$PATTERN")"; then
+  log="$(git log --format='%h %B' "$1")" || { echo "check-public: cannot read commits in $1 (fetch first?)"; exit 2; }
+  if msgs="$(printf '%s\n' "$log" | grep -nE "$PATTERN")"; then
     echo "check-public: commit messages in $1 carry data that must not be published:"
     echo "$msgs" | cut -c1-200
     status=1

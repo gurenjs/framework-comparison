@@ -61,14 +61,14 @@ make_start_state() {
       # refreshes the pin by hand: copy the two files back). GUREN_UPDATE=none
       # keeps the base's own lock, for a base scaffolded on the releases being
       # measured (eval/v2310: create-guren-app 1.19.0, @guren/cli 2.32.0).
-      if [ "${GUREN_UPDATE:-pinned}" = none ]; then
-        :
-      elif [ "${GUREN_UPDATE:-pinned}" = live ]; then
-        (cd "$dest" && bun update >/dev/null 2>&1) || { echo "BUN-UPDATE-FAILED"; return 1; }
-      else
-        cp "$VE_ROOT/harness/guren-pinned/package.json" "$VE_ROOT/harness/guren-pinned/bun.lock" "$dest/"
+      case "${GUREN_UPDATE:-pinned}" in
+        none) ;;
+        live) (cd "$dest" && bun update >/dev/null 2>&1) || { echo "BUN-UPDATE-FAILED"; return 1; } ;;
+        *) cp "$VE_ROOT/harness/guren-pinned/package.json" "$VE_ROOT/harness/guren-pinned/bun.lock" "$dest/" ;;
+      esac
+      if [ -n "$(git -C "$dest" status --porcelain)" ]; then
+        git -C "$dest" add -A && git -C "$dest" "${GIT_ID[@]}" commit -q -m "harness: current @guren/* releases" --no-verify
       fi
-      git -C "$dest" add -A && git -C "$dest" "${GIT_ID[@]}" commit -q --allow-empty -m "harness: current @guren/* releases" --no-verify
       # A void-eval task may carry its own Guren seed (tasks/<id>-authz: a defect the statement never names).
       local seed="$AOG_ROOT/tasks/$task/seed.patch"
       [ -f "$VE_ROOT/tasks/$task/seed.guren.patch" ] && seed="$VE_ROOT/tasks/$task/seed.guren.patch"

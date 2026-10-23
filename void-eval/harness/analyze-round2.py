@@ -16,6 +16,9 @@ import re
 import statistics as st
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from spend import cost  # noqa: E402  token-priced: Claude Code 2.1.304's total_cost_usd reads ~20% under
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 R2 = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'results-round2')
@@ -28,19 +31,11 @@ ARMS = [('guren', R2, 'Guren before'), ('guren-v2', R2, 'Guren v2'), ('guren-v3'
 TEST_PATH = re.compile(r'/tests?/|\.test\.')
 
 
-def priced(u):
-    # Token-priced like spend.py: Claude Code 2.1.304's total_cost_usd reads about 20% under
-    # these rates for the same tokens, so it cannot be compared with 2.1.289's.
-    i, w, r, o = 2e-6, 4e-6, 0.2e-6, 10e-6
-    return (u.get('input_tokens', 0) * i + u.get('cache_creation_input_tokens', 0) * w
-            + u.get('cache_read_input_tokens', 0) * r + u.get('output_tokens', 0) * o)
-
-
 def cell(base):
     res = json.load(open(base + '.result.json'))
     verdict = json.load(open(base + '.verdict.json')) if os.path.exists(base + '.verdict.json') else {}
     u = res.get('usage', {})
-    c = dict(ok=verdict.get('status') == 'PASS', turns=res.get('num_turns') or 0, cost=priced(u),
+    c = dict(ok=verdict.get('status') == 'PASS', turns=res.get('num_turns') or 0, cost=cost(u, MODEL),
              inp=u.get('input_tokens', 0) + u.get('cache_creation_input_tokens', 0) + u.get('cache_read_input_tokens', 0),
              write=u.get('cache_creation_input_tokens', 0), out=u.get('output_tokens', 0),
              calls=0, first=0, ref=0, nm=0, tests_written=False, test_runs=0, blocks=0)

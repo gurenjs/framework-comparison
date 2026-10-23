@@ -16,16 +16,14 @@ import json, re, sys
 PATHS = [
     (re.compile(r'(?:/private)?/tmp/ve-worktrees/'), '$WT_ROOT/'),
     (re.compile(r'(?:/private)?/tmp/suite-validate[\w-]*/'), '$LOGDIR/'),
-    (re.compile(r'/Users/[^/\s"\']+/Development/framework-comparison[\w-]*/'), ''),
-    (re.compile(r'/Users/[^/\s"\']+/Development/([\w.-]+)'), r'../\1'),
-    (re.compile(r'~/Development/framework-comparison[\w-]*/'), ''),
-    (re.compile(r'~/Development/([\w.-]+)'), r'../\1'),
+    (re.compile(r'(?:/Users/[^/\s"\']+|~)/Development/framework-comparison[\w-]*/'), ''),
+    (re.compile(r'(?:/Users/[^/\s"\']+|~)/Development/([\w.-]+)'), r'../\1'),
     (re.compile(r'/private/tmp/claude-\d+/[^\s"\']*'), '$TMPDIR/…'),
     (re.compile(r'/(?:private/)?var/folders/[^\s"\']*'), '$TMPDIR/…'),
     (re.compile(r'/Users/[^/\s"\']+'), '$HOME'),
 ]
 RESULT_KEEP = ('type', 'subtype', 'is_error', 'num_turns', 'duration_ms', 'duration_api_ms', 'stop_reason',
-               'terminal_reason', 'total_cost_usd', 'usage', 'modelUsage', 'result')
+               'terminal_reason', 'total_cost_usd', 'usage', 'modelUsage', 'result', 'permission_denials_count')
 USAGE_KEEP = ('input_tokens', 'cache_creation_input_tokens', 'cache_read_input_tokens', 'output_tokens',
               'output_tokens_details', 'cache_creation', 'service_tier')
 MODEL_USAGE_KEEP = ('inputTokens', 'outputTokens', 'cacheReadInputTokens', 'cacheCreationInputTokens', 'costUSD')

@@ -82,12 +82,13 @@ for line in open(sys.argv[1]):
     if ev.get('type') == 'result': last = line
 open(sys.argv[2], 'w').write((last or '{}') + '\n')
 PY
-REPO_ROOT="$REPO_ROOT" python3 - "$TASK" "$ARM_LABEL" "$MODEL" "$TRIAL" "$((END-START))" "$START_COMMIT" "$MAX_TURNS" "$(claude --version 2>/dev/null | head -1)" "$OUT.stream.jsonl" "$GUREN_CLI_VERSION" > "$OUT.meta.json" <<'PY'
+REPO_ROOT="$REPO_ROOT" python3 - "$TASK" "$ARM_LABEL" "$MODEL" "$TRIAL" "$((END-START))" "$START_COMMIT" "$MAX_TURNS" "$(claude --version 2>/dev/null | head -1)" "$GUREN_CLI_VERSION" > "$OUT.meta.json" <<'PY'
 import json, os, sys
-t, a, m, tr, w, sc, mt, cv, stream, gcli = sys.argv[1:11]
+t, a, m, tr, w, sc, mt, cv, gcli = sys.argv[1:10]
 json.dump({"task": t, "arm": a, "model": m, "trial": int(tr), "wall_seconds": int(w), "start_commit": sc,
            "max_turns": int(mt), "claude_version": cv, "guren_cli": gcli,
            "guren_base": os.environ.get("GUREN_BASE", "0fd1654"), "guren_preamble": os.environ.get("GUREN_PREAMBLE", "default"),
+           "guren_update": os.environ.get("GUREN_UPDATE", "pinned"), "void_ref": os.environ.get("VOID_REF", "HEAD"),
            "guren_overlay": os.path.relpath(os.environ["GUREN_TEMPLATE_OVERLAY"], os.environ["REPO_ROOT"]) if os.environ.get("GUREN_TEMPLATE_OVERLAY") else ""}, sys.stdout)
 print()
 PY

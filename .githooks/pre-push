@@ -5,18 +5,18 @@ set -uo pipefail
 zero=0000000000000000000000000000000000000000
 check="$(git rev-parse --show-toplevel)/scripts/check-public.sh"
 status=0
+seen=" "
 while read -r _local_ref local_sha _remote_ref remote_sha; do
   [ "$local_sha" = "$zero" ] && continue   # a branch deletion pushes nothing
+  case "$seen" in *" $local_sha "*) continue ;; esac
+  seen+="$local_sha "
   if [ "$remote_sha" = "$zero" ]; then
     range="origin/main..$local_sha"
   else
     range="$remote_sha..$local_sha"
   fi
   # The tree checked is the one being pushed, not the working copy.
-  tmp="$(mktemp -d)"
-  git worktree add -q --detach "$tmp" "$local_sha" >/dev/null 2>&1 || { echo "pre-push: cannot check out $local_sha"; exit 1; }
-  (cd "$tmp" && bash "$check" "$range") || status=1
-  git worktree remove --force "$tmp" >/dev/null 2>&1
+  bash "$check" --rev "$local_sha" "$range" || status=1
 done
 [ $status -eq 0 ] || echo "pre-push: push refused. Fix the lines above (void-eval/harness/sanitize-results.py cleans saved results)."
 exit $status

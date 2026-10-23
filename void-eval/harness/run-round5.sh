@@ -11,9 +11,9 @@ export GUREN_BASE=525c19c GUREN_UPDATE=none GUREN_PREAMBLE=typecheck-only
 unset GUREN_TEMPLATE_OVERLAY
 CAP="${SPEND_CAP:-10}"
 spent() { python3 -I harness/spend.py results-round5; }
-over() { python3 -I -c "import sys; sys.exit(0 if $(spent) > $CAP else 1)"; }
 for task in post-tags comments-moderation post-revisions json-api-tokens scheduled-publish; do
-  over && { echo "STOP: spend $(spent) > $CAP"; exit 3; }
+  s="$(spent)"
+  awk -v s="$s" -v c="$CAP" 'BEGIN { exit !(s > c) }' && { echo "STOP: spend $s > $CAP"; exit 3; }
   env RESULTS=$PWD/results-round5 bash harness/run-matrix.sh --tasks $task --arms guren-shipped --models claude-sonnet-5-5 --trials 3
 done
 echo "== done, spend $(spent)"

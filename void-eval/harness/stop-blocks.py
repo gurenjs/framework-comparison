@@ -15,7 +15,12 @@ for f in sorted(glob.glob(f'{d}/*/{arm}-claude-*.stream.jsonl')):
     cells += 1
     seen = set()
     for line in open(f):
-        e = json.loads(line)
+        if '"hook_response"' not in line:
+            continue
+        try:
+            e = json.loads(line)
+        except ValueError:   # a session killed mid-write leaves a truncated last line
+            continue
         if e.get('subtype') == 'hook_response' and e.get('hook_event') == 'Stop' and e.get('exit_code') == 2:
             out = e.get('output') or ''
             kinds = [k for k, needle in (('store force write (old app)', 'PostController.store force write'), ('missing authorization', 'neither the middleware chain'), ('gate failure', 'guren gate:')) if needle in out]
