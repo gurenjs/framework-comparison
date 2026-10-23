@@ -1,0 +1,1 @@
+{"task": "missing-authorize-destroy", "arm": "void", "model": "claude-sonnet-5-5", "trial": 1, "wall_seconds": 59, "start_commit": "5a3e2325719c49a1d9b1566025cc14fa365b0c8c", "max_turns": 120, "claude_version": "2.1.289 (Claude Code)"}

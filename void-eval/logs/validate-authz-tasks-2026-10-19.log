@@ -1,0 +1,143 @@
+######## guren post-tags-authz reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-authz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-tags-authz.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## guren post-tags-authz reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-authz.authz.test.ts
+(fail) post update authorization (hidden defect) > refuses another user's edit of a post and changes nothing [243.13ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-tags-authz.robustness.test.ts
+(fail) post tags: robustness (extra) > refuses another user's edit of a tagged post and keeps its tags [144.70ms]
+ 5 pass
+ 1 fail
+--- extra exit: 1
+######## void post-tags-authz reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-authz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-tags-authz.robustness.test.ts
+ 6 pass
+ 0 fail
+--- extra exit: 0
+######## void post-tags-authz reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-tags-authz.authz.test.ts
+(fail) post update authorization (hidden defect) > refuses another user's edit of a post and changes nothing [961.07ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-tags-authz.robustness.test.ts
+(fail) post tags: robustness (extra) > refuses another user's edit of a tagged post and keeps its tags [1607.85ms]
+ 5 pass
+ 1 fail
+--- extra exit: 1
+######## guren post-revisions-authz reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions-authz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-revisions-authz.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## guren post-revisions-authz reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions-authz.authz.test.ts
+(fail) post update authorization (hidden defect) > refuses another user's edit of a post and changes nothing [186.97ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-revisions-authz.robustness.test.ts
+(fail) post revisions: robustness (extra) > keeps no revision for another user's refused edit [249.65ms]
+ 2 pass
+ 1 fail
+--- extra exit: 1
+######## void post-revisions-authz reference
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions-authz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/post-revisions-authz.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## void post-revisions-authz reference-nofix
+ 6 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/post-revisions-authz.authz.test.ts
+(fail) post update authorization (hidden defect) > refuses another user's edit of a post and changes nothing [992.92ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/post-revisions-authz.robustness.test.ts
+(fail) post revisions: robustness (extra) > keeps no revision for another user's refused edit [979.09ms]
+ 2 pass
+ 1 fail
+--- extra exit: 1
+######## guren scheduled-publish-authz reference
+ 5 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/scheduled-publish-authz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/scheduled-publish-authz.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## guren scheduled-publish-authz reference-nofix
+ 5 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/scheduled-publish-authz.authz.test.ts
+(fail) post update authorization (hidden defect) > refuses another user's edit of a post and changes nothing [156.55ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/scheduled-publish-authz.robustness.test.ts
+(fail) scheduled publishing: robustness (extra) > hides a scheduled post's edit form from other users and refuses their update [142.99ms]
+ 2 pass
+ 1 fail
+--- extra exit: 1
+######## void scheduled-publish-authz reference
+ 5 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/scheduled-publish-authz.authz.test.ts
+ 1 pass
+ 0 fail
+--- extra exit: 0
+--- extra (not graded): ./tests/extras/scheduled-publish-authz.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0
+######## void scheduled-publish-authz reference-nofix
+ 5 pass
+ 0 fail
+--- extra (not graded): ./tests/extras/scheduled-publish-authz.authz.test.ts
+(fail) post update authorization (hidden defect) > refuses another user's edit of a post and changes nothing [526.55ms]
+ 0 pass
+ 1 fail
+--- extra exit: 1
+--- extra (not graded): ./tests/extras/scheduled-publish-authz.robustness.test.ts
+ 3 pass
+ 0 fail
+--- extra exit: 0

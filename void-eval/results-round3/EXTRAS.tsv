@@ -1,0 +1,18 @@
+post-tags-authz/guren-v4-claude-haiku-5-5-1	 6 pass  0 fail 	16	00	
+post-tags-authz/guren-v4-claude-haiku-5-5-2	 6 pass  0 fail 	16	00	
+post-tags-authz/guren-v4-claude-haiku-5-5-3	 6 pass  0 fail 	16	00	
+post-tags-authz/void-claude-haiku-5-5-1	 6 pass  0 fail 	05	11	post update authorization (hidden defect) > refuses another user's edit of a post and changes nothing|post tags: robustness (extra) > refuses another user's edit of a tagged post and keeps its tags|
+post-tags-authz/void-claude-haiku-5-5-2	 6 pass  0 fail 	05	11	post update authorization (hidden defect) > refuses another user's edit of a post and changes nothing|post tags: robustness (extra) > refuses another user's edit of a tagged post and keeps its tags|
+post-tags-authz/void-claude-haiku-5-5-3	 6 pass  0 fail 	05	11	post update authorization (hidden defect) > refuses another user's edit of a post and changes nothing|post tags: robustness (extra) > refuses another user's edit of a tagged post and keeps its tags|
+post-revisions-authz/guren-v4-claude-haiku-5-5-1	 6 pass  0 fail 	13	00	
+post-revisions-authz/guren-v4-claude-haiku-5-5-2	 6 pass  0 fail 	13	00	
+post-revisions-authz/guren-v4-claude-haiku-5-5-3	 6 pass  0 fail 	13	00	
+post-revisions-authz/void-claude-haiku-5-5-1	 6 pass  0 fail 	13	00	
+post-revisions-authz/void-claude-haiku-5-5-2	 5 pass  1 fail 	13	00	
+post-revisions-authz/void-claude-haiku-5-5-3	 6 pass  0 fail 	13	00	
+scheduled-publish-authz/guren-v4-claude-haiku-5-5-1	 5 pass  0 fail 	13	00	
+scheduled-publish-authz/guren-v4-claude-haiku-5-5-2	 5 pass  0 fail 	13	00	
+scheduled-publish-authz/guren-v4-claude-haiku-5-5-3	 5 pass  0 fail 	13	00	
+scheduled-publish-authz/void-claude-haiku-5-5-1	 5 pass  0 fail 	13	00	
+scheduled-publish-authz/void-claude-haiku-5-5-2	 5 pass  0 fail 	13	00	
+scheduled-publish-authz/void-claude-haiku-5-5-3	 5 pass  0 fail 	13	00	

@@ -1,0 +1,39 @@
+diff --git a/app/Http/Controllers/PostController.ts b/app/Http/Controllers/PostController.ts
+index 8f702c5..c239345 100644
+--- a/app/Http/Controllers/PostController.ts
++++ b/app/Http/Controllers/PostController.ts
+@@ -68,8 +68,6 @@ export default class PostController extends Controller {
+     await this.authorize('create', Post)
+     const author = await this.auth.userOrFail<UserRecord>()
+     const { body: data } = this.validated('posts.store')
+-    // forceCreate, because `authorId` is deliberately absent from Post.fillable:
+-    // it comes from the session, and a request must never be able to set it.
+     const post = await Post.forceCreate({ ...data, authorId: author.id })
+ 
+     return this.redirect(post?.id ? `/posts/${post.id}` : '/posts')
+diff --git a/app/Http/Validators/PostValidator.ts b/app/Http/Validators/PostValidator.ts
+index 804642a..3ff8259 100644
+--- a/app/Http/Validators/PostValidator.ts
++++ b/app/Http/Validators/PostValidator.ts
+@@ -20,6 +20,7 @@ export const PostPayloadSchema = z.object({
+   title: z.string().trim().min(1, 'Title is required.').max(255, 'Title must be 255 characters or fewer.'),
+   excerpt: z.string().trim().min(1, 'Excerpt is required.').max(500, 'Excerpt must be 500 characters or fewer.'),
+   body: z.string().trim().min(1, 'Body is required.'),
++  authorId: z.coerce.number().int().positive().optional(),
+ })
+ 
+ export type PostPayload = z.infer<typeof PostPayloadSchema>
+diff --git a/app/Models/Post.ts b/app/Models/Post.ts
+index ca838be..69bf7dc 100644
+--- a/app/Models/Post.ts
++++ b/app/Models/Post.ts
+@@ -7,8 +7,7 @@ export type NewPostRecord = typeof posts.$inferInsert
+ export type PostAuthorSummary = Pick<UserRecord, 'id' | 'name'>
+ 
+ export class Post extends defineModel(posts, {
+-  // `authorId` is set from the signed-in user, never from request input.
+-  fillable: ['title', 'excerpt', 'body'],
++  fillable: ['title', 'excerpt', 'body', 'authorId'],
+ }) {
+   static override relationTypes: { author: BelongsToRecord<PostAuthorSummary> } = {
+     author: null,

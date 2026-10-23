@@ -1,0 +1,1 @@
+{"task": "scheduled-publish", "arm": "guren-shipped", "model": "claude-sonnet-5-5", "trial": 1, "wall_seconds": 54, "start_commit": "3c503f2ed3495b1313c2fcdf6d8a321bbd56bd56", "max_turns": 200, "claude_version": "2.1.304 (Claude Code)", "guren_cli": "2.32.0", "guren_base": "525c19c", "guren_preamble": "typecheck-only", "guren_overlay": ""}

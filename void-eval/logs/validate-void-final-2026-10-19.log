@@ -1,0 +1,74 @@
+missing-authorize-destroy  start  run1  -> fail [ 2 pass  1 fail ] (expected fail) OK
+missing-authorize-destroy  start  run2  -> fail [ 2 pass  1 fail ] (expected fail) OK
+missing-authorize-destroy  reference  run1  -> pass [ 3 pass  0 fail ] (expected pass) OK
+missing-authorize-destroy  reference  run2  -> pass [ 3 pass  0 fail ] (expected pass) OK
+pagination-skips-page  start  run1  -> fail [ 0 pass  6 fail ] (expected fail) OK
+pagination-skips-page  start  run2  -> fail [ 0 pass  6 fail ] (expected fail) OK
+pagination-skips-page  reference  run1  -> pass [ 6 pass  0 fail ] (expected pass) OK
+pagination-skips-page  reference  run2  -> pass [ 6 pass  0 fail ] (expected pass) OK
+raw-body-no-validation  start  run1  -> fail [ 2 pass  4 fail ] (expected fail) OK
+raw-body-no-validation  start  run2  -> fail [ 2 pass  4 fail ] (expected fail) OK
+raw-body-no-validation  reference  run1  -> pass [ 6 pass  0 fail ] (expected pass) OK
+raw-body-no-validation  reference  run2  -> pass [ 6 pass  0 fail ] (expected pass) OK
+api-posts-contract  start  run1  -> fail [ 0 pass  8 fail ] (expected fail) OK
+api-posts-contract  start  run2  -> fail [ 0 pass  8 fail ] (expected fail) OK
+api-posts-contract  reference  run1  -> pass [ 8 pass  0 fail ] (expected pass) OK
+api-posts-contract  reference  run2  -> pass [ 8 pass  0 fail ] (expected pass) OK
+post-tags  start  run1  -> fail [ 0 pass  6 fail ] (expected fail) OK
+post-tags  start  run2  -> fail [ 0 pass  6 fail ] (expected fail) OK
+post-tags  reference  run1  -> pass [ 6 pass  0 fail ] (expected pass) OK
+post-tags  reference  run2  -> pass [ 6 pass  0 fail ] (expected pass) OK
+comments-moderation  start  run1  -> fail [ 0 pass  8 fail ] (expected fail) OK
+comments-moderation  start  run2  -> fail [ 0 pass  8 fail ] (expected fail) OK
+comments-moderation  reference  run1  -> pass [ 8 pass  0 fail ] (expected pass) OK
+comments-moderation  reference  run2  -> pass [ 8 pass  0 fail ] (expected pass) OK
+post-revisions  start  run1  -> fail [ 0 pass  6 fail ] (expected fail) OK
+post-revisions  start  run2  -> fail [ 0 pass  6 fail ] (expected fail) OK
+post-revisions  reference  run1  -> pass [ 6 pass  0 fail ] (expected pass) OK
+post-revisions  reference  run2  -> pass [ 6 pass  0 fail ] (expected pass) OK
+json-api-tokens  start  run1  -> fail [ 0 pass  10 fail ] (expected fail) OK
+json-api-tokens  start  run2  -> fail [ 0 pass  10 fail ] (expected fail) OK
+json-api-tokens  reference  run1  -> pass [ 10 pass  0 fail ] (expected pass) OK
+json-api-tokens  reference  run2  -> pass [ 10 pass  0 fail ] (expected pass) OK
+scheduled-publish  start  run1  -> fail [ 0 pass  5 fail ] (expected fail) OK
+scheduled-publish  start  run2  -> fail [ 0 pass  5 fail ] (expected fail) OK
+scheduled-publish  reference  run1  -> pass [ 5 pass  0 fail ] (expected pass) OK
+scheduled-publish  reference  run2  -> pass [ 5 pass  0 fail ] (expected pass) OK
+
+summary:
+  missing-authorize-destroy|start|run1|fail|OK
+  missing-authorize-destroy|start|run2|fail|OK
+  missing-authorize-destroy|reference|run1|pass|OK
+  missing-authorize-destroy|reference|run2|pass|OK
+  pagination-skips-page|start|run1|fail|OK
+  pagination-skips-page|start|run2|fail|OK
+  pagination-skips-page|reference|run1|pass|OK
+  pagination-skips-page|reference|run2|pass|OK
+  raw-body-no-validation|start|run1|fail|OK
+  raw-body-no-validation|start|run2|fail|OK
+  raw-body-no-validation|reference|run1|pass|OK
+  raw-body-no-validation|reference|run2|pass|OK
+  api-posts-contract|start|run1|fail|OK
+  api-posts-contract|start|run2|fail|OK
+  api-posts-contract|reference|run1|pass|OK
+  api-posts-contract|reference|run2|pass|OK
+  post-tags|start|run1|fail|OK
+  post-tags|start|run2|fail|OK
+  post-tags|reference|run1|pass|OK
+  post-tags|reference|run2|pass|OK
+  comments-moderation|start|run1|fail|OK
+  comments-moderation|start|run2|fail|OK
+  comments-moderation|reference|run1|pass|OK
+  comments-moderation|reference|run2|pass|OK
+  post-revisions|start|run1|fail|OK
+  post-revisions|start|run2|fail|OK
+  post-revisions|reference|run1|pass|OK
+  post-revisions|reference|run2|pass|OK
+  json-api-tokens|start|run1|fail|OK
+  json-api-tokens|start|run2|fail|OK
+  json-api-tokens|reference|run1|pass|OK
+  json-api-tokens|reference|run2|pass|OK
+  scheduled-publish|start|run1|fail|OK
+  scheduled-publish|start|run2|fail|OK
+  scheduled-publish|reference|run1|pass|OK
+  scheduled-publish|reference|run2|pass|OK

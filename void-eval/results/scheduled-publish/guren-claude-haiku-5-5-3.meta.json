@@ -1,0 +1,1 @@
+{"task": "scheduled-publish", "arm": "guren", "model": "claude-haiku-5-5", "trial": 3, "wall_seconds": 225, "start_commit": "4e5fa7821d13e8aeb40166986e841f5936e84b9c", "max_turns": 200, "claude_version": "2.1.289 (Claude Code)", "guren_cli": "2.31.1"}

@@ -1,0 +1,889 @@
+diff --git a/db/migrations/20261018135831_stale_impossible_man.sql b/db/migrations/20261018135831_stale_impossible_man.sql
+new file mode 100644
+index 0000000..e7e3b72
+--- /dev/null
++++ b/db/migrations/20261018135831_stale_impossible_man.sql
+@@ -0,0 +1,17 @@
++CREATE TABLE `api_rate_limits` (
++	`token_id` integer NOT NULL,
++	`window` integer NOT NULL,
++	`count` integer NOT NULL,
++	PRIMARY KEY(`token_id`, `window`)
++);
++--> statement-breakpoint
++CREATE TABLE `api_tokens` (
++	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
++	`user_id` text NOT NULL,
++	`name` text NOT NULL,
++	`token_hash` text NOT NULL,
++	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
++);
++--> statement-breakpoint
++CREATE UNIQUE INDEX `api_tokens_token_hash_unique` ON `api_tokens` (`token_hash`);--> statement-breakpoint
++CREATE INDEX `api_tokens_user_id_idx` ON `api_tokens` (`user_id`);
+\ No newline at end of file
+diff --git a/db/migrations/meta/20261018135831_snapshot.json b/db/migrations/meta/20261018135831_snapshot.json
+new file mode 100644
+index 0000000..8495554
+--- /dev/null
++++ b/db/migrations/meta/20261018135831_snapshot.json
+@@ -0,0 +1,516 @@
++{
++  "version": "6",
++  "dialect": "sqlite",
++  "id": "c3d2c6a2-f918-4ad0-bd20-8bf8bdf9fe9b",
++  "prevId": "d4a43e98-9576-4bfd-b3af-1ce1cef5eb2a",
++  "tables": {
++    "api_rate_limits": {
++      "name": "api_rate_limits",
++      "columns": {
++        "token_id": {
++          "name": "token_id",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "window": {
++          "name": "window",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "count": {
++          "name": "count",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {
++        "api_rate_limits_token_id_window_pk": {
++          "columns": [
++            "token_id",
++            "window"
++          ],
++          "name": "api_rate_limits_token_id_window_pk"
++        }
++      },
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "api_tokens": {
++      "name": "api_tokens",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "integer",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": true
++        },
++        "user_id": {
++          "name": "user_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "name": {
++          "name": "name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "token_hash": {
++          "name": "token_hash",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
++        }
++      },
++      "indexes": {
++        "api_tokens_token_hash_unique": {
++          "name": "api_tokens_token_hash_unique",
++          "columns": [
++            "token_hash"
++          ],
++          "isUnique": true
++        },
++        "api_tokens_user_id_idx": {
++          "name": "api_tokens_user_id_idx",
++          "columns": [
++            "user_id"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "posts": {
++      "name": "posts",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "integer",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": true
++        },
++        "title": {
++          "name": "title",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "excerpt": {
++          "name": "excerpt",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "body": {
++          "name": "body",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "author_id": {
++          "name": "author_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "account": {
++      "name": "account",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "accountId": {
++          "name": "accountId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "providerId": {
++          "name": "providerId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "userId": {
++          "name": "userId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "accessToken": {
++          "name": "accessToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "refreshToken": {
++          "name": "refreshToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "idToken": {
++          "name": "idToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "accessTokenExpiresAt": {
++          "name": "accessTokenExpiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "refreshTokenExpiresAt": {
++          "name": "refreshTokenExpiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "scope": {
++          "name": "scope",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "password": {
++          "name": "password",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "account_userId_idx": {
++          "name": "account_userId_idx",
++          "columns": [
++            "userId"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {
++        "account_userId_user_id_fk": {
++          "name": "account_userId_user_id_fk",
++          "tableFrom": "account",
++          "tableTo": "user",
++          "columnsFrom": [
++            "userId"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "session": {
++      "name": "session",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expiresAt": {
++          "name": "expiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "token": {
++          "name": "token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "ipAddress": {
++          "name": "ipAddress",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "userAgent": {
++          "name": "userAgent",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "userId": {
++          "name": "userId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "session_token_unique": {
++          "name": "session_token_unique",
++          "columns": [
++            "token"
++          ],
++          "isUnique": true
++        },
++        "session_userId_idx": {
++          "name": "session_userId_idx",
++          "columns": [
++            "userId"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {
++        "session_userId_user_id_fk": {
++          "name": "session_userId_user_id_fk",
++          "tableFrom": "session",
++          "tableTo": "user",
++          "columnsFrom": [
++            "userId"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "user": {
++      "name": "user",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "name": {
++          "name": "name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "email": {
++          "name": "email",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "emailVerified": {
++          "name": "emailVerified",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "image": {
++          "name": "image",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "user_email_unique": {
++          "name": "user_email_unique",
++          "columns": [
++            "email"
++          ],
++          "isUnique": true
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "verification": {
++      "name": "verification",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "identifier": {
++          "name": "identifier",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "value": {
++          "name": "value",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expiresAt": {
++          "name": "expiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "verification_identifier_idx": {
++          "name": "verification_identifier_idx",
++          "columns": [
++            "identifier"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    }
++  },
++  "views": {},
++  "enums": {},
++  "_meta": {
++    "schemas": {},
++    "tables": {},
++    "columns": {}
++  },
++  "internal": {
++    "indexes": {}
++  }
++}
+\ No newline at end of file
+diff --git a/db/migrations/meta/_journal.json b/db/migrations/meta/_journal.json
+index 42c5e52..611ea91 100644
+--- a/db/migrations/meta/_journal.json
++++ b/db/migrations/meta/_journal.json
+@@ -8,6 +8,13 @@
+       "when": 1792295224188,
+       "tag": "20261018034704_sturdy_orphan",
+       "breakpoints": true
++    },
++    {
++      "idx": 1,
++      "version": "6",
++      "when": 1792331911358,
++      "tag": "20261018135831_stale_impossible_man",
++      "breakpoints": true
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/db/schema.ts b/db/schema.ts
+index f256712..17a9c97 100644
+--- a/db/schema.ts
++++ b/db/schema.ts
+@@ -1,5 +1,5 @@
+ import { sql } from "void/db";
+-import { integer, sqliteTable, text } from "void/schema-d1";
++import { index, integer, primaryKey, sqliteTable, text, uniqueIndex } from "void/schema-d1";
+ 
+ // Authors are Better Auth users (the `user` table Void manages); see
+ // lib/users.ts for the read-only mapping used in joins.
+@@ -11,3 +11,27 @@ export const posts = sqliteTable("posts", {
+   authorId: text("author_id").notNull(),
+   createdAt: text("created_at").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+ });
++
++// Personal API tokens. Only a SHA-256 digest of the token is stored.
++export const apiTokens = sqliteTable(
++  "api_tokens",
++  {
++    id: integer("id").primaryKey({ autoIncrement: true }),
++    userId: text("user_id").notNull(),
++    name: text("name").notNull(),
++    tokenHash: text("token_hash").notNull(),
++    createdAt: text("created_at").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
++  },
++  (t) => [uniqueIndex("api_tokens_token_hash_unique").on(t.tokenHash), index("api_tokens_user_id_idx").on(t.userId)],
++);
++
++// Fixed-window request counters, one row per token per minute.
++export const apiRateLimits = sqliteTable(
++  "api_rate_limits",
++  {
++    tokenId: integer("token_id").notNull(),
++    window: integer("window").notNull(),
++    count: integer("count").notNull(),
++  },
++  (t) => [primaryKey({ columns: [t.tokenId, t.window] })],
++);
+diff --git a/lib/api-tokens.ts b/lib/api-tokens.ts
+new file mode 100644
+index 0000000..1572518
+--- /dev/null
++++ b/lib/api-tokens.ts
+@@ -0,0 +1,69 @@
++import type { Context } from "hono";
++import { apiRateLimits, apiTokens } from "@schema";
++import { db, eq, lt, and, sql } from "void/db";
++
++export const RATE_LIMIT = 60;
++const WINDOW_SECONDS = 60;
++
++export type ApiAuth = { tokenId: number; userId: string };
++
++/** The database only ever sees this digest, never the token itself. */
++export async function hashToken(token: string): Promise<string> {
++  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
++  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
++}
++
++export function generateToken(): string {
++  const bytes = crypto.getRandomValues(new Uint8Array(32));
++  let binary = "";
++  for (const b of bytes) binary += String.fromCharCode(b);
++  const encoded = btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
++  return `vbt_${encoded}`;
++}
++
++function bearerToken(c: Context): string | null {
++  const match = /^Bearer +([^\s]+)$/i.exec(c.req.header("authorization")?.trim() ?? "");
++  return match ? match[1] : null;
++}
++
++/** Resolves the bearer token to its owner, or null when missing/unknown/revoked. */
++export async function authenticateToken(c: Context): Promise<ApiAuth | null> {
++  const token = bearerToken(c);
++  if (!token || token.length > 256) return null;
++  const [row] = await db
++    .select({ tokenId: apiTokens.id, userId: apiTokens.userId })
++    .from(apiTokens)
++    .where(eq(apiTokens.tokenHash, await hashToken(token)));
++  return row ?? null;
++}
++
++/**
++ * Authenticates and rate-limits an API request. Returns the token owner, or a
++ * JSON error response (401 / 429) to send back.
++ */
++export async function authorizeApi(c: Context): Promise<ApiAuth | Response> {
++  const auth = await authenticateToken(c);
++  if (!auth) {
++    return c.json({ error: "Unauthorized" }, 401, { "WWW-Authenticate": "Bearer" });
++  }
++
++  const nowSeconds = Math.floor(Date.now() / 1000);
++  const window = Math.floor(nowSeconds / WINDOW_SECONDS);
++  const [row] = await db
++    .insert(apiRateLimits)
++    .values({ tokenId: auth.tokenId, window, count: 1 })
++    .onConflictDoUpdate({
++      target: [apiRateLimits.tokenId, apiRateLimits.window],
++      set: { count: sql`${apiRateLimits.count} + 1` },
++    })
++    .returning({ count: apiRateLimits.count });
++
++  if (row.count === 1) {
++    await db.delete(apiRateLimits).where(and(eq(apiRateLimits.tokenId, auth.tokenId), lt(apiRateLimits.window, window)));
++  }
++  if (row.count > RATE_LIMIT) {
++    const retryAfter = Math.min(WINDOW_SECONDS, Math.max(1, (window + 1) * WINDOW_SECONDS - nowSeconds));
++    return c.json({ error: "Too many requests" }, 429, { "Retry-After": String(retryAfter) });
++  }
++  return auth;
++}
+diff --git a/lib/validators.ts b/lib/validators.ts
+index c786db6..13df795 100644
+--- a/lib/validators.ts
++++ b/lib/validators.ts
+@@ -16,6 +16,12 @@ export const profileUpdateSchema = z.object({
+     .pipe(z.email("Enter a valid email address.")),
+ });
+ 
++export const tokenNameSchema = z
++  .string("Name is required.")
++  .trim()
++  .min(1, "Name is required.")
++  .max(50, "Name must be 50 characters or fewer.");
++
+ export const listPostsQuerySchema = z.object({
+   page: z.coerce.number().int().min(1).default(1),
+   q: z.string().trim().optional(),
+diff --git a/pages/profile.server.ts b/pages/profile.server.ts
+index e9205f9..2b94ec3 100644
+--- a/pages/profile.server.ts
++++ b/pages/profile.server.ts
+@@ -2,6 +2,7 @@ import { defineHandler, type InferProps } from "void";
+ import { ValidationError } from "void/handler";
+ import { requireAuth } from "void/auth";
+ import { and, db, eq, ne } from "void/db";
++import { apiTokens } from "@schema";
+ import { users } from "../lib/users";
+ import { userOrRedirect } from "../lib/guards";
+ import { profileUpdateSchema } from "../lib/validators";
+@@ -12,7 +13,11 @@ export const loader = defineHandler(async (c) => {
+   const user = userOrRedirect(c);
+   if (user instanceof Response) return user;
+   const [profile] = await db.select({ name: users.name, email: users.email }).from(users).where(eq(users.id, user.id));
+-  return { profile };
++  const tokens = await db
++    .select({ id: apiTokens.id, name: apiTokens.name, createdAt: apiTokens.createdAt })
++    .from(apiTokens)
++    .where(eq(apiTokens.userId, user.id));
++  return { profile, tokens };
+ });
+ 
+ export const action = defineHandler.withValidator({
+diff --git a/pages/profile.tsx b/pages/profile.tsx
+index ee91225..d06c660 100644
+--- a/pages/profile.tsx
++++ b/pages/profile.tsx
+@@ -1,8 +1,34 @@
++import { useState } from "react";
+ import { Form, useForm } from "@void/react";
+ import type { Props } from "./profile.server";
+ 
+-export default function Profile({ profile }: Props) {
++export default function Profile({ profile, tokens }: Props) {
+   const form = useForm("/profile", { name: profile.name, email: profile.email });
++  const [tokenName, setTokenName] = useState("");
++  const [newToken, setNewToken] = useState<string | null>(null);
++  const [tokenError, setTokenError] = useState<string | null>(null);
++
++  async function createToken(e: React.FormEvent) {
++    e.preventDefault();
++    setTokenError(null);
++    const res = await fetch("/profile/tokens", {
++      method: "POST",
++      headers: { "Content-Type": "application/json", Accept: "application/json" },
++      body: JSON.stringify({ name: tokenName }),
++    });
++    if (!res.ok) {
++      setTokenError("Token name must be 1 to 50 characters.");
++      return;
++    }
++    const created = (await res.json()) as { token: string };
++    setNewToken(created.token);
++    setTokenName("");
++  }
++
++  async function revokeToken(id: number) {
++    await fetch(`/profile/tokens/${id}`, { method: "DELETE", headers: { Accept: "application/json" } });
++    window.location.reload();
++  }
+ 
+   return (
+     <section>
+@@ -19,6 +45,28 @@ export default function Profile({ profile }: Props) {
+         {form.recentlySuccessful && <p>Profile updated successfully.</p>}
+         <button disabled={form.pending}>Save</button>
+       </Form>
++
++      <h2>API tokens</h2>
++      {newToken && (
++        <p>
++          Copy your new token now, it will not be shown again: <code>{newToken}</code>
++        </p>
++      )}
++      <ul>
++        {tokens.map((t) => (
++          <li key={t.id}>
++            {t.name} <button type="button" onClick={() => revokeToken(t.id)}>Revoke</button>
++          </li>
++        ))}
++      </ul>
++      <form onSubmit={createToken}>
++        <label>
++          Token name <input value={tokenName} onChange={(e) => setTokenName(e.target.value)} />
++        </label>
++        {tokenError && <p className="error">{tokenError}</p>}
++        <button>Create token</button>
++      </form>
++      {newToken && <button type="button" onClick={() => window.location.reload()}>Done</button>}
+     </section>
+   );
+ }
+diff --git a/routes/api/posts.ts b/routes/api/posts.ts
+new file mode 100644
+index 0000000..2fd7ee4
+--- /dev/null
++++ b/routes/api/posts.ts
+@@ -0,0 +1,36 @@
++import { defineHandler } from "void";
++import { posts } from "@schema";
++import { db, desc } from "void/db";
++import { authorizeApi } from "../../lib/api-tokens";
++import { selectPosts } from "../../lib/posts";
++import { postPayloadSchema } from "../../lib/validators";
++
++type ApiPost = { id: number; title: string; excerpt: string; authorId: string; createdAt: string };
++
++function present(p: ApiPost): ApiPost {
++  return { id: p.id, title: p.title, excerpt: p.excerpt, authorId: p.authorId, createdAt: p.createdAt };
++}
++
++export const GET = defineHandler(async (c) => {
++  const auth = await authorizeApi(c);
++  if (auth instanceof Response) return auth;
++  const rows = await selectPosts().orderBy(desc(posts.createdAt), desc(posts.id));
++  return c.json({ data: rows.map(present) });
++});
++
++export const POST = defineHandler(async (c) => {
++  const auth = await authorizeApi(c);
++  if (auth instanceof Response) return auth;
++
++  const raw = await c.req.json().catch(() => null);
++  const parsed = postPayloadSchema.safeParse(raw && typeof raw === "object" ? raw : {});
++  if (!parsed.success) {
++    return c.json({ error: "Validation failed", issues: parsed.error.issues.map((i) => ({ path: i.path.join("."), message: i.message })) }, 422);
++  }
++
++  const [post] = await db
++    .insert(posts)
++    .values({ ...parsed.data, authorId: auth.userId })
++    .returning();
++  return c.json({ data: present(post) }, 201);
++});
+diff --git a/routes/profile/tokens.ts b/routes/profile/tokens.ts
+new file mode 100644
+index 0000000..966c887
+--- /dev/null
++++ b/routes/profile/tokens.ts
+@@ -0,0 +1,24 @@
++import { defineHandler } from "void";
++import { getUser } from "void/auth";
++import { apiTokens } from "@schema";
++import { db } from "void/db";
++import { generateToken, hashToken } from "../../lib/api-tokens";
++import { tokenNameSchema } from "../../lib/validators";
++
++export const POST = defineHandler(async (c) => {
++  const user = getUser();
++  if (!user) return c.json({ error: "Unauthorized" }, 401);
++
++  const raw = await c.req.json().catch(() => null);
++  const parsed = tokenNameSchema.safeParse(raw && typeof raw === "object" ? (raw as { name?: unknown }).name : undefined);
++  if (!parsed.success) {
++    return c.json({ error: "Validation failed", issues: [{ path: "name", message: parsed.error.issues[0].message }] }, 422);
++  }
++
++  const token = generateToken();
++  const [row] = await db
++    .insert(apiTokens)
++    .values({ userId: user.id, name: parsed.data, tokenHash: await hashToken(token) })
++    .returning({ id: apiTokens.id });
++  return c.json({ id: row.id, name: parsed.data, token }, 201);
++});
+diff --git a/routes/profile/tokens/[id].ts b/routes/profile/tokens/[id].ts
+new file mode 100644
+index 0000000..bb767b3
+--- /dev/null
++++ b/routes/profile/tokens/[id].ts
+@@ -0,0 +1,20 @@
++import { defineHandler } from "void";
++import { getUser } from "void/auth";
++import { apiTokens } from "@schema";
++import { and, db, eq } from "void/db";
++import { postIdSchema } from "../../../lib/validators";
++
++export const DELETE = defineHandler(async (c) => {
++  const user = getUser();
++  if (!user) return c.json({ error: "Unauthorized" }, 401);
++
++  const id = postIdSchema.safeParse(c.req.param("id"));
++  if (!id.success) return c.json({ error: "Token not found" }, 404);
++
++  const deleted = await db
++    .delete(apiTokens)
++    .where(and(eq(apiTokens.id, id.data), eq(apiTokens.userId, user.id)))
++    .returning({ id: apiTokens.id });
++  if (deleted.length === 0) return c.json({ error: "Token not found" }, 404);
++  return c.body(null, 204);
++});

@@ -1,0 +1,1 @@
+{"task": "post-revisions", "arm": "void", "model": "claude-haiku-5-5", "trial": 2, "wall_seconds": 83, "start_commit": "5fdef6c0e4c7b03604d1a00e8334fec6d048fa77", "max_turns": 200, "claude_version": "2.1.289 (Claude Code)", "guren_cli": "-"}

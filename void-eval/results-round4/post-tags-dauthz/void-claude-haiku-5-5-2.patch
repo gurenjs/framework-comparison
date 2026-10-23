@@ -1,0 +1,920 @@
+diff --git a/db/migrations/20261019223129_faithful_molecule_man.sql b/db/migrations/20261019223129_faithful_molecule_man.sql
+new file mode 100644
+index 0000000..9479aa1
+--- /dev/null
++++ b/db/migrations/20261019223129_faithful_molecule_man.sql
+@@ -0,0 +1,15 @@
++CREATE TABLE `post_tags` (
++	`post_id` integer NOT NULL,
++	`tag_id` integer NOT NULL,
++	PRIMARY KEY(`post_id`, `tag_id`),
++	FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`) ON UPDATE no action ON DELETE cascade,
++	FOREIGN KEY (`tag_id`) REFERENCES `tags`(`id`) ON UPDATE no action ON DELETE cascade
++);
++--> statement-breakpoint
++CREATE INDEX `post_tags_tag_id_idx` ON `post_tags` (`tag_id`);--> statement-breakpoint
++CREATE TABLE `tags` (
++	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
++	`name` text NOT NULL
++);
++--> statement-breakpoint
++CREATE UNIQUE INDEX `tags_name_unique` ON `tags` (`name`);
+\ No newline at end of file
+diff --git a/db/migrations/meta/20261019223129_snapshot.json b/db/migrations/meta/20261019223129_snapshot.json
+new file mode 100644
+index 0000000..b317855
+--- /dev/null
++++ b/db/migrations/meta/20261019223129_snapshot.json
+@@ -0,0 +1,515 @@
++{
++  "version": "6",
++  "dialect": "sqlite",
++  "id": "82bc9492-0397-41c8-b1f6-a8b0349c6b23",
++  "prevId": "d4a43e98-9576-4bfd-b3af-1ce1cef5eb2a",
++  "tables": {
++    "post_tags": {
++      "name": "post_tags",
++      "columns": {
++        "post_id": {
++          "name": "post_id",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "tag_id": {
++          "name": "tag_id",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "post_tags_tag_id_idx": {
++          "name": "post_tags_tag_id_idx",
++          "columns": [
++            "tag_id"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {
++        "post_tags_post_id_posts_id_fk": {
++          "name": "post_tags_post_id_posts_id_fk",
++          "tableFrom": "post_tags",
++          "tableTo": "posts",
++          "columnsFrom": [
++            "post_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        },
++        "post_tags_tag_id_tags_id_fk": {
++          "name": "post_tags_tag_id_tags_id_fk",
++          "tableFrom": "post_tags",
++          "tableTo": "tags",
++          "columnsFrom": [
++            "tag_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {
++        "post_tags_post_id_tag_id_pk": {
++          "columns": [
++            "post_id",
++            "tag_id"
++          ],
++          "name": "post_tags_post_id_tag_id_pk"
++        }
++      },
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "posts": {
++      "name": "posts",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "integer",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": true
++        },
++        "title": {
++          "name": "title",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "excerpt": {
++          "name": "excerpt",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "body": {
++          "name": "body",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "author_id": {
++          "name": "author_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "tags": {
++      "name": "tags",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "integer",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": true
++        },
++        "name": {
++          "name": "name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "tags_name_unique": {
++          "name": "tags_name_unique",
++          "columns": [
++            "name"
++          ],
++          "isUnique": true
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "account": {
++      "name": "account",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "accountId": {
++          "name": "accountId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "providerId": {
++          "name": "providerId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "userId": {
++          "name": "userId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "accessToken": {
++          "name": "accessToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "refreshToken": {
++          "name": "refreshToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "idToken": {
++          "name": "idToken",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "accessTokenExpiresAt": {
++          "name": "accessTokenExpiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "refreshTokenExpiresAt": {
++          "name": "refreshTokenExpiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "scope": {
++          "name": "scope",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "password": {
++          "name": "password",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "account_userId_idx": {
++          "name": "account_userId_idx",
++          "columns": [
++            "userId"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {
++        "account_userId_user_id_fk": {
++          "name": "account_userId_user_id_fk",
++          "tableFrom": "account",
++          "tableTo": "user",
++          "columnsFrom": [
++            "userId"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "session": {
++      "name": "session",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expiresAt": {
++          "name": "expiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "token": {
++          "name": "token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "ipAddress": {
++          "name": "ipAddress",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "userAgent": {
++          "name": "userAgent",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "userId": {
++          "name": "userId",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "session_token_unique": {
++          "name": "session_token_unique",
++          "columns": [
++            "token"
++          ],
++          "isUnique": true
++        },
++        "session_userId_idx": {
++          "name": "session_userId_idx",
++          "columns": [
++            "userId"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {
++        "session_userId_user_id_fk": {
++          "name": "session_userId_user_id_fk",
++          "tableFrom": "session",
++          "tableTo": "user",
++          "columnsFrom": [
++            "userId"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "user": {
++      "name": "user",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "name": {
++          "name": "name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "email": {
++          "name": "email",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "emailVerified": {
++          "name": "emailVerified",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "image": {
++          "name": "image",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "user_email_unique": {
++          "name": "user_email_unique",
++          "columns": [
++            "email"
++          ],
++          "isUnique": true
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "verification": {
++      "name": "verification",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "identifier": {
++          "name": "identifier",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "value": {
++          "name": "value",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expiresAt": {
++          "name": "expiresAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "createdAt": {
++          "name": "createdAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updatedAt": {
++          "name": "updatedAt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "verification_identifier_idx": {
++          "name": "verification_identifier_idx",
++          "columns": [
++            "identifier"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    }
++  },
++  "views": {},
++  "enums": {},
++  "_meta": {
++    "schemas": {},
++    "tables": {},
++    "columns": {}
++  },
++  "internal": {
++    "indexes": {}
++  }
++}
+\ No newline at end of file
+diff --git a/db/migrations/meta/_journal.json b/db/migrations/meta/_journal.json
+index 42c5e52..20999c9 100644
+--- a/db/migrations/meta/_journal.json
++++ b/db/migrations/meta/_journal.json
+@@ -8,6 +8,13 @@
+       "when": 1792295224188,
+       "tag": "20261018034704_sturdy_orphan",
+       "breakpoints": true
++    },
++    {
++      "idx": 1,
++      "version": "6",
++      "when": 1792449089698,
++      "tag": "20261019223129_faithful_molecule_man",
++      "breakpoints": true
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/db/schema.ts b/db/schema.ts
+index f256712..f2b306f 100644
+--- a/db/schema.ts
++++ b/db/schema.ts
+@@ -1,5 +1,5 @@
+ import { sql } from "void/db";
+-import { integer, sqliteTable, text } from "void/schema-d1";
++import { index, integer, primaryKey, sqliteTable, text } from "void/schema-d1";
+ 
+ // Authors are Better Auth users (the `user` table Void manages); see
+ // lib/users.ts for the read-only mapping used in joins.
+@@ -11,3 +11,21 @@ export const posts = sqliteTable("posts", {
+   authorId: text("author_id").notNull(),
+   createdAt: text("created_at").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+ });
++
++export const tags = sqliteTable("tags", {
++  id: integer("id").primaryKey({ autoIncrement: true }),
++  name: text("name").notNull().unique(),
++});
++
++export const postTags = sqliteTable(
++  "post_tags",
++  {
++    postId: integer("post_id")
++      .notNull()
++      .references(() => posts.id, { onDelete: "cascade" }),
++    tagId: integer("tag_id")
++      .notNull()
++      .references(() => tags.id, { onDelete: "cascade" }),
++  },
++  (table) => [primaryKey({ columns: [table.postId, table.tagId] }), index("post_tags_tag_id_idx").on(table.tagId)],
++);
+diff --git a/lib/tags.ts b/lib/tags.ts
+new file mode 100644
+index 0000000..1c8f3b1
+--- /dev/null
++++ b/lib/tags.ts
+@@ -0,0 +1,45 @@
++import { posts, postTags, tags } from "@schema";
++import { asc, db, eq, inArray } from "void/db";
++import { parseTagNames } from "./validators";
++
++export function postHasTag(name: string) {
++  return inArray(
++    posts.id,
++    db
++      .select({ id: postTags.postId })
++      .from(postTags)
++      .innerJoin(tags, eq(tags.id, postTags.tagId))
++      .where(eq(tags.name, name)),
++  );
++}
++
++export async function saveTags(postId: number, raw: string): Promise<void> {
++  const names = parseTagNames(raw);
++  if (names.length > 0) {
++    await db
++      .insert(tags)
++      .values(names.map((name) => ({ name })))
++      .onConflictDoNothing({ target: tags.name });
++  }
++  const ids = names.length > 0 ? await db.select({ id: tags.id }).from(tags).where(inArray(tags.name, names)) : [];
++  await db.delete(postTags).where(eq(postTags.postId, postId));
++  if (ids.length > 0) {
++    await db.insert(postTags).values(ids.map(({ id }) => ({ postId, tagId: id })));
++  }
++}
++
++export async function withTags<T extends { id: number }>(rows: T[]): Promise<(T & { tags: string[] })[]> {
++  const byPost = new Map<number, string[]>();
++  if (rows.length > 0) {
++    const links = await db
++      .select({ postId: postTags.postId, name: tags.name })
++      .from(postTags)
++      .innerJoin(tags, eq(tags.id, postTags.tagId))
++      .where(inArray(postTags.postId, rows.map((row) => row.id)))
++      .orderBy(asc(tags.name));
++    for (const { postId, name } of links) {
++      byPost.set(postId, [...(byPost.get(postId) ?? []), name]);
++    }
++  }
++  return rows.map((row) => ({ ...row, tags: byPost.get(row.id) ?? [] }));
++}
+diff --git a/lib/validators.ts b/lib/validators.ts
+index c786db6..e922dc0 100644
+--- a/lib/validators.ts
++++ b/lib/validators.ts
+@@ -1,9 +1,28 @@
+ import { z } from "zod";
+ 
++/** Comma-separated names: trimmed, empty entries and repeats dropped. */
++export function parseTagNames(raw: string): string[] {
++  const names = raw
++    .split(",")
++    .map((name) => name.trim())
++    .filter((name) => name.length > 0);
++  return [...new Set(names)];
++}
++
++const tagsField = z.string().default("").superRefine((raw, ctx) => {
++  const names = parseTagNames(raw);
++  if (names.some((name) => name.length > 30)) {
++    ctx.addIssue({ code: "custom", message: "Each tag must be 30 characters or fewer." });
++  } else if (names.length > 5) {
++    ctx.addIssue({ code: "custom", message: "A post can have at most 5 tags." });
++  }
++});
++
+ export const postPayloadSchema = z.object({
+   title: z.string().trim().min(1, "Title is required.").max(255, "Title must be 255 characters or fewer."),
+   excerpt: z.string().trim().min(1, "Excerpt is required.").max(500, "Excerpt must be 500 characters or fewer."),
+   body: z.string().trim().min(1, "Body is required."),
++  tags: tagsField,
+ });
+ 
+ export const profileUpdateSchema = z.object({
+@@ -19,6 +38,7 @@ export const profileUpdateSchema = z.object({
+ export const listPostsQuerySchema = z.object({
+   page: z.coerce.number().int().min(1).default(1),
+   q: z.string().trim().optional(),
++  tag: z.string().trim().optional(),
+ });
+ 
+ export const postIdSchema = z.coerce.number().int().positive();
+diff --git a/pages/posts/[id].server.ts b/pages/posts/[id].server.ts
+index 2e7feb8..ae479ce 100644
+--- a/pages/posts/[id].server.ts
++++ b/pages/posts/[id].server.ts
+@@ -3,12 +3,13 @@ import { getUser, requireAuth } from "void/auth";
+ import { db, eq } from "void/db";
+ import { posts } from "@schema";
+ import { authorizeAuthor, findPostOrFail, parsePostId } from "../../lib/posts";
++import { saveTags, withTags } from "../../lib/tags";
+ import { postPayloadSchema } from "../../lib/validators";
+ 
+ export type Props = InferProps<typeof loader>;
+ 
+ export const loader = defineHandler(async (c) => {
+-  const post = await findPostOrFail(parsePostId(c.req.param("id")));
++  const [post] = await withTags([await findPostOrFail(parsePostId(c.req.param("id")))]);
+   return { post, canManage: getUser()?.id === post.authorId };
+ });
+ 
+@@ -19,7 +20,9 @@ export const actions = {
+     const user = requireAuth(c);
+     const post = await findPostOrFail(parsePostId(c.req.param("id")));
+     authorizeAuthor(user, post);
+-    await db.update(posts).set(body).where(eq(posts.id, post.id));
++    const { tags: rawTags, ...fields } = body;
++    await db.update(posts).set(fields).where(eq(posts.id, post.id));
++    await saveTags(post.id, rawTags);
+     return c.redirect(`/posts/${post.id}`);
+   }),
+ 
+diff --git a/pages/posts/[id].tsx b/pages/posts/[id].tsx
+index 2cb334c..9b4da84 100644
+--- a/pages/posts/[id].tsx
++++ b/pages/posts/[id].tsx
+@@ -17,6 +17,18 @@ export default function PostShow({ post, canManage }: Props) {
+       </p>
+       <p>{post.excerpt}</p>
+       <div>{post.body}</div>
++      {post.tags.length > 0 && (
++        <p>
++          {post.tags.map((name, i) => (
++            <span key={name}>
++              {i > 0 && " "}
++              <Link href="/posts" data={{ tag: name }}>
++                {name}
++              </Link>
++            </span>
++          ))}
++        </p>
++      )}
+       {canManage && (
+         <p>
+           <Link href={`/posts/${post.id}/edit`}>Edit</Link>{" "}
+diff --git a/pages/posts/[id]/edit.server.ts b/pages/posts/[id]/edit.server.ts
+index c82614d..cb4eb12 100644
+--- a/pages/posts/[id]/edit.server.ts
++++ b/pages/posts/[id]/edit.server.ts
+@@ -1,5 +1,6 @@
+ import { defineHandler, type InferProps } from "void";
+ import { authorizeAuthor, findPostOrFail, parsePostId } from "../../../lib/posts";
++import { withTags } from "../../../lib/tags";
+ import { userOrRedirect } from "../../../lib/guards";
+ 
+ export type Props = InferProps<typeof loader>;
+@@ -9,5 +10,6 @@ export const loader = defineHandler(async (c) => {
+   if (user instanceof Response) return user;
+   const post = await findPostOrFail(parsePostId(c.req.param("id")));
+   authorizeAuthor(user, post);
+-  return { post };
++  const [tagged] = await withTags([post]);
++  return { post: tagged };
+ });
+diff --git a/pages/posts/[id]/edit.tsx b/pages/posts/[id]/edit.tsx
+index fdd0f27..5b24a81 100644
+--- a/pages/posts/[id]/edit.tsx
++++ b/pages/posts/[id]/edit.tsx
+@@ -4,7 +4,7 @@ import type { Props } from "./edit.server";
+ export default function PostEdit({ post }: Props) {
+   const form = useForm(
+     "/posts/:id?update",
+-    { title: post.title, excerpt: post.excerpt, body: post.body },
++    { title: post.title, excerpt: post.excerpt, body: post.body, tags: post.tags.join(", ") },
+     { params: { id: String(post.id) } },
+   );
+ 
+@@ -20,6 +20,10 @@ export default function PostEdit({ post }: Props) {
+           Excerpt <input value={form.data.excerpt} onChange={(e) => form.setData("excerpt", e.target.value)} />
+         </label>
+         {form.errors.excerpt && <p className="error">{form.errors.excerpt}</p>}
++        <label>
++          Tags <input value={form.data.tags} onChange={(e) => form.setData("tags", e.target.value)} placeholder="bun, webdev" />
++        </label>
++        {form.errors.tags && <p className="error">{form.errors.tags}</p>}
+         <label>
+           Body <textarea rows={10} value={form.data.body} onChange={(e) => form.setData("body", e.target.value)} />
+         </label>
+diff --git a/pages/posts/create.tsx b/pages/posts/create.tsx
+index 7446382..813a27b 100644
+--- a/pages/posts/create.tsx
++++ b/pages/posts/create.tsx
+@@ -1,7 +1,7 @@
+ import { Form, useForm } from "@void/react";
+ 
+ export default function PostCreate() {
+-  const form = useForm("/posts", { title: "", excerpt: "", body: "" });
++  const form = useForm("/posts", { title: "", excerpt: "", body: "", tags: "" });
+ 
+   return (
+     <section>
+@@ -15,6 +15,10 @@ export default function PostCreate() {
+           Excerpt <input value={form.data.excerpt} onChange={(e) => form.setData("excerpt", e.target.value)} />
+         </label>
+         {form.errors.excerpt && <p className="error">{form.errors.excerpt}</p>}
++        <label>
++          Tags <input value={form.data.tags} onChange={(e) => form.setData("tags", e.target.value)} placeholder="bun, webdev" />
++        </label>
++        {form.errors.tags && <p className="error">{form.errors.tags}</p>}
+         <label>
+           Body <textarea rows={10} value={form.data.body} onChange={(e) => form.setData("body", e.target.value)} />
+         </label>
+diff --git a/pages/posts/index.server.ts b/pages/posts/index.server.ts
+index e1ac737..668bd16 100644
+--- a/pages/posts/index.server.ts
++++ b/pages/posts/index.server.ts
+@@ -1,9 +1,10 @@
+ import { defineHandler, type InferProps } from "void";
+ import { requireAuth } from "void/auth";
+-import { count, db, desc, like, or } from "void/db";
++import { and, count, db, desc, like, or } from "void/db";
+ import { posts } from "@schema";
+ import { selectPosts } from "../../lib/posts";
+ import { paginationMeta } from "../../lib/pagination";
++import { postHasTag, saveTags, withTags } from "../../lib/tags";
+ import { listPostsQuerySchema, postPayloadSchema } from "../../lib/validators";
+ 
+ const PER_PAGE = 10;
+@@ -12,23 +13,27 @@ export type Props = InferProps<typeof loader>;
+ 
+ export const loader = defineHandler(async (c) => {
+   const parsed = listPostsQuerySchema.safeParse(c.req.query());
+-  const { page, q } = parsed.success ? parsed.data : { page: 1, q: undefined };
++  const { page, q, tag } = parsed.success ? parsed.data : { page: 1, q: undefined, tag: undefined };
+   const keywords = (q ?? "").split(/\s+/).filter((k) => k.length > 0);
+   // Any keyword in the title or excerpt matches.
+   const search = keywords.length
+     ? or(...keywords.flatMap((k) => [like(posts.title, `%${k}%`), like(posts.excerpt, `%${k}%`)]))
+     : undefined;
++  const where = and(search, tag ? postHasTag(tag) : undefined);
+ 
+-  const [{ total }] = await db.select({ total: count() }).from(posts).where(search);
+-  const data = await selectPosts()
+-    .where(search)
+-    .orderBy(desc(posts.id))
+-    .limit(PER_PAGE)
+-    .offset((page - 1) * PER_PAGE);
++  const [{ total }] = await db.select({ total: count() }).from(posts).where(where);
++  const data = await withTags(
++    await selectPosts()
++      .where(where)
++      .orderBy(desc(posts.id))
++      .limit(PER_PAGE)
++      .offset((page - 1) * PER_PAGE),
++  );
+ 
+   return {
+     data,
+     q: q ?? "",
++    tag: tag ?? "",
+     pagination: { meta: paginationMeta(page, PER_PAGE, total, data.length) },
+   };
+ });
+@@ -37,9 +42,11 @@ export const action = defineHandler.withValidator({
+   body: postPayloadSchema,
+ })(async (c, { body }) => {
+   const user = requireAuth(c);
++  const { tags: rawTags, ...fields } = body;
+   const [post] = await db
+     .insert(posts)
+-    .values({ ...body, authorId: user.id })
++    .values({ ...fields, authorId: user.id })
+     .returning({ id: posts.id });
++  await saveTags(post.id, rawTags);
+   return c.redirect(`/posts/${post.id}`);
+ });
+diff --git a/pages/posts/index.tsx b/pages/posts/index.tsx
+index 94fa731..fd5e555 100644
+--- a/pages/posts/index.tsx
++++ b/pages/posts/index.tsx
+@@ -2,12 +2,12 @@ import { useState } from "react";
+ import { Link, useRouter } from "@void/react";
+ import type { Props } from "./index.server";
+ 
+-export default function PostsIndex({ data, q, pagination }: Props) {
++export default function PostsIndex({ data, q, tag, pagination }: Props) {
+   const { meta } = pagination;
+   const [keywords, setKeywords] = useState(q);
+   const router = useRouter();
+   const pages = Array.from({ length: meta.lastPage }, (_, i) => i + 1);
+-  const query = (page: number) => ({ page, ...(q ? { q } : {}) });
++  const query = (page: number) => ({ page, ...(q ? { q } : {}), ...(tag ? { tag } : {}) });
+ 
+   return (
+     <section>
+@@ -15,18 +15,27 @@ export default function PostsIndex({ data, q, pagination }: Props) {
+       <form
+         onSubmit={(event) => {
+           event.preventDefault();
+-          router.visit("/posts", { data: keywords ? { q: keywords } : {} });
++          router.visit("/posts", { data: { ...(keywords ? { q: keywords } : {}), ...(tag ? { tag } : {}) } });
+         }}
+       >
+         <input type="search" value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="Search posts…" />
+         <button>Search</button>
+       </form>
++      {tag && <p>Tagged “{tag}”</p>}
+ 
+       {data.map((post) => (
+         <article key={post.id}>
+           <Link href={`/posts/${post.id}`}>{post.title}</Link>
+           <p>{post.excerpt}</p>
+           <small>by {post.author.name}</small>
++          {post.tags.map((name) => (
++            <span key={name}>
++              {" "}
++              <Link href="/posts" data={{ tag: name }}>
++                {name}
++              </Link>
++            </span>
++          ))}
+         </article>
+       ))}
+ 

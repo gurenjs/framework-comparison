@@ -1,0 +1,12 @@
+diff --git a/app/Http/Controllers/PostController.ts b/app/Http/Controllers/PostController.ts
+index 8f702c5..4f8c410 100644
+--- a/app/Http/Controllers/PostController.ts
++++ b/app/Http/Controllers/PostController.ts
+@@ -99,7 +99,6 @@ export default class PostController extends Controller {
+   async destroy(): Promise<Response> {
+     const { id } = this.validateParams(PostIdParamSchema)
+     const post = await Post.findOrFail(id)
+-    await this.authorize('delete', [Post, post])
+ 
+     await Post.delete({ id: post.id })
+ 

@@ -1,0 +1,148 @@
+diff --git a/.guren/api-client.gen.ts b/.guren/api-client.gen.ts
+index 61e4c73..8743384 100644
+--- a/.guren/api-client.gen.ts
++++ b/.guren/api-client.gen.ts
+@@ -14,6 +14,11 @@ import type { Data } from './data.gen'
+  * `path` literal, the same string the server routes on.
+  */
+ export interface ApiRoutes {
++  'api.posts.index': {
++    method: 'GET'
++    path: '/api/posts'
++    response: { data: Array<Data.Post> }
++  }
+   'dashboard': {
+     method: 'GET'
+     path: '/dashboard'
+@@ -303,6 +308,7 @@ export function createApiClient<TRoutes extends { [K in keyof TRoutes]: { method
+ }
+ 
+ const routes: Record<string, { method: string; path: string }> = {
++  'api.posts.index': { method: 'GET', path: '/api/posts' },
+   'dashboard': { method: 'GET', path: '/dashboard' },
+   'home': { method: 'GET', path: '/' },
+   'login': { method: 'GET', path: '/login' },
+diff --git a/.guren/routes.gen.ts b/.guren/routes.gen.ts
+index 846382c..903a59c 100644
+--- a/.guren/routes.gen.ts
++++ b/.guren/routes.gen.ts
+@@ -2,6 +2,7 @@
+ // Run `guren codegen` to regenerate.
+ 
+ export const routeManifest = {
++  'api.posts.index': { method: 'GET', path: '/api/posts' },
+   'dashboard': { method: 'GET', path: '/dashboard' },
+   'home': { method: 'GET', path: '/' },
+   'login': { method: 'GET', path: '/login' },
+@@ -67,6 +68,11 @@ export function route<TName extends RouteName>(name: TName, ...args: RouteArgs<T
+ }
+ 
+ export const routes = {
++  api: {
++    posts: {
++      index: (query?: RouteQuery) => route('api.posts.index', query)
++    }
++  },
+   dashboard: (query?: RouteQuery) => route('dashboard', query),
+   home: (query?: RouteQuery) => route('home', query),
+   login: Object.assign(
+@@ -147,6 +153,7 @@ function appendQueryString(path: string, query?: RouteQuery): string {
+ declare module '@guren/core' {
+   interface GurenRouteContracts {
+     routes: {
++      'api.posts.index': { query: { page: number; author?: number } }
+       'posts.search': { body: { keywords: string[]; limit: number } }
+       'posts.store': { body: { title: string; excerpt: string; body: string } }
+       'posts.update': { body: { title: string; excerpt: string; body: string } }
+diff --git a/app/Http/Controllers/PostController.ts b/app/Http/Controllers/PostController.ts
+index 8f702c5..f7e85a1 100644
+--- a/app/Http/Controllers/PostController.ts
++++ b/app/Http/Controllers/PostController.ts
+@@ -25,6 +25,25 @@ export default class PostController extends Controller {
+     } satisfies PostsIndexProps)
+   }
+ 
++  async apiIndex(): Promise<Response> {
++    const { page, author } = this.validated('api.posts.index').query
++    const result = await Post.newQuery()
++      .with('author')
++      .where(author === undefined ? {} : { authorId: author })
++      .orderBy('id', 'desc')
++      .paginate({ page, perPage: 10 })
++
++    return this.json({
++      data: PostResource.collection(result.data),
++      meta: {
++        currentPage: result.meta.currentPage,
++        lastPage: result.meta.totalPages,
++        perPage: result.meta.perPage,
++        total: result.meta.total,
++      },
++    })
++  }
++
+   // Serves the HTTP QUERY route `posts.search` — a safe read that carries its
+   // criteria in a JSON body. Matches posts with any keyword in title or
+   // excerpt; `%` and `_` in a keyword act as SQL LIKE wildcards, which this
+diff --git a/app/Http/Validators/PostValidator.ts b/app/Http/Validators/PostValidator.ts
+index 804642a..2bc355a 100644
+--- a/app/Http/Validators/PostValidator.ts
++++ b/app/Http/Validators/PostValidator.ts
+@@ -8,6 +8,11 @@ export const ListPostsQuerySchema = z.object({
+   page: z.coerce.number().int().min(1).default(1),
+ })
+ 
++export const ApiListPostsQuerySchema = z.object({
++  page: z.coerce.number().int().min(1).default(1),
++  author: z.coerce.number().int().min(1).optional(),
++})
++
+ export const PostSearchSchema = z.object({
+   keywords: z
+     .array(z.string().trim().min(1, 'Keywords must not be blank.'))
+diff --git a/routes/web.ts b/routes/web.ts
+index 4c174ac..9dc2fa7 100644
+--- a/routes/web.ts
++++ b/routes/web.ts
+@@ -1,7 +1,7 @@
+ import { Router, requireAuthenticated, requireGuest } from '@guren/core'
+ import HomeController from '../app/Http/Controllers/HomeController.js'
+ import PostController from '../app/Http/Controllers/PostController.js'
+-import { PostPayloadSchema, PostSearchSchema } from '../app/Http/Validators/PostValidator.js'
++import { ApiListPostsQuerySchema, PostPayloadSchema, PostSearchSchema } from '../app/Http/Validators/PostValidator.js'
+ import { PostResource } from '../app/Http/Resources/PostResource.js'
+ import { registerAuthRoutes } from './auth.js'
+ 
+@@ -19,6 +19,12 @@ export function registerWebRoutes(baseRouter: Router): void {
+ 
+   registerAuthRoutes(router)
+ 
++  router.get('/api/posts', {
++    name: 'api.posts.index',
++    query: ApiListPostsQuerySchema,
++    resource: { data: [PostResource] },
++  }, [PostController, 'apiIndex'])
++
+   router.group('/posts', (posts) => {
+     // Registered before '/:id', or "create" is read as a post id.
+     posts.middleware('auth').group((authed) => {
+diff --git a/tests/PostController.test.ts b/tests/PostController.test.ts
+index 16a6a79..1267603 100644
+--- a/tests/PostController.test.ts
++++ b/tests/PostController.test.ts
+@@ -20,3 +20,15 @@ describe('posts.search', () => {
+     await http.query('/posts/search', { keywords: [] }).assertStatus(422)
+   })
+ })
++
++describe('api.posts.index', () => {
++  let http: TestApp
++
++  beforeAll(async () => {
++    http = await TestApp.fromApp(app)
++  })
++
++  it.each(['page=0', 'page=abc', 'author=abc', 'author=0'])('rejects ?%s', async (qs) => {
++    await http.json().get(`/api/posts?${qs}`).assertStatus(422)
++  })
++})

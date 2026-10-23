@@ -1,0 +1,20 @@
+# lean base c0a533c, before (pinned 2.31.1)
+Preparing worktree (detached HEAD c0a533c)
+(start)                                                 input_tokens=35631   file_chars=-
+README.md                                               input_tokens=36284   file_chars=1163
+app/Http/Controllers/PostController.ts                  input_tokens=44091   file_chars=3841
+app/Models/Post.ts                                      input_tokens=42773   file_chars=699
+tests/PostController.test.ts                            input_tokens=40367   file_chars=806
+routes/web.ts                                           input_tokens=42078   file_chars=2378
+db/schema.ts                                            input_tokens=42854   file_chars=889
+resources/js/pages/posts/Index.tsx                      input_tokens=39843   file_chars=3301
+# lean base c0a533c, after (overlays/guren-harness-v2)
+Preparing worktree (detached HEAD c0a533c)
+(start)                                                 input_tokens=34731   file_chars=-
+README.md                                               input_tokens=35381   file_chars=1163
+app/Http/Controllers/PostController.ts                  input_tokens=38648   file_chars=3841
+app/Models/Post.ts                                      input_tokens=37552   file_chars=699
+tests/PostController.test.ts                            input_tokens=37692   file_chars=806
+routes/web.ts                                           input_tokens=37535   file_chars=2378
+db/schema.ts                                            input_tokens=37627   file_chars=889
+resources/js/pages/posts/Index.tsx                      input_tokens=37069   file_chars=3301

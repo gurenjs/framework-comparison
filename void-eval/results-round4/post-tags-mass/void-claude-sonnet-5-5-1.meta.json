@@ -1,0 +1,1 @@
+{"task": "post-tags-mass", "arm": "void", "model": "claude-sonnet-5-5", "trial": 1, "wall_seconds": 75, "start_commit": "ee2f059d7ce7bf2cbcd0689000603c44f3ae2546", "max_turns": 200, "claude_version": "2.1.289 (Claude Code)", "guren_cli": "-", "guren_base": "c0a533c", "guren_preamble": "typecheck-only", "guren_overlay": ""}

@@ -1,0 +1,84 @@
+== cell: json-api-tokens/guren-claude-sonnet-5-5-1
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 487s
+== saved: results/json-api-tokens/guren-claude-sonnet-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict json-api-tokens/guren-claude-sonnet-5-5-1: PASS (typecheck=pass suite=pass 10 pass  0 fail)
+== cell: json-api-tokens/void-claude-sonnet-5-5-1
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 127s
+== saved: results/json-api-tokens/void-claude-sonnet-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+verdict json-api-tokens/void-claude-sonnet-5-5-1: FAIL (typecheck=pass suite=fail 9 pass  1 fail)
+== cell: scheduled-publish/guren-claude-sonnet-5-5-1
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 159s
+== saved: results/scheduled-publish/guren-claude-sonnet-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict scheduled-publish/guren-claude-sonnet-5-5-1: PASS (typecheck=pass suite=pass 5 pass  0 fail)
+== cell: scheduled-publish/void-claude-sonnet-5-5-1
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 87s
+== saved: results/scheduled-publish/void-claude-sonnet-5-5-1.{stream.jsonl,result.json,patch,meta.json}
+verdict scheduled-publish/void-claude-sonnet-5-5-1: PASS (typecheck=pass suite=pass 5 pass  0 fail)
+== cell: json-api-tokens/void-claude-sonnet-5-5-2
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 254s
+== saved: results/json-api-tokens/void-claude-sonnet-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+verdict json-api-tokens/void-claude-sonnet-5-5-2: PASS (typecheck=pass suite=pass 10 pass  0 fail)
+== cell: json-api-tokens/guren-claude-sonnet-5-5-2
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 303s
+== saved: results/json-api-tokens/guren-claude-sonnet-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict json-api-tokens/guren-claude-sonnet-5-5-2: PASS (typecheck=pass suite=pass 10 pass  0 fail)
+== cell: scheduled-publish/void-claude-sonnet-5-5-2
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 118s
+== saved: results/scheduled-publish/void-claude-sonnet-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+verdict scheduled-publish/void-claude-sonnet-5-5-2: PASS (typecheck=pass suite=pass 5 pass  0 fail)
+== cell: scheduled-publish/guren-claude-sonnet-5-5-2
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 132s
+== saved: results/scheduled-publish/guren-claude-sonnet-5-5-2.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict scheduled-publish/guren-claude-sonnet-5-5-2: PASS (typecheck=pass suite=pass 5 pass  0 fail)
+== cell: json-api-tokens/guren-claude-sonnet-5-5-3
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 403s
+== saved: results/json-api-tokens/guren-claude-sonnet-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict json-api-tokens/guren-claude-sonnet-5-5-3: PASS (typecheck=pass suite=pass 10 pass  0 fail)
+== cell: json-api-tokens/void-claude-sonnet-5-5-3
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 128s
+== saved: results/json-api-tokens/void-claude-sonnet-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+verdict json-api-tokens/void-claude-sonnet-5-5-3: PASS (typecheck=pass suite=pass 10 pass  0 fail)
+== cell: scheduled-publish/guren-claude-sonnet-5-5-3
+Preparing worktree (detached HEAD 0fd1654)
+== guidance: .claude/rules .claude/settings.json .claude/skills/agent-interface .claude/skills/ai-agent .claude/skills/db-manage .claude/skills/dev-workflow .claude/skills/feature .claude/skills/github-projects .claude/skills/guren-api .claude/skills/plan-implement .claude/skills/plan-write .claude/skills/plugin-authoring .claude/skills/scaffold CLAUDE.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 161s
+== saved: results/scheduled-publish/guren-claude-sonnet-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+Preparing worktree (detached HEAD 0fd1654)
+verdict scheduled-publish/guren-claude-sonnet-5-5-3: PASS (typecheck=pass suite=pass 5 pass  0 fail)
+== cell: scheduled-publish/void-claude-sonnet-5-5-3
+== guidance: .claude/skills/migrate-vite-cloudflare-to-void .claude/skills/void AGENTS.md 
+== starting agent (model: claude-sonnet-5-5, max-turns: 200)
+== agent finished in 83s
+== saved: results/scheduled-publish/void-claude-sonnet-5-5-3.{stream.jsonl,result.json,patch,meta.json}
+verdict scheduled-publish/void-claude-sonnet-5-5-3: PASS (typecheck=pass suite=pass 5 pass  0 fail)

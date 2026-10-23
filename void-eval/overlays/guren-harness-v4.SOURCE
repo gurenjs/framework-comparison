@@ -1,0 +1,1 @@
+gurenjs perf/agent-harness-cost 83e8f4570: v3 + Stop hook audit warnings on changed files (core/hooks/gate-on-stop.ts reimplements stopGateFindings' new branch for @guren/cli 2.31.1: uncommitted files only, via guren audit --json)

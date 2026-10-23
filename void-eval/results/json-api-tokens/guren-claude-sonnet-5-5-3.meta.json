@@ -1,0 +1,1 @@
+{"task": "json-api-tokens", "arm": "guren", "model": "claude-sonnet-5-5", "trial": 3, "wall_seconds": 403, "start_commit": "2a7cef4ab608ff62976e52569ee44c182ff57cd3", "max_turns": 200, "claude_version": "2.1.289 (Claude Code)", "guren_cli": "2.31.1"}

@@ -1,0 +1,17 @@
+[boot-guren] codegen
+[boot-guren] vite build (client + ssr)
+[boot-guren] ready on http://127.0.0.1:4100 (pid 82976)
+bun test v1.3.14 (0d9b296a)
+
+tests/post-revisions.test.ts:
+(pass) post revisions > keeps the previous version on every edit and lists revisions newest first [1226.56ms]
+(pass) post revisions > restores a revision, redirects to the post, and keeps the pre-restore state as a revision [1146.78ms]
+(pass) post revisions > refuses another signed-in user with 403, both for the list and for a restore [1186.55ms]
+(pass) post revisions > sends a guest to the login page, both for the list and for a restore [1148.65ms]
+(pass) post revisions > answers 404 for a revision id that belongs to another post, and changes nothing [3433.72ms]
+(pass) post revisions > removes a post's revisions when the post is deleted [2286.38ms]
+
+ 6 pass
+ 0 fail
+ 61 expect() calls
+Ran 6 tests across 1 file. [10.45s]

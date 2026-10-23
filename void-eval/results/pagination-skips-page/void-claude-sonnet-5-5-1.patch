@@ -1,0 +1,19 @@
+diff --git a/pages/posts/index.server.ts b/pages/posts/index.server.ts
+index b0aba56..e1ac737 100644
+--- a/pages/posts/index.server.ts
++++ b/pages/posts/index.server.ts
+@@ -24,12 +24,12 @@ export const loader = defineHandler(async (c) => {
+     .where(search)
+     .orderBy(desc(posts.id))
+     .limit(PER_PAGE)
+-    .offset(page * PER_PAGE);
++    .offset((page - 1) * PER_PAGE);
+ 
+   return {
+     data,
+     q: q ?? "",
+-    pagination: { meta: paginationMeta(page + 1, PER_PAGE, total, data.length) },
++    pagination: { meta: paginationMeta(page, PER_PAGE, total, data.length) },
+   };
+ });
+ 

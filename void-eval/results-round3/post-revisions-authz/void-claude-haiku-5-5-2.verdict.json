@@ -1,0 +1,1 @@
+{"task":"post-revisions-authz","arm":"void","model":"claude-haiku-5-5","trial":2,"status":"FAIL","typecheck":"pass","suite":"fail","suite_summary":"5 pass  1 fail"}

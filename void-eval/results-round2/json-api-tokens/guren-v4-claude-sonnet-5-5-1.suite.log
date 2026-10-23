@@ -1,0 +1,21 @@
+[boot-guren] codegen
+[boot-guren] vite build (client + ssr)
+[boot-guren] ready on http://127.0.0.1:4100 (pid 84556)
+bun test v1.3.14 (0d9b296a)
+
+tests/json-api-tokens.test.ts:
+(pass) personal API tokens > creates a token as JSON, shows the plain text once, and stores only a hash of it [45.61ms]
+(pass) personal API tokens > refuses a token name that is missing, empty or longer than 50 characters [30.94ms]
+(pass) personal API tokens > does not let a guest create a token [2.25ms]
+(pass) personal API tokens > revokes a token with 204, after which it is refused while the owner's other tokens keep working [30.21ms]
+(pass) personal API tokens > answers 404 when revoking another user's token, and that token keeps working [54.55ms]
+(pass) JSON posts API > lists every author's posts newest first with the pinned fields [58.48ms]
+(pass) JSON posts API > creates a post as the token's owner and answers 201 with the post [55.93ms]
+(pass) JSON posts API > rejects an invalid post with a JSON validation error and creates nothing [28.69ms]
+(pass) JSON posts API > answers 401 JSON to a missing, malformed, unknown or tampered token and creates nothing [29.31ms]
+(pass) API rate limit > allows 60 requests per minute per token, answers the 61st with 429 and Retry-After, and keeps each token's own budget [4880.29ms]
+
+ 10 pass
+ 0 fail
+ 141 expect() calls
+Ran 10 tests across 1 file. [5.24s]

@@ -1,0 +1,863 @@
+diff --git a/.guren/api-client.gen.ts b/.guren/api-client.gen.ts
+index 61e4c73..f292a83 100644
+--- a/.guren/api-client.gen.ts
++++ b/.guren/api-client.gen.ts
+@@ -63,12 +63,12 @@ export interface ApiRoutes {
+   'posts.store': {
+     method: 'POST'
+     path: '/posts'
+-    body: { title: string; excerpt: string; body: string }
++    body: { tags?: string; title: string; excerpt: string; body: string }
+   }
+   'posts.update': {
+     method: 'PUT'
+     path: '/posts/:id'
+-    body: { title: string; excerpt: string; body: string }
++    body: { tags?: string; title: string; excerpt: string; body: string }
+   }
+   'profile.edit': {
+     method: 'GET'
+diff --git a/.guren/data.gen.ts b/.guren/data.gen.ts
+index 392ad58..e743d39 100644
+--- a/.guren/data.gen.ts
++++ b/.guren/data.gen.ts
+@@ -19,5 +19,7 @@ export namespace Data {
+   // PostgreSQL and MySQL — pages should not have to know which.
+   createdAt: string
+   author?: PostAuthorSummary
++  // Sorted names; empty unless the `tags` relation was loaded.
++  tags: string[]
+ }
+ }
+diff --git a/.guren/pages.gen.ts b/.guren/pages.gen.ts
+index 8db6dc3..778aafc 100644
+--- a/.guren/pages.gen.ts
++++ b/.guren/pages.gen.ts
+@@ -48,7 +48,7 @@ export interface PagePropsMap {
+   latest: PostResourceData[]
+ }
+   'posts/Edit': {
+-  post: PostFormData & { id: number }
++  post: Omit<PostFormData, 'tags'> & { id: number; tags: string[] }
+ }
+   'posts/Index': PaginatedPageProps<PostResourceData> & {}
+   'posts/Show': {
+diff --git a/.guren/routes.gen.ts b/.guren/routes.gen.ts
+index 846382c..95665e8 100644
+--- a/.guren/routes.gen.ts
++++ b/.guren/routes.gen.ts
+@@ -148,8 +148,8 @@ declare module '@guren/core' {
+   interface GurenRouteContracts {
+     routes: {
+       'posts.search': { body: { keywords: string[]; limit: number } }
+-      'posts.store': { body: { title: string; excerpt: string; body: string } }
+-      'posts.update': { body: { title: string; excerpt: string; body: string } }
++      'posts.store': { body: { tags?: string; title: string; excerpt: string; body: string } }
++      'posts.update': { body: { tags?: string; title: string; excerpt: string; body: string } }
+     }
+   }
+ }
+diff --git a/app/Http/Controllers/PostController.ts b/app/Http/Controllers/PostController.ts
+index 8f702c5..04312de 100644
+--- a/app/Http/Controllers/PostController.ts
++++ b/app/Http/Controllers/PostController.ts
+@@ -1,20 +1,28 @@
+ import { Controller, paginate, type PaginatedPageProps } from '@guren/core'
+ import { pages } from '@/.guren/pages.gen'
+ import { Post } from '../../Models/Post.js'
++import { PostTag } from '../../Models/PostTag.js'
++import { Tag } from '../../Models/Tag.js'
+ import type { UserRecord } from '../../Models/User.js'
+ import { PostResource, type PostResourceData } from '../Resources/PostResource.js'
+-import { PostIdParamSchema, ListPostsQuerySchema } from '../Validators/PostValidator.js'
++import { PostIdParamSchema, ListPostsQuerySchema, parseTags } from '../Validators/PostValidator.js'
+ 
+ type PostsIndexProps = PaginatedPageProps<PostResourceData>
+ 
+ export default class PostController extends Controller {
+   async index(): Promise<Response> {
+-    const { page } = this.validateQuery(ListPostsQuerySchema)
+-    const result = await Post.newQuery()
+-      .with('author')
+-      .orderBy('id', 'desc')
+-      .paginate({ page, perPage: 10 })
+-    const paginator = paginate(result, { path: this.request.path ?? '/posts' })
++    const { page, tag } = this.validateQuery(ListPostsQuerySchema)
++    const query = Post.newQuery().with('author', 'tags')
++    if (tag !== undefined) {
++      const found = await Tag.first({ name: tag })
++      const links = found ? await PostTag.where({ tagId: found.id }).get() : []
++      query.whereIn('id', links.map((link) => link.postId))
++    }
++    const result = await query.orderBy('id', 'desc').paginate({ page, perPage: 10 })
++    const paginator = paginate(result, {
++      path: this.request.path ?? '/posts',
++      ...(tag !== undefined ? { query: { tag } } : {}),
++    })
+ 
+     return this.inertia(pages.posts.Index, {
+       data: result.data.map((post) => new PostResource(post).toJSON()),
+@@ -52,7 +60,7 @@ export default class PostController extends Controller {
+ 
+   async show(): Promise<Response> {
+     const { id } = this.validateParams(PostIdParamSchema)
+-    const post = await Post.findWithOrFail(id, 'author')
++    const post = await Post.findWithOrFail(id, ['author', 'tags'])
+ 
+     return this.inertia(pages.posts.Show, {
+       post: new PostResource(post).toJSON(),
+@@ -70,14 +78,16 @@ export default class PostController extends Controller {
+     const { body: data } = this.validated('posts.store')
+     // forceCreate, because `authorId` is deliberately absent from Post.fillable:
+     // it comes from the session, and a request must never be able to set it.
+-    const post = await Post.forceCreate({ ...data, authorId: author.id })
++    const { tags: tagNames, ...fields } = data
++    const post = await Post.forceCreate({ ...fields, authorId: author.id })
++    if (post?.id) await this.syncTags(post.id, parseTags(tagNames))
+ 
+     return this.redirect(post?.id ? `/posts/${post.id}` : '/posts')
+   }
+ 
+   async edit(): Promise<Response> {
+     const { id } = this.validateParams(PostIdParamSchema)
+-    const post = await Post.findOrFail(id)
++    const post = await Post.findWithOrFail(id, ['tags'])
+     await this.authorize('update', [Post, post])
+ 
+     return this.inertia(pages.posts.Edit, {
+@@ -91,7 +101,9 @@ export default class PostController extends Controller {
+     await this.authorize('update', [Post, post])
+ 
+     const { body: data } = this.validated('posts.update')
+-    await Post.update({ id: post.id }, data)
++    const { tags: tagNames, ...fields } = data
++    await Post.update({ id: post.id }, fields)
++    await this.syncTags(post.id, parseTags(tagNames))
+ 
+     return this.redirect(`/posts/${post.id}`)
+   }
+@@ -101,8 +113,19 @@ export default class PostController extends Controller {
+     const post = await Post.findOrFail(id)
+     await this.authorize('delete', [Post, post])
+ 
++    await PostTag.delete({ postId: post.id })
+     await Post.delete({ id: post.id })
+ 
+     return this.redirect('/posts')
+   }
++
++  private async syncTags(postId: number, names: string[]): Promise<void> {
++    const tagIds: number[] = []
++    for (const name of names) {
++      const tag = (await Tag.first({ name })) ?? (await Tag.create({ name }))
++      tagIds.push(tag.id)
++    }
++    await PostTag.delete({ postId })
++    for (const tagId of tagIds) await PostTag.create({ postId, tagId })
++  }
+ }
+diff --git a/app/Http/Resources/PostResource.ts b/app/Http/Resources/PostResource.ts
+index 679024d..8b83342 100644
+--- a/app/Http/Resources/PostResource.ts
++++ b/app/Http/Resources/PostResource.ts
+@@ -2,7 +2,7 @@ import { Resource, type WithRelations } from '@guren/core'
+ import { Post } from '../../Models/Post.js'
+ import type { PostRecord, PostAuthorSummary } from '../../Models/Post.js'
+ 
+-type PostWithAuthor = WithRelations<typeof Post, 'author'>
++type PostWithAuthor = WithRelations<typeof Post, 'author' | 'tags'>
+ 
+ export interface PostResourceData extends Record<string, unknown> {
+   id: number
+@@ -14,11 +14,14 @@ export interface PostResourceData extends Record<string, unknown> {
+   // PostgreSQL and MySQL — pages should not have to know which.
+   createdAt: string
+   author?: PostAuthorSummary
++  // Sorted names; empty unless the `tags` relation was loaded.
++  tags: string[]
+ }
+ 
+ export class PostResource extends Resource<PostRecord | PostWithAuthor, PostResourceData> {
+   toArray(): PostResourceData {
+     const post = this.resource
++    const loadedTags = (post as Partial<PostWithAuthor>).tags ?? []
+ 
+     return {
+       id: post.id,
+@@ -31,6 +34,7 @@ export class PostResource extends Resource<PostRecord | PostWithAuthor, PostReso
+         id: (post as PostWithAuthor).author?.id,
+         name: (post as PostWithAuthor).author?.name,
+       })) as PostAuthorSummary | undefined,
++      tags: loadedTags.map((tag) => tag.name).sort(),
+     }
+   }
+ }
+diff --git a/app/Http/Validators/PostValidator.ts b/app/Http/Validators/PostValidator.ts
+index 804642a..21b0aab 100644
+--- a/app/Http/Validators/PostValidator.ts
++++ b/app/Http/Validators/PostValidator.ts
+@@ -6,6 +6,7 @@ export const PostIdParamSchema = z.object({
+ 
+ export const ListPostsQuerySchema = z.object({
+   page: z.coerce.number().int().min(1).default(1),
++  tag: z.string().optional(),
+ })
+ 
+ export const PostSearchSchema = z.object({
+@@ -16,7 +17,34 @@ export const PostSearchSchema = z.object({
+   limit: z.number().int().min(1).max(50).default(10),
+ })
+ 
++export const MAX_TAGS = 5
++export const MAX_TAG_LENGTH = 30
++
++// Comma-separated names → unique, trimmed, non-empty names. Every rule failure
++// is reported on the `tags` field itself, not on an array index.
++export function parseTags(raw: string | string[] | undefined): string[] {
++  const parts = Array.isArray(raw) ? raw : (raw ?? '').split(',')
++  return [...new Set(parts.map((name) => name.trim()).filter((name) => name !== ''))]
++}
++
++export const TagsFieldSchema = z
++  .string()
++  .optional()
++  .transform((raw, ctx) => {
++    const names = parseTags(raw)
++    if (names.some((name) => name.length > MAX_TAG_LENGTH)) {
++      ctx.addIssue({ code: 'custom', message: `Each tag must be ${MAX_TAG_LENGTH} characters or fewer.` })
++      return z.NEVER
++    }
++    if (names.length > MAX_TAGS) {
++      ctx.addIssue({ code: 'custom', message: `Use at most ${MAX_TAGS} tags.` })
++      return z.NEVER
++    }
++    return names
++  })
++
+ export const PostPayloadSchema = z.object({
++  tags: TagsFieldSchema,
+   title: z.string().trim().min(1, 'Title is required.').max(255, 'Title must be 255 characters or fewer.'),
+   excerpt: z.string().trim().min(1, 'Excerpt is required.').max(500, 'Excerpt must be 500 characters or fewer.'),
+   body: z.string().trim().min(1, 'Body is required.'),
+diff --git a/app/Models/Post.ts b/app/Models/Post.ts
+index ca838be..927940c 100644
+--- a/app/Models/Post.ts
++++ b/app/Models/Post.ts
+@@ -1,5 +1,6 @@
+-import { defineModel, type BelongsToRecord } from '@guren/core'
+-import { posts } from '../../db/schema.js'
++import { defineModel, type BelongsToManyRecord, type BelongsToRecord } from '@guren/core'
++import { postTags, posts } from '../../db/schema.js'
++import type { TagRecord } from './Tag.js'
+ import type { UserRecord } from './User.js'
+ 
+ export type PostRecord = typeof posts.$inferSelect
+@@ -10,9 +11,14 @@ export class Post extends defineModel(posts, {
+   // `authorId` is set from the signed-in user, never from request input.
+   fillable: ['title', 'excerpt', 'body'],
+ }) {
+-  static override relationTypes: { author: BelongsToRecord<PostAuthorSummary> } = {
++  static override relationTypes: {
++    author: BelongsToRecord<PostAuthorSummary>
++    tags: BelongsToManyRecord<TagRecord>
++  } = {
+     author: null,
++    tags: [],
+   }
+ }
+ 
+ Post.belongsTo('author', () => import('./User.js').then((module) => module.User), 'authorId', 'id')
++Post.belongsToMany('tags', () => import('./Tag.js').then((module) => module.Tag), postTags, 'postId', 'tagId')
+diff --git a/app/Models/PostTag.ts b/app/Models/PostTag.ts
+new file mode 100644
+index 0000000..8c7a2a9
+--- /dev/null
++++ b/app/Models/PostTag.ts
+@@ -0,0 +1,6 @@
++import { defineModel } from '@guren/core'
++import { postTags } from '../../db/schema.js'
++
++export class PostTag extends defineModel(postTags, {
++  fillable: ['postId', 'tagId'],
++}) {}
+diff --git a/app/Models/Tag.ts b/app/Models/Tag.ts
+new file mode 100644
+index 0000000..2f4a722
+--- /dev/null
++++ b/app/Models/Tag.ts
+@@ -0,0 +1,8 @@
++import { defineModel } from '@guren/core'
++import { tags } from '../../db/schema.js'
++
++export type TagRecord = typeof tags.$inferSelect
++
++export class Tag extends defineModel(tags, {
++  fillable: ['name'],
++}) {}
+diff --git a/db/migrations/20261019001519_add_tags/migration.sql b/db/migrations/20261019001519_add_tags/migration.sql
+new file mode 100644
+index 0000000..93b01fd
+--- /dev/null
++++ b/db/migrations/20261019001519_add_tags/migration.sql
+@@ -0,0 +1,12 @@
++CREATE TABLE `post_tags` (
++	`post_id` integer NOT NULL,
++	`tag_id` integer NOT NULL,
++	CONSTRAINT `post_tags_pk` PRIMARY KEY(`post_id`, `tag_id`),
++	CONSTRAINT `fk_post_tags_post_id_posts_id_fk` FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`) ON DELETE CASCADE,
++	CONSTRAINT `fk_post_tags_tag_id_tags_id_fk` FOREIGN KEY (`tag_id`) REFERENCES `tags`(`id`) ON DELETE CASCADE
++);
++--> statement-breakpoint
++CREATE TABLE `tags` (
++	`id` integer PRIMARY KEY AUTOINCREMENT,
++	`name` text NOT NULL UNIQUE
++);
+diff --git a/db/migrations/20261019001519_add_tags/snapshot.json b/db/migrations/20261019001519_add_tags/snapshot.json
+new file mode 100644
+index 0000000..f3bb7f3
+--- /dev/null
++++ b/db/migrations/20261019001519_add_tags/snapshot.json
+@@ -0,0 +1,297 @@
++{
++  "version": "7",
++  "dialect": "sqlite",
++  "id": "a0996f0c-a7e6-44cd-a27d-c103bd9fac77",
++  "prevIds": [
++    "dce5db2f-81fb-4672-bae0-e7a4ffdb9d3a"
++  ],
++  "ddl": [
++    {
++      "name": "post_tags",
++      "entityType": "tables"
++    },
++    {
++      "name": "posts",
++      "entityType": "tables"
++    },
++    {
++      "name": "tags",
++      "entityType": "tables"
++    },
++    {
++      "name": "users",
++      "entityType": "tables"
++    },
++    {
++      "type": "integer",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "post_id",
++      "entityType": "columns",
++      "table": "post_tags"
++    },
++    {
++      "type": "integer",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "tag_id",
++      "entityType": "columns",
++      "table": "post_tags"
++    },
++    {
++      "type": "integer",
++      "notNull": false,
++      "autoincrement": true,
++      "default": null,
++      "generated": null,
++      "name": "id",
++      "entityType": "columns",
++      "table": "posts"
++    },
++    {
++      "type": "text",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "title",
++      "entityType": "columns",
++      "table": "posts"
++    },
++    {
++      "type": "text",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "excerpt",
++      "entityType": "columns",
++      "table": "posts"
++    },
++    {
++      "type": "text",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "body",
++      "entityType": "columns",
++      "table": "posts"
++    },
++    {
++      "type": "integer",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "author_id",
++      "entityType": "columns",
++      "table": "posts"
++    },
++    {
++      "type": "text",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "created_at",
++      "entityType": "columns",
++      "table": "posts"
++    },
++    {
++      "type": "integer",
++      "notNull": false,
++      "autoincrement": true,
++      "default": null,
++      "generated": null,
++      "name": "id",
++      "entityType": "columns",
++      "table": "tags"
++    },
++    {
++      "type": "text",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "name",
++      "entityType": "columns",
++      "table": "tags"
++    },
++    {
++      "type": "integer",
++      "notNull": false,
++      "autoincrement": true,
++      "default": null,
++      "generated": null,
++      "name": "id",
++      "entityType": "columns",
++      "table": "users"
++    },
++    {
++      "type": "text",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "name",
++      "entityType": "columns",
++      "table": "users"
++    },
++    {
++      "type": "text",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "email",
++      "entityType": "columns",
++      "table": "users"
++    },
++    {
++      "type": "text",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "password_hash",
++      "entityType": "columns",
++      "table": "users"
++    },
++    {
++      "type": "text",
++      "notNull": false,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "remember_token",
++      "entityType": "columns",
++      "table": "users"
++    },
++    {
++      "type": "text",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "created_at",
++      "entityType": "columns",
++      "table": "users"
++    },
++    {
++      "type": "text",
++      "notNull": true,
++      "autoincrement": false,
++      "default": null,
++      "generated": null,
++      "name": "updated_at",
++      "entityType": "columns",
++      "table": "users"
++    },
++    {
++      "columns": [
++        "post_id"
++      ],
++      "tableTo": "posts",
++      "columnsTo": [
++        "id"
++      ],
++      "onUpdate": "NO ACTION",
++      "onDelete": "CASCADE",
++      "nameExplicit": false,
++      "name": "fk_post_tags_post_id_posts_id_fk",
++      "entityType": "fks",
++      "table": "post_tags"
++    },
++    {
++      "columns": [
++        "tag_id"
++      ],
++      "tableTo": "tags",
++      "columnsTo": [
++        "id"
++      ],
++      "onUpdate": "NO ACTION",
++      "onDelete": "CASCADE",
++      "nameExplicit": false,
++      "name": "fk_post_tags_tag_id_tags_id_fk",
++      "entityType": "fks",
++      "table": "post_tags"
++    },
++    {
++      "columns": [
++        "author_id"
++      ],
++      "tableTo": "users",
++      "columnsTo": [
++        "id"
++      ],
++      "onUpdate": "NO ACTION",
++      "onDelete": "NO ACTION",
++      "nameExplicit": false,
++      "name": "fk_posts_author_id_users_id_fk",
++      "entityType": "fks",
++      "table": "posts"
++    },
++    {
++      "columns": [
++        "post_id",
++        "tag_id"
++      ],
++      "nameExplicit": false,
++      "name": "post_tags_pk",
++      "entityType": "pks",
++      "table": "post_tags"
++    },
++    {
++      "columns": [
++        "id"
++      ],
++      "nameExplicit": false,
++      "name": "posts_pk",
++      "table": "posts",
++      "entityType": "pks"
++    },
++    {
++      "columns": [
++        "id"
++      ],
++      "nameExplicit": false,
++      "name": "tags_pk",
++      "table": "tags",
++      "entityType": "pks"
++    },
++    {
++      "columns": [
++        "id"
++      ],
++      "nameExplicit": false,
++      "name": "users_pk",
++      "table": "users",
++      "entityType": "pks"
++    },
++    {
++      "columns": [
++        "name"
++      ],
++      "nameExplicit": false,
++      "name": "tags_name_unique",
++      "entityType": "uniques",
++      "table": "tags"
++    },
++    {
++      "columns": [
++        "email"
++      ],
++      "nameExplicit": false,
++      "name": "users_email_unique",
++      "entityType": "uniques",
++      "table": "users"
++    }
++  ],
++  "renames": []
++}
+\ No newline at end of file
+diff --git a/db/schema.ts b/db/schema.ts
+index 47b96e5..733cc91 100644
+--- a/db/schema.ts
++++ b/db/schema.ts
+@@ -1,4 +1,4 @@
+-import { sqliteTable, integer, text } from '@guren/orm/drizzle/sqlite'
++import { sqliteTable, integer, text, primaryKey } from '@guren/orm/drizzle/sqlite'
+ 
+ export const users = sqliteTable('users', {
+   id: integer('id').primaryKey({ autoIncrement: true }),
+@@ -20,3 +20,21 @@ export const posts = sqliteTable('posts', {
+     .references(() => users.id),
+   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
+ })
++
++export const tags = sqliteTable('tags', {
++  id: integer('id').primaryKey({ autoIncrement: true }),
++  name: text('name').notNull().unique(),
++})
++
++export const postTags = sqliteTable(
++  'post_tags',
++  {
++    postId: integer('post_id')
++      .notNull()
++      .references(() => posts.id, { onDelete: 'cascade' }),
++    tagId: integer('tag_id')
++      .notNull()
++      .references(() => tags.id, { onDelete: 'cascade' }),
++  },
++  (table) => [primaryKey({ columns: [table.postId, table.tagId] })],
++)
+diff --git a/resources/js/components/TagList.tsx b/resources/js/components/TagList.tsx
+new file mode 100644
+index 0000000..6e16b12
+--- /dev/null
++++ b/resources/js/components/TagList.tsx
+@@ -0,0 +1,21 @@
++import { Link } from '@inertiajs/react'
++import { route } from '@/.guren/routes.gen'
++
++export default function TagList({ tags }: { tags: string[] }) {
++  if (tags.length === 0) return null
++
++  return (
++    <ul className="mt-3 flex flex-wrap gap-2">
++      {tags.map((tag) => (
++        <li key={tag}>
++          <Link
++            href={`${route('posts.index')}?tag=${encodeURIComponent(tag)}`}
++            className="rounded-g-ctl border border-g-line px-2 py-0.5 font-mono text-xs text-g-text-2 transition hover:border-g-line-strong hover:text-g-heading"
++          >
++            {tag}
++          </Link>
++        </li>
++      ))}
++    </ul>
++  )
++}
+diff --git a/resources/js/pages/posts/Edit.tsx b/resources/js/pages/posts/Edit.tsx
+index c5f3d76..bcb9dd8 100644
+--- a/resources/js/pages/posts/Edit.tsx
++++ b/resources/js/pages/posts/Edit.tsx
+@@ -6,7 +6,7 @@ import Layout from '../../components/Layout.js'
+ type PostFormData = ApiRoutes['posts.store']['body']
+ 
+ interface Props {
+-  post: PostFormData & { id: number }
++  post: Omit<PostFormData, 'tags'> & { id: number; tags: string[] }
+ }
+ 
+ const fieldClass =
+@@ -17,6 +17,7 @@ export default function EditPost({ post }: Props) {
+     title: post.title,
+     excerpt: post.excerpt,
+     body: post.body,
++    tags: post.tags.join(', '),
+   })
+ 
+   return (
+@@ -68,6 +69,18 @@ export default function EditPost({ post }: Props) {
+             {form.errors.body ? <p className="mt-1 text-sm text-g-danger">{form.errors.body}</p> : null}
+           </div>
+ 
++          <div>
++            <label className="block text-sm font-bold text-g-heading">Tags</label>
++            <input
++              type="text"
++              value={form.data.tags ?? ''}
++              onChange={(event) => form.setData('tags', event.target.value)}
++              placeholder="bun, webdev"
++              className={fieldClass}
++            />
++            {form.errors.tags ? <p className="mt-1 text-sm text-g-danger">{form.errors.tags}</p> : null}
++          </div>
++
+           <button
+             type="submit"
+             disabled={form.processing}
+diff --git a/resources/js/pages/posts/Index.tsx b/resources/js/pages/posts/Index.tsx
+index f4731cc..b516cce 100644
+--- a/resources/js/pages/posts/Index.tsx
++++ b/resources/js/pages/posts/Index.tsx
+@@ -5,6 +5,7 @@ import type { PostResourceData } from '@/app/Http/Resources/PostResource'
+ import { route } from '@/.guren/routes.gen'
+ import { createApiClient, type ApiRoutes } from '@/.guren/api-client.gen'
+ import Layout from '../../components/Layout.js'
++import TagList from '../../components/TagList.js'
+ 
+ interface Props extends PaginatedPageProps<PostResourceData> {}
+ 
+@@ -106,6 +107,7 @@ export default function PostsIndex({ data, pagination }: Props) {
+                 {post.title}
+               </Link>
+               <p className="mt-2 text-sm text-g-text-2">{post.excerpt}</p>
++              <TagList tags={post.tags} />
+               {post.author ? (
+                 <p className="mt-3 font-mono text-xs uppercase tracking-wide text-g-muted">by {post.author.name}</p>
+               ) : null}
+diff --git a/resources/js/pages/posts/New.tsx b/resources/js/pages/posts/New.tsx
+index e06958d..5be6d74 100644
+--- a/resources/js/pages/posts/New.tsx
++++ b/resources/js/pages/posts/New.tsx
+@@ -9,7 +9,7 @@ const fieldClass =
+   'mt-1 w-full rounded-g-ctl border border-g-line-strong bg-g-panel px-3 py-2 text-g-text transition outline-none placeholder:text-g-muted focus:border-transparent focus:outline-2 focus:-outline-offset-1 focus:outline-g-accent'
+ 
+ export default function NewPost() {
+-  const form = useForm<PostFormData>({ title: '', excerpt: '', body: '' })
++  const form = useForm<PostFormData>({ title: '', excerpt: '', body: '', tags: '' })
+ 
+   return (
+     <Layout>
+@@ -60,6 +60,18 @@ export default function NewPost() {
+             {form.errors.body ? <p className="mt-1 text-sm text-g-danger">{form.errors.body}</p> : null}
+           </div>
+ 
++          <div>
++            <label className="block text-sm font-bold text-g-heading">Tags</label>
++            <input
++              type="text"
++              value={form.data.tags ?? ''}
++              onChange={(event) => form.setData('tags', event.target.value)}
++              placeholder="bun, webdev"
++              className={fieldClass}
++            />
++            {form.errors.tags ? <p className="mt-1 text-sm text-g-danger">{form.errors.tags}</p> : null}
++          </div>
++
+           <button
+             type="submit"
+             disabled={form.processing}
+diff --git a/resources/js/pages/posts/Show.tsx b/resources/js/pages/posts/Show.tsx
+index 537c81e..87ee1d1 100644
+--- a/resources/js/pages/posts/Show.tsx
++++ b/resources/js/pages/posts/Show.tsx
+@@ -2,6 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react'
+ import type { PostResourceData } from '@/app/Http/Resources/PostResource'
+ import { route } from '@/.guren/routes.gen'
+ import Layout from '../../components/Layout.js'
++import TagList from '../../components/TagList.js'
+ 
+ interface Props {
+   post: PostResourceData
+@@ -27,6 +28,7 @@ export default function PostShow({ post }: Props) {
+             {new Date(post.createdAt).toLocaleDateString()}
+           </p>
+           <p className="text-g-text-2">{post.excerpt}</p>
++          <TagList tags={post.tags} />
+         </header>
+ 
+         <div className="whitespace-pre-wrap text-g-text">{post.body}</div>
+diff --git a/tests/PostTags.test.ts b/tests/PostTags.test.ts
+new file mode 100644
+index 0000000..61d4208
+--- /dev/null
++++ b/tests/PostTags.test.ts
+@@ -0,0 +1,68 @@
++import { beforeAll, beforeEach, describe, expect, it } from 'bun:test'
++import { TestApp } from '@guren/testing'
++import app from '../src/app.js'
++import { resetDatabase } from '../config/database.js'
++import { Post } from '../app/Models/Post.js'
++import { PostTag } from '../app/Models/PostTag.js'
++import { Tag } from '../app/Models/Tag.js'
++import { User, type UserRecord } from '../app/Models/User.js'
++
++describe('post tags', () => {
++  let http: TestApp
++  let author: UserRecord
++  let csrf: TestApp
++
++  const payload = (tags?: string) => ({ title: 'T', excerpt: 'E', body: 'B', ...(tags === undefined ? {} : { tags }) })
++
++  beforeAll(async () => {
++    http = await TestApp.fromApp(app)
++  })
++
++  beforeEach(async () => {
++    await resetDatabase()
++    author = await User.create({ name: 'A', email: 'a@example.com', password: 'secret-pass' })
++    csrf = await http.actingAs(author).withCsrf()
++  })
++
++  async function showTags(id: number): Promise<string[]> {
++    const res = await http.json().get(`/posts/${id}`)
++    return (await res.json<{ props: { post: { tags: string[] } } }>()).props.post.tags
++  }
++
++  it('creates, trims and dedupes tags, then syncs them on update', async () => {
++    await csrf.post('/posts', payload(' bun ,bun, webdev,')).assertRedirect()
++    const [post] = await Post.newQuery().get()
++    expect(await Tag.newQuery().count()).toBe(2)
++    expect(await PostTag.where({ postId: post!.id }).count()).toBe(2)
++    expect(await showTags(post!.id)).toEqual(['bun', 'webdev'])
++
++    await csrf.put(`/posts/${post!.id}`, payload('bun')).assertRedirect()
++    expect(await PostTag.where({ postId: post!.id }).count()).toBe(1)
++    expect(await showTags(post!.id)).toEqual(['bun'])
++
++    await csrf.delete(`/posts/${post!.id}`).assertRedirect('/posts')
++    expect(await PostTag.newQuery().count()).toBe(0)
++  })
++
++  it('filters the list by tag', async () => {
++    await csrf.post('/posts', payload('bun')).assertRedirect()
++    await csrf.post('/posts', payload('other')).assertRedirect()
++
++    const res = await http.json().get('/posts?tag=bun')
++    const body = await res.json<{ props: { data: { tags: string[] }[] } }>()
++    expect(body.props.data.map((p) => p.tags)).toEqual([['bun']])
++
++    const none = await http.json().get('/posts?tag=nope')
++    expect((await none.json<{ props: { data: unknown[] } }>()).props.data).toEqual([])
++  })
++
++  it('refuses too many or too long tags and writes nothing', async () => {
++    await csrf.post('/posts', payload('a,b,c,d,e,f')).assertStatus(422)
++    await csrf.post('/posts', payload('x'.repeat(31))).assertStatus(422)
++    expect(await Post.newQuery().count()).toBe(0)
++    expect(await Tag.newQuery().count()).toBe(0)
++
++    await csrf.post('/posts', payload('x'.repeat(30))).assertRedirect()
++    expect(await Tag.newQuery().count()).toBe(1)
++  })
++})

@@ -1,0 +1,1 @@
+{"task": "comments-moderation-dauthz", "arm": "void", "model": "claude-haiku-5-5", "trial": 2, "wall_seconds": 171, "start_commit": "5082986fffb241e0f5f0e557a3160d53d5159943", "max_turns": 200, "claude_version": "2.1.289 (Claude Code)", "guren_cli": "-", "guren_base": "c0a533c", "guren_preamble": "typecheck-only", "guren_overlay": ""}

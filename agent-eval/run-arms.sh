@@ -3,7 +3,7 @@
 # each cell right after it runs. Skips cells that already have a verdict, so it resumes.
 # Edit ARMS and MODEL for the round; results land in results/<label>-<trial>.*.
 set -uo pipefail
-EVAL=~/Development/framework-comparison/agent-eval
+EVAL="$(cd "$(dirname "$0")" && pwd)"
 cd "$EVAL" || exit 2
 ARMS=(   # Sonnet 5.5 re-run of round 7's Sonnet arms (MODEL=claude-sonnet-5-5); edit per round
   "guren-shipped-s55:guren:shipped:dae2973"
